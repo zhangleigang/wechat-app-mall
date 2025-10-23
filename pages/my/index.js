@@ -17,6 +17,7 @@ Page({
     count_id_no_reputation: 0,
     count_id_no_transfer: 0,
     nick: undefined,
+    memberExpireDate: '',
   },
 	onLoad() {
     this.readConfigVal()
@@ -170,9 +171,16 @@ Page({
     const res = await WXAPI.cardMyList(wx.getStorageSync('token'))
     if (res.code == 0) {
       const myCards = res.data.filter(ele => { return ele.status == 0 })
+      let memberExpireDate = ''
       if (myCards.length > 0) {
+        const expireDates = myCards.map(ele => ele.dateEnd).filter(Boolean)
+        if (expireDates.length > 0) {
+          expireDates.sort((a, b) => new Date(a) - new Date(b))
+          memberExpireDate = expireDates[expireDates.length - 1]
+        }
         this.setData({
-          myCards: res.data
+          myCards: res.data,
+          memberExpireDate
         })
       }
     }

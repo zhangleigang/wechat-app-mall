@@ -2,22 +2,33 @@
   <view class="header">
     <text class="title">面试知识</text>
     <view class="search">
-      <input class="ipt" placeholder="搜索知识点/岗位" value="{{q}}" bindinput="bindinput" />
+      <input class="ipt" placeholder="搜索知识点/关键词" value="{{q}}" bindinput="bindinput" />
       <button class="btn" type="primary" bindtap="search">搜索</button>
     </view>
   </view>
-  <view class="cats">
-    <text class="sub">分类</text>
-    <view class="cat-list">
-      <block wx:for="{{categories}}" wx:key="index">
-        <view class="cat">{{item.name}}</view>
-      </block>
+  <view class="body">
+    <view class="sidebar">
+      <text class="sub">分类</text>
+      <view class="cat-list">
+        <block wx:for="{{categories}}" wx:key="key">
+          <view class="cat {{item.key === activeCategoryKey ? 'active' : ''}}" data-key="{{item.key}}" bindtap="switchCategory">{{item.name}}</view>
+        </block>
+      </view>
     </view>
-  </view>
-  <view class="list">
-    <text class="sub">常用知识</text>
-    <block wx:for="{{list}}" wx:key="index">
-      <view class="cell">{{item.title}}</view>
-    </block>
+    <view class="content">
+      <text class="sub">主题</text>
+      <block wx:for="{{filteredTopics}}" wx:key="id">
+        <view class="card" data-id="{{item.id}}" bindtap="toDetail">
+          <view class="card-title">{{item.title}}</view>
+          <view class="card-summary">{{item.summary}}</view>
+          <view class="tags">
+            <block wx:for="{{item.tags}}" wx:key="index">
+              <text class="tag">{{item}}</text>
+            </block>
+          </view>
+        </view>
+      </block>
+      <view wx:if="{{filteredTopics.length === 0}}" class="empty">暂无匹配主题</view>
+    </view>
   </view>
 </view>

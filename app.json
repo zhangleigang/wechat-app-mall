@@ -2,6 +2,7 @@
   "pages": [
     "pages/ai/job/index",
     "pages/knowledge/index",
+    "pages/knowledge/detail",
     "pages/ai/resume/index",
     "pages/ai/mood/index",
     "pages/my/index",
@@ -46,14 +47,14 @@
       },
       {
         "pagePath": "pages/ai/resume/index",
-        "iconPath": "images/nav/coupon-off.png",
-        "selectedIconPath": "images/nav/coupon-on.png",
+        "iconPath": "images/nav/order-off.png",
+        "selectedIconPath": "images/nav/order-on.png",
         "text": "简历解读"
       },
       {
         "pagePath": "pages/ai/mood/index",
-        "iconPath": "images/nav/cart-off.png",
-        "selectedIconPath": "images/nav/cart-on.png",
+        "iconPath": "images/nav/coupon-off.png",
+        "selectedIconPath": "images/nav/coupon-on.png",
         "text": "情绪小屋"
       },
       {

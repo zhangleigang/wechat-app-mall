@@ -1,0 +1,32 @@
+<view class="page">
+  <view wx:if="{{!topic}}" class="empty">未获取到主题数据</view>
+  <view wx:else>
+    <view class="header">
+      <text class="title">{{topic.title}}</text>
+      <view class="summary">{{topic.summary}}</view>
+      <view class="tags">
+        <block wx:for="{{topic.tags}}" wx:key="index">
+          <text class="tag">{{item}}</text>
+        </block>
+      </view>
+    </view>
+    <view class="section">
+      <text class="sec-title">高频面试题</text>
+      <block wx:for="{{topic.faqs}}" wx:key="index">
+        <view class="li">• {{item}}</view>
+      </block>
+    </view>
+    <view class="section">
+      <text class="sec-title">踩坑与调优</text>
+      <block wx:for="{{topic.pitfalls}}" wx:key="index">
+        <view class="li">• {{item}}</view>
+      </block>
+    </view>
+    <view class="section">
+      <text class="sec-title">示例</text>
+      <block wx:for="{{topic.examples}}" wx:key="index">
+        <view class="code">{{item}}</view>
+      </block>
+    </view>
+  </view>
+</view>
