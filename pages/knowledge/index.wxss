@@ -1,0 +1,12 @@
+.page { display: flex; flex-direction: column; height: 100vh; }
+.header { padding: 12px; border-bottom: 1px solid #eee; }
+.title { font-weight: bold; font-size: 16px; }
+.search { margin-top: 8px; display: flex; gap: 8px; }
+.ipt { flex: 1; background: #fff; border: 1px solid #ddd; border-radius: 6px; padding: 8px; }
+.btn { width: 88px; }
+.cats { padding: 12px; }
+.sub { color: #666; font-size: 13px; }
+.cat-list { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+.cat { padding: 6px 10px; background: #f6f6f6; border-radius: 999px; }
+.list { padding: 12px; }
+.cell { padding: 12px; border-bottom: 1px solid #eee; }

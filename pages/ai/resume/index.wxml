@@ -1,0 +1,19 @@
+<view class="page">
+  <view class="header">
+    <text class="title">简历解读助手</text>
+    <view class="actions">
+      <button size="mini" bindtap="uploadResume">上传简历</button>
+    </view>
+  </view>
+  <scroll-view class="chat" scroll-y="true">
+    <block wx:for="{{messages}}" wx:key="index">
+      <view class="msg {{item.role}}">
+        <text>{{item.content}}</text>
+      </view>
+    </block>
+  </scroll-view>
+  <view class="input-bar">
+    <input class="ipt" placeholder="输入岗位或问题，如：匹配XX岗位的优化建议" value="{{inputVal}}" bindinput="bindinput" confirm-type="send" bindconfirm="send" />
+    <button class="send" type="primary" loading="{{sending}}" bindtap="send">发送</button>
+  </view>
+</view>

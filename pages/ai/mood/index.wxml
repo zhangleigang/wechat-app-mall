@@ -1,0 +1,16 @@
+<view class="page">
+  <view class="header">
+    <text class="title">情绪小屋</text>
+  </view>
+  <scroll-view class="chat" scroll-y="true">
+    <block wx:for="{{messages}}" wx:key="index">
+      <view class="msg {{item.role}}">
+        <text>{{item.content}}</text>
+      </view>
+    </block>
+  </scroll-view>
+  <view class="input-bar">
+    <input class="ipt" placeholder="说说你的压力、困扰或当前情绪…" value="{{inputVal}}" bindinput="bindinput" confirm-type="send" bindconfirm="send" />
+    <button class="send" type="primary" loading="{{sending}}" bindtap="send">发送</button>
+  </view>
+</view>

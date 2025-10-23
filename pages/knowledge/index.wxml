@@ -1,0 +1,23 @@
+<view class="page">
+  <view class="header">
+    <text class="title">面试知识</text>
+    <view class="search">
+      <input class="ipt" placeholder="搜索知识点/岗位" value="{{q}}" bindinput="bindinput" />
+      <button class="btn" type="primary" bindtap="search">搜索</button>
+    </view>
+  </view>
+  <view class="cats">
+    <text class="sub">分类</text>
+    <view class="cat-list">
+      <block wx:for="{{categories}}" wx:key="index">
+        <view class="cat">{{item.name}}</view>
+      </block>
+    </view>
+  </view>
+  <view class="list">
+    <text class="sub">常用知识</text>
+    <block wx:for="{{list}}" wx:key="index">
+      <view class="cell">{{item.title}}</view>
+    </block>
+  </view>
+</view>

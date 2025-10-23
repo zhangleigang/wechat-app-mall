@@ -1,0 +1,20 @@
+<view class="page">
+  <view class="header">
+    <text class="title">岗位分析助手</text>
+    <view class="quick">
+      <button size="mini" bindtap="quick" data-q="帮我分析XX岗位的核心技能与学习路径">示例1</button>
+      <button size="mini" bindtap="quick" data-q="这是JD，给出可能的面试问题与回答框架：...">示例2</button>
+    </view>
+  </view>
+  <scroll-view class="chat" scroll-y="true">
+    <block wx:for="{{messages}}" wx:key="index">
+      <view class="msg {{item.role}}">
+        <text>{{item.content}}</text>
+      </view>
+    </block>
+  </scroll-view>
+  <view class="input-bar">
+    <input class="ipt" placeholder="输入岗位链接/JD/关键词" value="{{inputVal}}" bindinput="bindinput" confirm-type="send" bindconfirm="send" />
+    <button class="send" type="primary" loading="{{sending}}" bindtap="send">发送</button>
+  </view>
+</view>

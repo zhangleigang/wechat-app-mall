@@ -71,7 +71,7 @@ Page({
       return
     }
     wx.reLaunch({
-      url: '/pages/index/index',
+      url: '/pages/ai/job/index',
     })
   },
   async getPhoneNumber(e) {
@@ -134,7 +134,7 @@ Page({
     wx.setStorageSync('openid', res.data.openid)
     wx.setStorageSync('mobile', res.data.mobile)
     wx.reLaunch({
-      url: '/pages/index/index',
+      url: '/pages/ai/job/index',
     })
   },
 })
