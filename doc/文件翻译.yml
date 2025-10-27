@@ -1,0 +1,846 @@
+app:
+  description: ''
+  icon: 📂
+  icon_background: '#E0F2FE'
+  mode: advanced-chat
+  name: 文件翻译
+  use_icon_as_answer_icon: false
+dependencies:
+- current_identifier: null
+  type: marketplace
+  value:
+    marketplace_plugin_unique_identifier: langgenius/openai:0.2.6@e2665624a156f52160927bceac9e169bd7e5ae6b936ae82575e14c90af390e6e
+    version: null
+kind: app
+version: 0.4.0
+workflow:
+  conversation_variables:
+  - description: 'Text to be translated. '
+    id: e520bb9f-da6f-49a3-9da6-a3c74f1d68d6
+    name: text
+    selector:
+    - conversation
+    - text
+    value: ''
+    value_type: string
+  environment_variables: []
+  features:
+    file_upload:
+      allowed_file_extensions:
+      - .JPG
+      - .JPEG
+      - .PNG
+      - .GIF
+      - .WEBP
+      - .SVG
+      allowed_file_types:
+      - image
+      allowed_file_upload_methods:
+      - local_file
+      - remote_url
+      enabled: false
+      fileUploadConfig:
+        audio_file_size_limit: 50
+        batch_count_limit: 5
+        file_size_limit: 15
+        image_file_size_limit: 10
+        video_file_size_limit: 100
+        workflow_file_upload_limit: 10
+      image:
+        enabled: false
+        number_limits: 3
+        transfer_methods:
+        - local_file
+        - remote_url
+      number_limits: 3
+    opening_statement: ''
+    retriever_resource:
+      enabled: false
+    sensitive_word_avoidance:
+      enabled: false
+    speech_to_text:
+      enabled: false
+    suggested_questions: []
+    suggested_questions_after_answer:
+      enabled: false
+    text_to_speech:
+      enabled: false
+      language: ''
+      voice: ''
+  graph:
+    edges:
+    - data:
+        isInIteration: false
+        sourceType: if-else
+        targetType: document-extractor
+      id: 1727235780030-true-1727235420145-target
+      selected: false
+      source: '1727235780030'
+      sourceHandle: 'true'
+      target: '1727235420145'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: assigner
+        targetType: answer
+      id: 1727243290238-source-1727243331745-target
+      selected: false
+      source: '1727243290238'
+      sourceHandle: source
+      target: '1727243331745'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: answer
+      id: 1727244691213-source-1727244764225-target
+      selected: false
+      source: '1727244691213'
+      sourceHandle: source
+      target: '1727244764225'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: answer
+      id: 17272454043470-source-1727245512406-target
+      selected: false
+      source: '17272454043470'
+      sourceHandle: source
+      target: '1727245512406'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: llm
+        targetType: llm
+      id: 1727245644467-source-17272454043470-target
+      selected: false
+      source: '1727245644467'
+      sourceHandle: source
+      target: '17272454043470'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: if-else
+        targetType: llm
+      id: 1727235780030-d8e58cc8-8c7c-4426-a596-32178b8fc6df-1727245644467-target
+      selected: false
+      source: '1727235780030'
+      sourceHandle: d8e58cc8-8c7c-4426-a596-32178b8fc6df
+      target: '1727245644467'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: start
+        targetType: if-else
+      id: 1727234055352-source-1727235780030-target
+      selected: false
+      source: '1727234055352'
+      sourceHandle: source
+      target: '1727235780030'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: document-extractor
+        targetType: assigner
+      id: 1727235420145-source-1727243290238-target
+      source: '1727235420145'
+      sourceHandle: source
+      target: '1727243290238'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    - data:
+        isInIteration: false
+        sourceType: answer
+        targetType: llm
+      id: 1727243331745-source-1727244691213-target
+      source: '1727243331745'
+      sourceHandle: source
+      target: '1727244691213'
+      targetHandle: target
+      type: custom
+      zIndex: 0
+    nodes:
+    - data:
+        desc: ''
+        selected: false
+        title: 开始
+        type: start
+        variables:
+        - allowed_file_extensions: []
+          allowed_file_types:
+          - document
+          allowed_file_upload_methods:
+          - local_file
+          - remote_url
+          label: 需要翻译的文件：
+          max_length: 5
+          options: []
+          required: true
+          type: file
+          variable: text
+        - label: 目标语言：
+          max_length: 48
+          options: []
+          required: true
+          type: text-input
+          variable: target_language
+      height: 114
+      id: '1727234055352'
+      position:
+        x: 30
+        y: 286.5
+      positionAbsolute:
+        x: 30
+        y: 286.5
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        desc: ''
+        is_array_file: false
+        selected: false
+        title: 文档提取器
+        type: document-extractor
+        variable_selector:
+        - '1727234055352'
+        - text
+      height: 92
+      id: '1727235420145'
+      position:
+        x: 638
+        y: 286.5
+      positionAbsolute:
+        x: 638
+        y: 286.5
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        cases:
+        - case_id: 'true'
+          conditions:
+          - comparison_operator: '='
+            id: aedd7231-30bc-450e-830f-068697835bc5
+            value: '1'
+            varType: number
+            variable_selector:
+            - sys
+            - dialogue_count
+          id: 'true'
+          logical_operator: and
+        - case_id: d8e58cc8-8c7c-4426-a596-32178b8fc6df
+          conditions:
+          - comparison_operator: '>'
+            id: 6f2dfa0d-f898-49d6-9d10-cd61ce884bed
+            value: '1'
+            varType: number
+            variable_selector:
+            - sys
+            - dialogue_count
+          id: d8e58cc8-8c7c-4426-a596-32178b8fc6df
+          logical_operator: and
+        desc: ''
+        selected: false
+        title: 条件分支
+        type: if-else
+      height: 172
+      id: '1727235780030'
+      position:
+        x: 334
+        y: 286.5
+      positionAbsolute:
+        x: 334
+        y: 286.5
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        assigned_variable_selector:
+        - conversation
+        - text
+        desc: ''
+        input_variable_selector:
+        - '1727235420145'
+        - text
+        selected: false
+        title: 变量赋值
+        type: assigner
+        write_mode: over-write
+      height: 84
+      id: '1727243290238'
+      position:
+        x: 942
+        y: 286.5
+      positionAbsolute:
+        x: 942
+        y: 286.5
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        answer: 'Document Processed! '
+        desc: ''
+        selected: false
+        title: 直接回复
+        type: answer
+        variables: []
+      height: 100
+      id: '1727243331745'
+      position:
+        x: 1246
+        y: 286.5
+      positionAbsolute:
+        x: 1246
+        y: 286.5
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: gpt-4o
+          provider: langgenius/openai/openai
+        prompt_template:
+        - id: 28742294-85bb-4612-8e4e-6e590bb48c99
+          role: system
+          text: '您是一位能够翻译多种语言的译员。您的任务是将给定的文本从源语言准确地翻译成 {{#1727234055352.target_language#}}。请按照以下步骤完成任务：
+
+
+            1. 识别输入文本的源语言。​​
+
+            2. 将文本翻译成 {{#1727234055352.target_language#}}。
+
+            3. 确保翻译保留原始含义和上下文。
+
+            4. 在翻译文本中使用正确的语法、标点和句法。
+
+
+            确保适当处理惯用表达和文化差异。如果输入文本包含任何专业术语或行话，请确保翻译反映目标语言中的正确术语。'
+        - id: 90c836a7-2dd0-4221-99b5-220ee47395fd
+          role: user
+          text: '{{#1727235420145.text#}}'
+        selected: false
+        title: LLM 翻译
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 88
+      id: '1727244691213'
+      position:
+        x: 1548.5714285714287
+        y: 286.5
+      positionAbsolute:
+        x: 1548.5714285714287
+        y: 286.5
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        answer: '{{#1727244691213.text#}}'
+        desc: ''
+        selected: false
+        title: 直接回复
+        type: answer
+        variables: []
+      height: 103
+      id: '1727244764225'
+      position:
+        x: 1854
+        y: 286.5
+      positionAbsolute:
+        x: 1854
+        y: 286.5
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: gpt-4o
+          provider: langgenius/openai/openai
+        prompt_template:
+        - id: 28742294-85bb-4612-8e4e-6e590bb48c99
+          role: system
+          text: '<instructions>
+
+            您是一位能够翻译多种语言的翻译人员。您的任务是将给定的文本从源语言准确地翻译成{{#1727234055352.target_language#}}。请按照以下步骤完成任务：
+
+
+            1. 识别输入文本的源语言。​​
+
+            2. 将文本翻译成{{#1727234055352.target_language#}}。
+
+            3. 确保翻译保留原始含义和上下文。
+
+            4. 在翻译的文本中使用正确的语法、标点和句法。
+
+            5. 不要在输出中包含任何 XML 标签。
+
+
+            确保适当处理惯用表达和文化细微差别。如果输入文本包含任何专业术语或行话，请确保翻译反映目标语言中的正确术语。
+
+
+            </instructions>
+
+
+            <additional_instruction>
+
+            {{#1727245644467.text#}}
+
+            </additional_instruction>'
+        - id: 90c836a7-2dd0-4221-99b5-220ee47395fd
+          role: user
+          text: '{{#conversation.text#}}'
+        selected: false
+        title: LLM 翻译
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 88
+      id: '17272454043470'
+      position:
+        x: 942
+        y: 457.5
+      positionAbsolute:
+        x: 942
+        y: 457.5
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        answer: '{{#17272454043470.text#}}'
+        desc: ''
+        selected: false
+        title: 直接回复
+        type: answer
+        variables: []
+      height: 103
+      id: '1727245512406'
+      position:
+        x: 1246
+        y: 439
+      positionAbsolute:
+        x: 1246
+        y: 439
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        context:
+          enabled: false
+          variable_selector: []
+        desc: ''
+        memory:
+          query_prompt_template: '{{#sys.query#}}'
+          role_prefix:
+            assistant: ''
+            user: ''
+          window:
+            enabled: true
+            size: 15
+        model:
+          completion_params:
+            temperature: 0.7
+          mode: chat
+          name: gpt-4o
+          provider: langgenius/openai/openai
+        prompt_template:
+        - id: 1746f3a9-608a-462f-9532-34c71c38c8bb
+          role: system
+          text: '<instructions>
+
+            To complete the task of summarizing users'' requirements on translated
+            text in bullet points, follow these steps:
+
+
+            1. **Read the User''s Input**: Carefully read the user''s input to understand
+            their requirements, opinions on styles, and terms of translation.
+
+            2. **Identify Key Points**: Extract the key points from the user''s input.
+            Focus on specific requirements, preferences, and opinions related to the
+            translation.
+
+            3. **Summarize in Bullet Points**: Summarize the identified key points
+            in clear and concise bullet points. Ensure each bullet point addresses
+            a distinct requirement or opinion.
+
+            4. **Maintain Clarity and Brevity**: Ensure that the bullet points are
+            easy to understand and free from unnecessary details. Each point should
+            be brief and to the point.
+
+            5. **Avoid XML Tags in Output**: The final output should be free from
+            any XML tags. Only use bullet points to list the summarized requirements
+            and opinions.
+
+
+            Here are some examples to clarify the task further:
+
+
+            <examples>
+
+            <example>
+
+            <user_input>
+
+            I prefer the translation to maintain a formal tone. Also, please use the
+            term "client" instead of "customer". The translated text should be easy
+            to read and free from jargon.
+
+            </user_input>
+
+            <output>
+
+            - Maintain a formal tone in the translation.
+
+            - Use the term "client" instead of "customer".
+
+            - Ensure the translated text is easy to read.
+
+            - Avoid using jargon.
+
+            </output>
+
+            </example>
+
+
+            <example>
+
+            <user_input>
+
+            The translation should be culturally appropriate for a Japanese audience.
+            I would like the text to be concise and to the point. Please avoid using
+            slang or colloquial expressions.
+
+            </user_input>
+
+            <output>
+
+            - Ensure the translation is culturally appropriate for a Japanese audience.
+
+            - Make the text concise and to the point.
+
+            - Avoid using slang or colloquial expressions.
+
+            </output>
+
+            </example>
+
+
+            <example>
+
+            <user_input>
+
+            I want the translation to have a friendly and approachable tone. Use simple
+            language that can be understood by non-native speakers. Please ensure
+            technical terms are accurately translated.
+
+            </user_input>
+
+            <output>
+
+            - Use a friendly and approachable tone in the translation.
+
+            - Use simple language for non-native speakers.
+
+            - Ensure technical terms are accurately translated.
+
+            </output>
+
+            </example>
+
+            </examples>
+
+            </instructions>'
+        - id: 65bc0a91-f01d-481d-b86c-b07c75ad7b06
+          role: user
+          text: ''
+        selected: false
+        title: 识别用户意图
+        type: llm
+        variables: []
+        vision:
+          enabled: false
+      height: 88
+      id: '1727245644467'
+      position:
+        x: 638
+        y: 438.5
+      positionAbsolute:
+        x: 638
+        y: 438.5
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom
+      width: 242
+    - data:
+        author: 'Dify '
+        desc: ''
+        height: 120
+        selected: false
+        showAuthor: true
+        text: '{"root":{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"这是工作流的起点。用户需要上传一个文档并选择目标语言进行翻译。","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"paragraph","version":1,"textFormat":0}],"direction":"ltr","format":"","indent":0,"type":"root","version":1}}'
+        theme: blue
+        title: ''
+        type: ''
+        width: 245
+      height: 120
+      id: '1729515962341'
+      position:
+        x: 22.857142857142858
+        y: 145.7142857142856
+      positionAbsolute:
+        x: 22.857142857142858
+        y: 145.7142857142856
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom-note
+      width: 245
+    - data:
+        author: 'Dify '
+        desc: ''
+        height: 122
+        selected: false
+        showAuthor: true
+        text: '{"root":{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"判断当前对话是否是首次对话或后续对话，根据对话次数决定下一步操作。","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"paragraph","version":1,"textFormat":0}],"direction":"ltr","format":"","indent":0,"type":"root","version":1}}'
+        theme: blue
+        title: ''
+        type: ''
+        width: 241
+      height: 122
+      id: '1729515964743'
+      position:
+        x: 334
+        y: 145.7142857142856
+      positionAbsolute:
+        x: 334
+        y: 145.7142857142856
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom-note
+      width: 241
+    - data:
+        author: 'Dify '
+        desc: ''
+        height: 118
+        selected: false
+        showAuthor: true
+        text: '{"root":{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"从上传的文档中提取文本，准备进行翻译。","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"paragraph","version":1,"textFormat":0}],"direction":"ltr","format":"","indent":0,"type":"root","version":1}}'
+        theme: blue
+        title: ''
+        type: ''
+        width: 240
+      height: 118
+      id: '1729515966282'
+      position:
+        x: 647.1428571428572
+        y: 145.7142857142856
+      positionAbsolute:
+        x: 647.1428571428572
+        y: 145.7142857142856
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom-note
+      width: 240
+    - data:
+        author: 'Dify '
+        desc: ''
+        height: 119
+        selected: false
+        showAuthor: true
+        text: '{"root":{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"将提取的文本分配给
+          ","type":"text","version":1},{"detail":0,"format":16,"mode":"normal","style":"","text":"conversation.text","type":"text","version":1},{"detail":0,"format":0,"mode":"normal","style":"","text":"
+          变量，以便进一步处理。","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"paragraph","version":1,"textFormat":0}],"direction":"ltr","format":"","indent":0,"type":"root","version":1}}'
+        theme: blue
+        title: ''
+        type: ''
+        width: 240
+      height: 119
+      id: '1729515968013'
+      position:
+        x: 942
+        y: 145.7142857142856
+      positionAbsolute:
+        x: 942
+        y: 145.7142857142856
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom-note
+      width: 240
+    - data:
+        author: 'Dify '
+        desc: ''
+        height: 118
+        selected: false
+        showAuthor: true
+        text: '{"root":{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"确认文档已经成功处理，作为对用户的反馈。","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"paragraph","version":1,"textFormat":0}],"direction":"ltr","format":"","indent":0,"type":"root","version":1}}'
+        theme: blue
+        title: ''
+        type: ''
+        width: 240
+      height: 118
+      id: '1729515969555'
+      position:
+        x: 1246
+        y: 145.7142857142856
+      positionAbsolute:
+        x: 1246
+        y: 145.7142857142856
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom-note
+      width: 240
+    - data:
+        author: 'Dify '
+        desc: ''
+        height: 118
+        selected: false
+        showAuthor: true
+        text: '{"root":{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"此节点使用AI语言模型处理翻译，根据用户选择的目标语言进行文本翻译。","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"paragraph","version":1,"textFormat":0}],"direction":"ltr","format":"","indent":0,"type":"root","version":1}}'
+        theme: blue
+        title: ''
+        type: ''
+        width: 240
+      height: 118
+      id: '1729515971253'
+      position:
+        x: 1548.5714285714287
+        y: 145.7142857142856
+      positionAbsolute:
+        x: 1548.5714285714287
+        y: 145.7142857142856
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom-note
+      width: 240
+    - data:
+        author: 'Dify '
+        desc: ''
+        height: 116
+        selected: false
+        showAuthor: true
+        text: '{"root":{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"向用户显示翻译后的文本，作为最终输出。","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"paragraph","version":1,"textFormat":0}],"direction":"ltr","format":"","indent":0,"type":"root","version":1}}'
+        theme: blue
+        title: ''
+        type: ''
+        width: 240
+      height: 116
+      id: '1729515973219'
+      position:
+        x: 1854
+        y: 145.7142857142856
+      positionAbsolute:
+        x: 1854
+        y: 145.7142857142856
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom-note
+      width: 240
+    - data:
+        author: 'Dify '
+        desc: ''
+        height: 175
+        selected: false
+        showAuthor: true
+        text: '{"root":{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"根据用户的附加指令或条件，进一步优化翻译。","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"paragraph","version":1,"textFormat":0}],"direction":"ltr","format":"","indent":0,"type":"root","version":1}}'
+        theme: blue
+        title: ''
+        type: ''
+        width: 240
+      height: 175
+      id: '1729515975090'
+      position:
+        x: 942
+        y: 565.7142857142857
+      positionAbsolute:
+        x: 942
+        y: 565.7142857142857
+      selected: true
+      sourcePosition: right
+      targetPosition: left
+      type: custom-note
+      width: 240
+    - data:
+        author: 'Dify '
+        desc: ''
+        height: 173
+        selected: false
+        showAuthor: true
+        text: '{"root":{"children":[{"children":[{"detail":0,"format":0,"mode":"normal","style":"","text":"此节点用于解读和总结用户对翻译的具体要求。它会读取用户的输入，提取关键点（如语气、术语或风格偏好），并以要点形式总结。这有助于确保翻译结果符合用户的特定偏好，如语气、语言简洁度或文化差异等。","type":"text","version":1}],"direction":"ltr","format":"","indent":0,"type":"paragraph","version":1,"textFormat":0}],"direction":"ltr","format":"","indent":0,"type":"root","version":1}}'
+        theme: blue
+        title: ''
+        type: ''
+        width: 240
+      height: 173
+      id: '1729516043055'
+      position:
+        x: 638
+        y: 565.7142857142857
+      positionAbsolute:
+        x: 638
+        y: 565.7142857142857
+      selected: false
+      sourcePosition: right
+      targetPosition: left
+      type: custom-note
+      width: 240
+    viewport:
+      x: -14.999999999999886
+      y: 57.000000000000114
+      zoom: 0.7
+  rag_pipeline_variables: []
