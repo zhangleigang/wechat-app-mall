@@ -3,30 +3,34 @@
   <view wx:else>
     <view class="header">
       <text class="title">{{topic.title}}</text>
-      <view class="summary">{{topic.summary}}</view>
-      <view class="tags">
-        <block wx:for="{{topic.tags}}" wx:key="index">
-          <text class="tag">{{item}}</text>
-        </block>
+    </view>
+    
+    <!-- 问题和答案列表 -->
+    <block wx:for="{{topic.faqs}}" wx:key="index" wx:for-item="question">
+      <view class="section">
+        <text class="sec-title">问题 {{index + 1}}</text>
+        <view class="li question-item">• {{question}}</view>
+        
+        <!-- 生成答案按钮 -->
+        <button class="generate-btn" 
+                data-question-index="{{index}}" 
+                bindtap="generateAnswer"
+                disabled="{{generatingAnswer}}">
+          {{generatingAnswer ? '生成中...' : '生成答案'}}
+        </button>
+        
+        <!-- AI生成的答案 -->
+        <view wx:if="{{generatedAnswers[index]}}" class="answer-container">
+          <text class="answer-title">答案：</text>
+          <view class="answer ai-answer">{{generatedAnswers[index]}}</view>
+        </view>
+        
+        <!-- 原始答案（如果存在） -->
+        <view wx:if="{{topic.answers && topic.answers[index]}}">
+          <text class="answer-title">预设答案：</text>
+          <view class="answer">{{topic.answers[index]}}</view>
+        </view>
       </view>
-    </view>
-    <view class="section">
-      <text class="sec-title">高频面试题</text>
-      <block wx:for="{{topic.faqs}}" wx:key="index">
-        <view class="li">• {{item}}</view>
-      </block>
-    </view>
-    <view class="section">
-      <text class="sec-title">踩坑与调优</text>
-      <block wx:for="{{topic.pitfalls}}" wx:key="index">
-        <view class="li">• {{item}}</view>
-      </block>
-    </view>
-    <view class="section">
-      <text class="sec-title">示例</text>
-      <block wx:for="{{topic.examples}}" wx:key="index">
-        <view class="code">{{item}}</view>
-      </block>
-    </view>
+    </block>
   </view>
 </view>

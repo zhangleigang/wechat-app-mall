@@ -1,8 +1,11 @@
 const KNOW = require('../../utils/knowledge.js')
+const AI = require('../../utils/ai.js')
 
 Page({
   data: {
-    topic: null
+    topic: null,
+    generatingAnswer: false,
+    generatedAnswers: {}
   },
   onLoad(options) {
     wx.setNavigationBarTitle({ title: '知识详情' })
@@ -26,6 +29,51 @@ Page({
         }
       })
     }
+  },
+  // 调用AI生成答案
+  generateAnswer(e) {
+    const { questionIndex } = e.currentTarget.dataset
+    const { topic } = this.data
+    const question = topic.faqs[questionIndex]
+    
+    if (!question) return
+    
+    this.setData({
+      generatingAnswer: true
+    })
+    
+    // 构建提示信息
+    const systemPrompt = '你是一个专业的技术面试官助手，请对下面的大数据相关技术问题提供准确、详细且专业的回答。回答应当条理清晰，包含必要的技术细节。'
+    const messages = [
+      { role: 'system', content: systemPrompt },
+      { role: 'user', content: question }
+    ]
+    
+    // 调用AI接口
+    AI.chat({
+      scene: 'knowledge',
+      messages,
+      sessionId: `knowledge-${Date.now()}`
+    }).then(res => {
+      const answer = res.answer || res.data || '暂无答案'
+      const generatedAnswers = { ...this.data.generatedAnswers }
+      generatedAnswers[questionIndex] = answer
+      
+      this.setData({
+        generatingAnswer,
+        generatedAnswers
+      })
+    }).catch(err => {
+      console.error('AI生成答案失败:', err)
+      wx.showToast({
+        title: '生成答案失败，请重试',
+        icon: 'none'
+      })
+    }).finally(() => {
+      this.setData({
+        generatingAnswer: false
+      })
+    })
   },
   onShareAppMessage() {
     const topic = this.data.topic
