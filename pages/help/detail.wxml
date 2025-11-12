@@ -1,3 +1,0 @@
-<view class="content">
-  <mp-html content="{{cmsArticleDetail.content}}" />
-</view>
