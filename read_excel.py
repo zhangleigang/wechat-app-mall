@@ -1,7 +1,7 @@
 from openpyxl import load_workbook
 
 # 加载Excel文件
-wb = load_workbook('./doc/question and answer.xlsx')
+wb = load_workbook('./doc/question and answer_with_answers.xlsx')
 
 # 获取活动工作表
 ws = wb.active

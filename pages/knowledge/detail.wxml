@@ -11,23 +11,9 @@
         <text class="sec-title">问题 {{index + 1}}</text>
         <view class="li question-item">• {{question}}</view>
         
-        <!-- 生成答案按钮 -->
-        <button class="generate-btn" 
-                data-question-index="{{index}}" 
-                bindtap="generateAnswer"
-                disabled="{{generatingAnswer}}">
-          {{generatingAnswer ? '生成中...' : '生成答案'}}
-        </button>
-        
-        <!-- AI生成的答案 -->
-        <view wx:if="{{generatedAnswers[index]}}" class="answer-container">
-          <text class="answer-title">答案：</text>
-          <view class="answer ai-answer">{{generatedAnswers[index]}}</view>
-        </view>
-        
-        <!-- 原始答案（如果存在） -->
+        <!-- 答案（如果存在） -->
         <view wx:if="{{topic.answers && topic.answers[index]}}">
-          <text class="answer-title">预设答案：</text>
+          <text class="answer-title">答案：</text>
           <view class="answer">{{topic.answers[index]}}</view>
         </view>
       </view>

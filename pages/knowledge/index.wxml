@@ -16,7 +16,7 @@
       </view>
     </view>
     <view class="content">
-      <text class="sub">主题</text>
+      <text class="sub">主题 (共{{filteredTopics.length}}个)</text>
       <block wx:for="{{filteredTopics}}" wx:key="id">
         <view class="card" data-id="{{item.id}}" bindtap="toDetail">
           <view class="card-title">{{item.title}}</view>
