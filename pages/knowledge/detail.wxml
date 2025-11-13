@@ -1,22 +1,18 @@
-<view class="page">
-  <view wx:if="{{!topic}}" class="empty">未获取到主题数据</view>
-  <view wx:else>
-    <view class="header">
-      <text class="title">{{topic.title}}</text>
+<view class="detail-page">
+  <!-- 问题标题 -->
+  <view class="question-section">
+    <view class="question-icon">❓</view>
+    <text class="question-title">{{question}}</text>
+  </view>
+  
+  <!-- 答案内容 -->
+  <view class="answer-section">
+    <view class="answer-header">
+      <text class="answer-icon">💡</text>
+      <text class="answer-title">答案解析</text>
     </view>
-    
-    <!-- 问题和答案列表 -->
-    <block wx:for="{{topic.faqs}}" wx:key="index" wx:for-item="question">
-      <view class="section">
-        <text class="sec-title">问题 {{index + 1}}</text>
-        <view class="li question-item">• {{question}}</view>
-        
-        <!-- 答案（如果存在） -->
-        <view wx:if="{{topic.answers && topic.answers[index]}}">
-          <text class="answer-title">答案：</text>
-          <view class="answer">{{topic.answers[index]}}</view>
-        </view>
-      </view>
-    </block>
+    <view class="answer-content">
+      <mp-html content="{{answerHtml}}" />
+    </view>
   </view>
 </view>

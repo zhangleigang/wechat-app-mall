@@ -1,15 +1,71 @@
-<view class="box">
-  <view class="title">本次操作需要先登陆</view>
-  <view class="btn">
-    <van-button wx:if="{{ checked }}" block round open-type="getPhoneNumber" bind:getphonenumber="getPhoneNumber">手机号安全登录</van-button>
-    <van-button wx:else block round bind:click="showModal2">手机号安全登录</van-button>
+<view class="login-container">
+  <!-- 顶部装饰 -->
+  <view class="login-header">
+    <view class="header-decoration"></view>
   </view>
-  <view class="btn">
-    <van-button type="primary" block round bind:click="loginOne">一键登录</van-button>
+  
+  <!-- Logo和标题 -->
+  <view class="login-brand">
+    <view class="brand-icon">🎯</view>
+    <text class="brand-title">AI面试助手</text>
+    <text class="brand-subtitle">智能陪伴，助力求职</text>
   </view>
-</view>
-<view class="xieyi">
-  <van-checkbox value="{{ checked }}" bind:change="xieyiChange">阅读并同意</van-checkbox>
-  <text data-key="yhxy" bind:tap="goxieyi">《用户协议》</text>、
-  <text data-key="ysxy" bind:tap="goxieyi">《隐私协议》</text>
+  
+  <!-- 登录卡片 -->
+  <view class="login-card">
+    <view class="card-title">
+      <text class="title-text">欢迎使用</text>
+      <text class="title-desc">请登录以继续使用完整功能</text>
+    </view>
+    
+    <!-- 登录按钮 -->
+    <view class="login-buttons">
+      <button 
+        wx:if="{{ checked }}" 
+        class="login-btn primary-btn"
+        open-type="getPhoneNumber" 
+        bindgetphonenumber="getPhoneNumber"
+      >
+        <text class="btn-icon">📱</text>
+        <text class="btn-text">手机号安全登录</text>
+      </button>
+      <button 
+        wx:else 
+        class="login-btn primary-btn"
+        bindtap="showModal2"
+      >
+        <text class="btn-icon">📱</text>
+        <text class="btn-text">手机号安全登录</text>
+      </button>
+      
+      <button 
+        class="login-btn secondary-btn"
+        bindtap="loginOne"
+      >
+        <text class="btn-icon">⚡</text>
+        <text class="btn-text">一键快速登录</text>
+      </button>
+    </view>
+    
+    <!-- 协议 -->
+    <view class="agreement-section">
+      <van-checkbox 
+        value="{{ checked }}" 
+        bindchange="xieyiChange"
+        checked-color="#8b5cf6"
+      >
+        <text class="agreement-text">
+          我已阅读并同意
+          <text class="agreement-link" data-key="yhxy" bindtap="goxieyi">《用户协议》</text>
+          和
+          <text class="agreement-link" data-key="ysxy" bindtap="goxieyi">《隐私协议》</text>
+        </text>
+      </van-checkbox>
+    </view>
+  </view>
+  
+  <!-- 底部提示 -->
+  <view class="login-footer">
+    <text class="footer-text">登录即表示您同意我们的服务条款</text>
+  </view>
 </view>

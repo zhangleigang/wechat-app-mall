@@ -1,19 +1,177 @@
-<view class="page">
-  <view class="header">
-    <text class="title">简历解读助手</text>
-    <view class="actions">
-      <button size="mini" bindtap="uploadResume">上传简历</button>
+<view class="page-container">
+  <!-- 页面头部 -->
+  <view class="gradient-header">
+    <view class="header-content">
+      <view class="header-text">
+        <text class="text-2xl text-bold text-white">简历解读</text>
+        <text class="text-sm text-white mt-xs" style="opacity: 0.9;">
+          AI智能分析简历，提供优化建议
+        </text>
+      </view>
+      <button class="header-upload-btn" bindtap="uploadResume">
+        <text class="btn-icon">📤</text>
+        <text class="btn-text">上传</text>
+      </button>
     </view>
   </view>
-  <scroll-view class="chat" scroll-y="true">
-    <block wx:for="{{messages}}" wx:key="index">
-      <view class="msg {{item.role}}">
-        <text>{{item.content}}</text>
+  
+  <!-- 上传引导区域（未上传时显示） -->
+  <view wx:if="{{!resumeStatus.uploaded}}" class="upload-section">
+    <view class="upload-icon">📄</view>
+    <text class="upload-title">上传简历开始分析</text>
+    <text class="upload-desc">支持 PDF、Word、图片格式</text>
+    <button class="upload-btn" bindtap="uploadResume">
+      <text class="upload-btn-text">选择文件</text>
+    </button>
+  </view>
+  
+  <!-- 简历状态卡片（已上传时显示） -->
+  <view wx:if="{{resumeStatus.uploaded}}" class="resume-status-card">
+    <view class="status-icon">✅</view>
+    <view class="status-info">
+      <text class="file-name">{{resumeStatus.fileName}}</text>
+      <text class="upload-time">上传于 {{resumeStatus.uploadTime}}</text>
+    </view>
+    <button class="reupload-btn" bindtap="uploadResume">
+      <text class="reupload-text">重新上传</text>
+    </button>
+  </view>
+  
+  <!-- 快捷分析选项（已上传时显示） -->
+  <view wx:if="{{resumeStatus.uploaded && messages.length === 0}}" class="quick-analysis-section">
+    <text class="quick-analysis-title">💡 快速分析</text>
+    <scroll-view class="quick-analysis-scroll" scroll-x="true" show-scrollbar="false">
+      <view class="quick-analysis-list">
+        <view 
+          wx:for="{{quickAnalysis}}" 
+          wx:key="index"
+          class="quick-analysis-item"
+          bindtap="selectAnalysis"
+          data-question="{{item}}"
+        >
+          <text class="quick-analysis-text">{{item}}</text>
+        </view>
       </view>
-    </block>
+    </scroll-view>
+  </view>
+  
+  <!-- 对话区域 -->
+  <scroll-view 
+    class="chat-container" 
+    scroll-y="true" 
+    scroll-top="{{scrollTop}}" 
+    scroll-with-animation="true"
+    enhanced="true"
+    show-scrollbar="false"
+  >
+    <view class="messages-wrapper">
+      <block wx:for="{{messages}}" wx:key="index">
+        <view class="message-item {{item.role === 'user' ? 'user-message' : 'ai-message'}}">
+          <!-- 用户消息 -->
+          <view wx:if="{{item.role === 'user'}}" class="user-bubble">
+            <view class="message-avatar user-avatar">
+              <text class="avatar-text">我</text>
+            </view>
+            <view class="message-bubble user-bubble-content">
+              <text class="message-text">{{item.content}}</text>
+              <text class="message-time">{{item.time}}</text>
+            </view>
+          </view>
+          
+          <!-- AI消息 -->
+          <view wx:else class="ai-bubble">
+            <view class="message-avatar ai-avatar">
+              <text class="avatar-text">AI</text>
+            </view>
+            <view class="message-bubble ai-bubble-content">
+              <text class="message-text">{{item.content}}</text>
+              <text class="message-time">{{item.time}}</text>
+              
+              <!-- 操作按钮 -->
+              <view class="message-actions">
+                <view class="action-btn" bindtap="copyMessage" data-content="{{item.content}}">
+                  <text class="action-icon">📋</text>
+                  <text class="action-text">复制</text>
+                </view>
+                <view class="action-btn" bindtap="likeMessage" data-index="{{index}}">
+                  <text class="action-icon">👍</text>
+                  <text class="action-text">有用</text>
+                </view>
+              </view>
+            </view>
+          </view>
+        </view>
+      </block>
+      
+      <!-- AI正在回复的提示 -->
+      <view wx:if="{{sending}}" class="message-item ai-message">
+        <view class="ai-bubble">
+          <view class="message-avatar ai-avatar">
+            <text class="avatar-text">AI</text>
+          </view>
+          <view class="message-bubble ai-bubble-content typing-bubble">
+            <view class="typing-indicator">
+              <text class="typing-text">AI正在分析中</text>
+              <view class="typing-dots">
+                <view class="dot"></view>
+                <view class="dot"></view>
+                <view class="dot"></view>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 底部占位 -->
+      <view class="messages-bottom"></view>
+    </view>
   </scroll-view>
-  <view class="input-bar">
-    <input class="ipt" placeholder="输入岗位或问题，如：匹配XX岗位的优化建议" value="{{inputVal}}" bindinput="bindinput" confirm-type="send" bindconfirm="send" />
-    <button class="send" type="primary" loading="{{sending}}" bindtap="send">发送</button>
+  
+  <!-- 输入区域 -->
+  <view class="input-section">
+    <!-- 功能按钮栏 -->
+    <view wx:if="{{messages.length > 0}}" class="function-bar">
+      <view class="function-btn" bindtap="clearChat">
+        <text class="function-icon">🗑️</text>
+        <text class="function-text">清空</text>
+      </view>
+      <view class="function-btn" bindtap="exportChat">
+        <text class="function-icon">📤</text>
+        <text class="function-text">导出</text>
+      </view>
+    </view>
+    
+    <!-- 输入框 -->
+    <view class="input-container">
+      <view class="input-wrapper">
+        <textarea 
+          class="message-input" 
+          placeholder="请输入问题，如：针对数据分析岗位优化建议..." 
+          value="{{inputVal}}" 
+          bindinput="handleInput"
+          bindconfirm="send"
+          auto-height
+          maxlength="2000"
+          show-confirm-bar="false"
+        ></textarea>
+        
+        <!-- 字数统计 -->
+        <view wx:if="{{inputVal.length > 0}}" class="char-count">
+          <text class="count-text">{{inputVal.length}}/2000</text>
+        </view>
+      </view>
+      
+      <!-- 发送按钮 -->
+      <view class="send-button-wrapper">
+        <button 
+          class="send-button {{inputVal && !sending ? 'active' : 'disabled'}}" 
+          bindtap="send" 
+          disabled="{{!inputVal || sending}}"
+        >
+          <text wx:if="{{sending}}" class="send-icon loading">⏳</text>
+          <text wx:else class="send-icon">🚀</text>
+        </button>
+      </view>
+    </view>
   </view>
 </view>

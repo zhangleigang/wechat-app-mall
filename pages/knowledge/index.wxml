@@ -1,34 +1,68 @@
-<view class="page">
-  <view class="header">
-    <text class="title">面试知识</text>
-    <view class="search">
-      <input class="ipt" placeholder="搜索知识点/关键词" value="{{q}}" bindinput="bindinput" />
-      <button class="btn" type="primary" bindtap="search">搜索</button>
-    </view>
-  </view>
-  <view class="body">
-    <view class="sidebar">
-      <text class="sub">分类</text>
-      <view class="cat-list">
-        <block wx:for="{{categories}}" wx:key="key">
-          <view class="cat {{item.key === activeCategoryKey ? 'active' : ''}}" data-key="{{item.key}}" bindtap="switchCategory">{{item.name}}</view>
-        </block>
+<view class="page-container">
+  <!-- 渐变头部 -->
+  <view class="gradient-header">
+    <text class="text-2xl text-bold text-white">面试知识库</text>
+    <text class="text-sm text-white mt-sm" style="opacity: 0.9;">
+      精选大数据技术面试题，助你面试成功
+    </text>
+    
+    <!-- 统计信息 -->
+    <view class="flex-start mt-lg">
+      <view class="stat-badge">
+        <text class="text-sm text-white">{{topics.length}} 个主题</text>
+      </view>
+      <view class="stat-badge ml-sm">
+        <text class="text-sm text-white">{{categories.length}} 个分类</text>
       </view>
     </view>
-    <view class="content">
-      <text class="sub">主题 (共{{filteredTopics.length}}个)</text>
-      <block wx:for="{{filteredTopics}}" wx:key="id">
-        <view class="card" data-id="{{item.id}}" bindtap="toDetail">
-          <view class="card-title">{{item.title}}</view>
-          <view class="card-summary">{{item.summary}}</view>
-          <view class="tags">
-            <block wx:for="{{item.tags}}" wx:key="index">
-              <text class="tag">{{item}}</text>
-            </block>
+  </view>
+  
+  <!-- 主内容区域：左侧分类 + 右侧题目 -->
+  <view class="main-content">
+    <!-- 左侧分类导航 -->
+    <scroll-view class="category-sidebar" scroll-y enhanced show-scrollbar="{{false}}">
+      <view 
+        wx:for="{{categories}}" 
+        wx:key="key"
+        class="category-item {{item.key === activeCategoryKey ? 'active' : ''}}"
+        bindtap="switchCategory"
+        data-key="{{item.key}}"
+      >
+        <view class="category-icon">{{item.icon || '📁'}}</view>
+        <text class="category-name">{{item.name}}</text>
+        <view wx:if="{{item.key === activeCategoryKey}}" class="category-indicator"></view>
+      </view>
+    </scroll-view>
+    
+    <!-- 右侧问题列表 -->
+    <scroll-view class="content-scroll" scroll-y enhanced show-scrollbar="{{false}}">
+    <view class="questions-section">
+      <!-- 直接显示所有问题 -->
+      <block wx:for="{{allQuestions}}" wx:key="id">
+        <view class="question-card">
+          <!-- 问题标题 -->
+          <view 
+            class="question-header" 
+            bindtap="viewDetail" 
+            data-index="{{index}}"
+          >
+            <view class="question-number">{{index + 1}}</view>
+            <text class="question-text">{{item.question}}</text>
+            <text class="question-arrow">›</text>
           </view>
         </view>
       </block>
-      <view wx:if="{{filteredTopics.length === 0}}" class="empty">暂无匹配主题</view>
+      
+      <!-- 空状态 -->
+      <view wx:if="{{allQuestions.length === 0}}" class="empty-state">
+        <text class="empty-icon">📚</text>
+        <text class="empty-text">该分类暂无题目</text>
+        <text class="empty-hint">试试切换其他分类</text>
+      </view>
+      
+      <!-- 底部占位 -->
+      <view class="bottom-space"></view>
     </view>
+    </scroll-view>
   </view>
 </view>

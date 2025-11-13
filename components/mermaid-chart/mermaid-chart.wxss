@@ -1,0 +1,5 @@
+.mermaid-canvas {
+  border-radius: 8px;
+  background: #f8f9fa;
+  margin: 16px 0;
+}

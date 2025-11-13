@@ -1,25 +1,169 @@
-<view wx:if="{{ !apiUserInfoMap }}" class="header-box">
-  <view class="login-btn">
-    <van-button type="warning" block round bind:click="login">立即登陆</van-button>
+<view class="page-container">
+  <!-- 未登录状态 -->
+  <view wx:if="{{ !apiUserInfoMap }}" class="login-container">
+    <view class="gradient-header">
+      <text class="text-3xl text-bold text-white mb-sm">个人中心</text>
+      <text class="text-sm text-white" style="opacity: 0.9;">登录后查看更多功能</text>
+    </view>
+    
+    <view class="login-card">
+      <text class="login-icon">👤</text>
+      <text class="login-title">欢迎使用 AI 面试助手</text>
+      <text class="login-desc">登录后可使用更多功能</text>
+      <button class="btn btn-primary btn-block btn-lg mt-xl" bind:click="login">
+        立即登录
+      </button>
+    </view>
   </view>
-</view>
-<view wx:else class="header-box">
-  <view class="header-box-left">
-    <button class="avatar" open-type="chooseAvatar" bind:chooseavatar="onChooseAvatar">
-      <image class="avatar-img" src="{{ apiUserInfoMap.base.avatarUrl ? apiUserInfoMap.base.avatarUrl : '/images/default.png' }}" mode="aspectFill"></image>
-    </button>
-    <view class="r">
-      <view class="uid" bind:tap="copyUid">用户ID: {{ apiUserInfoMap.base.id }}</view>
-      <view class="nick" bindtap="editNick">{{ apiUserInfoMap.base.nick ? apiUserInfoMap.base.nick : '点击设置昵称' }}</view>
-      <view wx:if="{{ apiUserInfoMap.userLevel }}" class="user-level"><van-icon name="medal-o" />{{ apiUserInfoMap.userLevel.name }}</view>
+
+  <!-- 已登录状态 -->
+  <view wx:else>
+    <!-- 用户信息头部 -->
+    <view class="gradient-header">
+      <view class="user-header">
+        <button class="avatar-btn" open-type="chooseAvatar" bind:chooseavatar="onChooseAvatar">
+          <image 
+            class="user-avatar" 
+            src="{{ apiUserInfoMap.base.avatarUrl ? apiUserInfoMap.base.avatarUrl : '/images/default.png' }}" 
+            mode="aspectFill"
+          />
+          <view class="avatar-edit-badge">
+            <text class="edit-icon">✏️</text>
+          </view>
+        </button>
+        
+        <view class="user-info">
+          <view class="user-nick" bindtap="editNick">
+            <text class="nick-text">{{ apiUserInfoMap.base.nick ? apiUserInfoMap.base.nick : '点击设置昵称' }}</text>
+            <text class="edit-hint">✏️</text>
+          </view>
+          
+          <view class="user-id" bind:tap="copyUid">
+            <text class="id-label">ID: {{ apiUserInfoMap.base.id }}</text>
+            <text class="copy-hint">📋</text>
+          </view>
+          
+          <view wx:if="{{ apiUserInfoMap.userLevel }}" class="user-level-badge">
+            <text class="level-icon">👑</text>
+            <text class="level-name">{{ apiUserInfoMap.userLevel.name }}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- 会员信息卡片 -->
+    <view class="member-card">
+      <view class="member-header">
+        <view class="member-title">
+          <text class="member-icon">💎</text>
+          <text class="member-text">会员服务</text>
+        </view>
+        <view class="member-status {{ memberExpireDate ? 'active' : 'inactive' }}">
+          {{ memberExpireDate ? '已开通' : '未开通' }}
+        </view>
+      </view>
+      
+      <view class="member-body">
+        <view class="member-info">
+          <text class="info-label">有效期至</text>
+          <text class="info-value">{{ memberExpireDate ? memberExpireDate : '--' }}</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 数据统计 -->
+    <view class="stats-container">
+      <view class="stat-item" bindtap="goAsset">
+        <text class="stat-value">{{ balance }}</text>
+        <text class="stat-label">余额</text>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-item" bindtap="goScore">
+        <text class="stat-value">{{ score }}</text>
+        <text class="stat-label">积分</text>
+      </view>
+      <view class="stat-divider"></view>
+      <view class="stat-item" bindtap="gogrowth">
+        <text class="stat-value">{{ growth }}</text>
+        <text class="stat-label">成长值</text>
+      </view>
+    </view>
+
+    <!-- 订单统计 -->
+    <view class="order-section">
+      <view class="section-title-bar">
+        <text class="section-title">我的订单</text>
+        <view class="section-action" bindtap="goOrder" data-type="">
+          <text class="action-text">全部订单</text>
+          <text class="action-arrow">→</text>
+        </view>
+      </view>
+      
+      <view class="order-grid">
+        <view class="order-item" bindtap="goOrder" data-type="0">
+          <view class="order-icon-wrapper">
+            <text class="order-icon">💰</text>
+            <view wx:if="{{ count_id_no_pay > 0 }}" class="order-badge">{{ count_id_no_pay }}</view>
+          </view>
+          <text class="order-label">待付款</text>
+        </view>
+        
+        <view class="order-item" bindtap="goOrder" data-type="1">
+          <view class="order-icon-wrapper">
+            <text class="order-icon">📦</text>
+            <view wx:if="{{ count_id_no_transfer > 0 }}" class="order-badge">{{ count_id_no_transfer }}</view>
+          </view>
+          <text class="order-label">待发货</text>
+        </view>
+        
+        <view class="order-item" bindtap="goOrder" data-type="2">
+          <view class="order-icon-wrapper">
+            <text class="order-icon">🚚</text>
+            <view wx:if="{{ count_id_no_confirm > 0 }}" class="order-badge">{{ count_id_no_confirm }}</view>
+          </view>
+          <text class="order-label">待收货</text>
+        </view>
+        
+        <view class="order-item" bindtap="goOrder" data-type="3">
+          <view class="order-icon-wrapper">
+            <text class="order-icon">⭐</text>
+            <view wx:if="{{ count_id_no_reputation > 0 }}" class="order-badge">{{ count_id_no_reputation }}</view>
+          </view>
+          <text class="order-label">待评价</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 功能菜单 -->
+    <view class="menu-section">
+      <view wx:if="{{ canHX }}" class="menu-item-card" bindtap="scanOrderCode">
+        <view class="menu-item-left">
+          <text class="menu-icon">📷</text>
+          <text class="menu-title">扫码核销</text>
+        </view>
+        <text class="menu-arrow">→</text>
+      </view>
+      
+      <view class="menu-item-card" bindtap="goUserCode">
+        <view class="menu-item-left">
+          <text class="menu-icon">🎫</text>
+          <text class="menu-title">我的二维码</text>
+        </view>
+        <text class="menu-arrow">→</text>
+      </view>
+      
+      <view wx:if="{{ customerServiceType === 'XCX' }}" class="menu-item-card" bindtap="customerService">
+        <view class="menu-item-left">
+          <text class="menu-icon">💬</text>
+          <text class="menu-title">联系客服</text>
+        </view>
+        <text class="menu-arrow">→</text>
+      </view>
     </view>
   </view>
 </view>
 
-<van-cell-group title="会员">
-  <van-cell title="会员有效期" value="{{ memberExpireDate ? memberExpireDate : '未开通' }}" />
-</van-cell-group>
-
+<!-- 修改昵称弹窗 -->
 <van-dialog
   use-slot
   title="修改昵称"

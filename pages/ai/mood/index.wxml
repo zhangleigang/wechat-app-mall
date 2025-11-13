@@ -1,16 +1,150 @@
-<view class="page">
-  <view class="header">
-    <text class="title">情绪小屋</text>
+<view class="page-container">
+  <!-- 页面头部 -->
+  <view class="warm-header">
+    <text class="text-2xl text-bold text-white">情绪小屋</text>
+    <text class="text-sm text-white mt-sm" style="opacity: 0.9;">
+      🌸 温暖陪伴，倾听你的心声
+    </text>
   </view>
-  <scroll-view class="chat" scroll-y="true">
-    <block wx:for="{{messages}}" wx:key="index">
-      <view class="msg {{item.role}}">
-        <text>{{item.content}}</text>
+  
+  <!-- 情绪选择（首次进入时显示） -->
+  <view wx:if="{{messages.length === 0}}" class="mood-selection-section">
+    <view class="mood-title">
+      <text class="mood-title-text">💭 今天感觉如何？</text>
+      <text class="mood-subtitle">选择你的情绪，我会陪你聊聊</text>
+    </view>
+    
+    <view class="mood-grid">
+      <view 
+        wx:for="{{moodOptions}}" 
+        wx:key="index"
+        class="mood-item"
+        bindtap="selectMood"
+        data-mood="{{item}}"
+      >
+        <text class="mood-emoji">{{item.emoji}}</text>
+        <text class="mood-label">{{item.label}}</text>
       </view>
-    </block>
+    </view>
+  </view>
+  
+  <!-- 对话区域 -->
+  <scroll-view 
+    class="chat-container" 
+    scroll-y="true" 
+    scroll-top="{{scrollTop}}" 
+    scroll-with-animation="true"
+    enhanced="true"
+    show-scrollbar="false"
+  >
+    <view class="messages-wrapper">
+      <block wx:for="{{messages}}" wx:key="index">
+        <view class="message-item {{item.role === 'user' ? 'user-message' : 'ai-message'}}">
+          <!-- 用户消息 -->
+          <view wx:if="{{item.role === 'user'}}" class="user-bubble">
+            <view class="message-avatar user-avatar">
+              <text class="avatar-text">我</text>
+            </view>
+            <view class="message-bubble user-bubble-content">
+              <text class="message-text">{{item.content}}</text>
+              <text class="message-time">{{item.time}}</text>
+            </view>
+          </view>
+          
+          <!-- AI消息 -->
+          <view wx:else class="ai-bubble">
+            <view class="message-avatar ai-avatar">
+              <text class="avatar-text">🌸</text>
+            </view>
+            <view class="message-bubble ai-bubble-content">
+              <text class="message-text">{{item.content}}</text>
+              <text class="message-time">{{item.time}}</text>
+              
+              <!-- 操作按钮 -->
+              <view class="message-actions">
+                <view class="action-btn" bindtap="copyMessage" data-content="{{item.content}}">
+                  <text class="action-icon">📋</text>
+                  <text class="action-text">复制</text>
+                </view>
+                <view class="action-btn" bindtap="likeMessage" data-index="{{index}}">
+                  <text class="action-icon">💖</text>
+                  <text class="action-text">有帮助</text>
+                </view>
+              </view>
+            </view>
+          </view>
+        </view>
+      </block>
+      
+      <!-- AI正在回复的提示 -->
+      <view wx:if="{{sending}}" class="message-item ai-message">
+        <view class="ai-bubble">
+          <view class="message-avatar ai-avatar">
+            <text class="avatar-text">🌸</text>
+          </view>
+          <view class="message-bubble ai-bubble-content typing-bubble">
+            <view class="typing-indicator">
+              <text class="typing-text">正在倾听中</text>
+              <view class="typing-dots">
+                <view class="dot"></view>
+                <view class="dot"></view>
+                <view class="dot"></view>
+              </view>
+            </view>
+          </view>
+        </view>
+      </view>
+      
+      <!-- 底部占位 -->
+      <view class="messages-bottom"></view>
+    </view>
   </scroll-view>
-  <view class="input-bar">
-    <input class="ipt" placeholder="说说你的压力、困扰或当前情绪…" value="{{inputVal}}" bindinput="bindinput" confirm-type="send" bindconfirm="send" />
-    <button class="send" type="primary" loading="{{sending}}" bindtap="send">发送</button>
+  
+  <!-- 输入区域 -->
+  <view class="input-section">
+    <!-- 功能按钮栏 -->
+    <view wx:if="{{messages.length > 0}}" class="function-bar">
+      <view class="function-btn" bindtap="clearChat">
+        <text class="function-icon">🗑️</text>
+        <text class="function-text">清空</text>
+      </view>
+      <view class="function-btn" bindtap="exportChat">
+        <text class="function-icon">📤</text>
+        <text class="function-text">导出</text>
+      </view>
+    </view>
+    
+    <!-- 输入框 -->
+    <view class="input-container">
+      <view class="input-wrapper">
+        <textarea 
+          class="message-input" 
+          placeholder="说说你的压力、困扰或当前情绪..." 
+          value="{{inputVal}}" 
+          bindinput="handleInput"
+          bindconfirm="send"
+          auto-height
+          maxlength="2000"
+          show-confirm-bar="false"
+        ></textarea>
+        
+        <!-- 字数统计 -->
+        <view wx:if="{{inputVal.length > 0}}" class="char-count">
+          <text class="count-text">{{inputVal.length}}/2000</text>
+        </view>
+      </view>
+      
+      <!-- 发送按钮 -->
+      <view class="send-button-wrapper">
+        <button 
+          class="send-button {{inputVal && !sending ? 'active' : 'disabled'}}" 
+          bindtap="send" 
+          disabled="{{!inputVal || sending}}"
+        >
+          <text wx:if="{{sending}}" class="send-icon loading">⏳</text>
+          <text wx:else class="send-icon">💌</text>
+        </button>
+      </view>
+    </view>
   </view>
 </view>

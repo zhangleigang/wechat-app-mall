@@ -1,43 +1,53 @@
 const categories = [
   {
     "key": "hdfs",
-    "name": "HDFS"
+    "name": "HDFS",
+    "icon": "📁"
   },
   {
     "key": "mr",
-    "name": "MapReduce"
+    "name": "MapReduce",
+    "icon": "🗺️"
   },
   {
     "key": "yarn",
-    "name": "Yarn"
+    "name": "Yarn",
+    "icon": "🧶"
   },
   {
     "key": "kafka",
-    "name": "Kafka"
+    "name": "Kafka",
+    "icon": "📨"
   },
   {
     "key": "hbase",
-    "name": "HBase"
+    "name": "HBase",
+    "icon": "🗄️"
   },
   {
     "key": "hive",
-    "name": "Hive"
+    "name": "Hive",
+    "icon": "🐝"
   },
   {
     "key": "spark",
-    "name": "Spark"
+    "name": "Spark",
+    "icon": "⚡"
   },
   {
     "key": "flink",
-    "name": "Flink"
+    "name": "Flink",
+    "icon": "🌊"
   },
   {
     "key": "数据仓库",
-    "name": "数据仓库"
+    "name": "数据仓库",
+    "icon": "🏢"
   },
   {
     "key": "skew",
-    "name": "数据倾斜"
+    "name": "数据倾斜",
+    "icon": "⚖️"
   }
 ]
 

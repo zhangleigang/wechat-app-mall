@@ -1,0 +1,8 @@
+<canvas 
+  canvas-id="flowchart-{{canvasId}}"
+  style="width:{{canvasWidth}}px;height:{{canvasHeight}}px;"
+  class="flowchart-canvas"
+  bindtouchstart="onTouchStart"
+  bindtouchmove="onTouchMove"
+  bindtouchend="onTouchEnd"
+></canvas>
