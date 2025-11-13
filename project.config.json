@@ -126,9 +126,58 @@
     "tabSize": 2
   },
   "packOptions": {
-    "ignore": [],
+    "ignore": [
+      {
+        "type": "folder",
+        "value": "doc"
+      },
+      {
+        "type": "folder",
+        "value": "docs"
+      },
+      {
+        "type": "folder",
+        "value": "scripts"
+      },
+      {
+        "type": "folder",
+        "value": ".kiro"
+      },
+      {
+        "type": "file",
+        "value": "README.md"
+      },
+      {
+        "type": "file",
+        "value": ".gitignore"
+      },
+      {
+        "type": "file",
+        "value": "convert_excel_to_knowledge.py"
+      },
+      {
+        "type": "file",
+        "value": "convert_excel_to_knowledge_v2.py"
+      },
+      {
+        "type": "suffix",
+        "value": ".md"
+      },
+      {
+        "type": "suffix",
+        "value": ".pdf"
+      },
+      {
+        "type": "suffix",
+        "value": ".py"
+      },
+      {
+        "type": "suffix",
+        "value": ".difypkg"
+      }
+    ],
     "include": []
   },
-  "appid": "touristappid",
+  "appid": "wxdfb05ea1837b9a25",
   "libVersion": "3.7.12"
 }
