@@ -8,7 +8,6 @@ const knowledgeApi = require('../../utils/knowledge-api.js');
 const { markdownToHtml } = require('../../utils/markdown.js');
 
 // 降级方案：本地数据（已禁用以减小包体积）
-// 如需使用本地数据，请取消下面的注释并设置 CONFIG.useLocalKnowledge = true
 // let localKnowledge = null;
 // if (CONFIG.useLocalKnowledge) {
 //     localKnowledge = require('../../utils/knowledge.js');
@@ -27,11 +26,6 @@ Page({
 
     onLoad() {
         wx.setNavigationBarTitle({ title: '面试知识' });
-
-        console.log('=== 知识库页面加载 ===');
-        console.log('配置:', CONFIG);
-        console.log('使用 API:', !CONFIG.useLocalKnowledge);
-
         this.initKnowledge();
     },
 
@@ -54,11 +48,18 @@ Page({
         } catch (error) {
             console.error('初始化知识库失败:', error);
 
-            // 本地数据降级已禁用（减小包体积）
-            this.setData({
-                error: '加载失败，请检查网络连接或 API 配置',
-                loading: false
-            });
+            // 尝试降级到本地数据
+            if (this.data.useApi && localKnowledge) {
+                console.log('降级到本地数据');
+                this.setData({ useApi: false });
+                this.loadFromLocal();
+                this.loadQuestions();
+            } else {
+                this.setData({
+                    error: '加载失败，请检查网络连接',
+                    loading: false
+                });
+            }
         }
     },
 
@@ -93,10 +94,20 @@ Page({
     },
 
     /**
-     * 从本地加载数据（已禁用以减小包体积）
+     * 从本地加载数据
      */
     loadFromLocal() {
-        throw new Error('本地数据已禁用，请使用 API 模式');
+        if (!localKnowledge) {
+            throw new Error('本地数据不可用');
+        }
+
+        this.setData({
+            categories: localKnowledge.categories || [],
+            topics: localKnowledge.topics || [],
+            loading: false
+        });
+
+        console.log('从本地加载成功');
     },
 
     /**
@@ -117,37 +128,15 @@ Page({
         const active = this.data.activeCategoryKey;
         const topics = this.data.topics || [];
 
-        console.log('=== 加载题目 ===');
-        console.log('当前分类:', active);
-        console.log('总主题数:', topics.length);
-
         // 筛选符合条件的主题
         const filteredTopics = topics.filter(t => t.categoryKey === active);
-        console.log('筛选后主题数:', filteredTopics.length);
-
-        // 调试：查看第一个主题的结构
-        if (filteredTopics.length > 0) {
-            const firstTopic = filteredTopics[0];
-            console.log('第一个主题:', {
-                id: firstTopic.id,
-                title: firstTopic.title,
-                categoryKey: firstTopic.categoryKey,
-                faqsCount: firstTopic.faqs ? firstTopic.faqs.length : 0,
-                answersCount: firstTopic.answers ? firstTopic.answers.length : 0,
-                firstFaq: firstTopic.faqs ? firstTopic.faqs[0] : null,
-                firstAnswerLength: firstTopic.answers && firstTopic.answers[0] ? firstTopic.answers[0].length : 0
-            });
-        }
 
         // 将所有问题展平成一个列表
         const allQuestions = [];
-        filteredTopics.forEach((topic, topicIndex) => {
-            console.log(`处理主题 ${topicIndex}:`, topic.title);
+        filteredTopics.forEach(topic => {
             if (topic.faqs && topic.answers) {
-                console.log(`  - FAQs: ${topic.faqs.length}, Answers: ${topic.answers.length}`);
                 topic.faqs.forEach((question, index) => {
                     const answer = topic.answers[index] || '答案加载中...';
-                    console.log(`  - 题目 ${index}: 问题长度=${question.length}, 答案长度=${answer.length}, 答案类型=${typeof answer}`);
                     allQuestions.push({
                         id: `${topic.id}-${index}`,
                         question: question,
@@ -156,18 +145,9 @@ Page({
                         expanded: false
                     });
                 });
-            } else {
-                console.warn(`  - 主题缺少 faqs 或 answers:`, {
-                    hasFaqs: !!topic.faqs,
-                    hasAnswers: !!topic.answers
-                });
             }
         });
 
-        console.log('生成题目数:', allQuestions.length);
-        if (allQuestions.length > 0) {
-            console.log('第一个题目:', allQuestions[0]);
-        }
         this.setData({ allQuestions });
     },
 
@@ -175,45 +155,13 @@ Page({
      * 查看题目详情
      */
     viewDetail(e) {
-        console.log('=== 点击查看详情 ===');
-        console.log('事件对象:', e);
-        console.log('dataset:', e.currentTarget.dataset);
+        const { id } = e.currentTarget.dataset;
+        const question = this.data.allQuestions.find(q => q.id === id);
 
-        const { index } = e.currentTarget.dataset;
-        console.log('题目索引:', index);
-        console.log('题目总数:', this.data.allQuestions.length);
-
-        const question = this.data.allQuestions[index];
-        console.log('题目数据:', question);
-
-        if (!question) {
-            console.error('题目不存在:', index);
-            wx.showToast({
-                title: '题目不存在',
-                icon: 'none'
-            });
-            return;
-        }
-
-        console.log('准备跳转到详情页');
-
-        // 将完整数据存储到全局变量，避免 URL 过长
-        const app = getApp();
-        app.globalData = app.globalData || {};
-        app.globalData.currentQuestion = question;
+        if (!question) return;
 
         wx.navigateTo({
-            url: `/pages/knowledge/detail?id=${question.id}`,
-            success: () => {
-                console.log('跳转成功');
-            },
-            fail: (err) => {
-                console.error('跳转失败:', err);
-                wx.showToast({
-                    title: '跳转失败',
-                    icon: 'none'
-                });
-            }
+            url: `/pages/knowledge/detail?id=${id}&question=${encodeURIComponent(question.question)}`
         });
     },
 
