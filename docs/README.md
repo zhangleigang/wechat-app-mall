@@ -1,237 +1,107 @@
-# AI面试助手小程序 - 文档中心
+# 项目文档索引
 
-## 📚 文档导航
+## 📚 文档结构
 
-### 🎨 设计系统文档
+### 知识库 API
 
-| 文档 | 说明 | 适合人群 |
-|------|------|----------|
-| [设计系统完整指南](./DESIGN_SYSTEM.md) | 详细的使用说明和示例 | 所有开发者 |
-| [设计系统速查表](./DESIGN_SYSTEM_CHEATSHEET.md) | 快速参考卡片 | 熟悉后快速查询 |
-| [设计系统可视化预览](./DESIGN_SYSTEM_PREVIEW.md) | 可视化效果展示 | 设计师、产品经理 |
-| [设计系统总结](./DESIGN_SYSTEM_SUMMARY.md) | 完成情况和效果总结 | 项目管理者 |
-| [迁移指南](./MIGRATION_GUIDE.md) | 现有页面迁移步骤 | 负责迁移的开发者 |
+- [API 集成文档](./KNOWLEDGE_API_INTEGRATION.md) - 小程序集成 API 的完整指南
+- [API 服务文档](../knowledge-api/README.md) - API 服务的使用说明
+- [部署文档](../knowledge-api/DEPLOYMENT.md) - 完整的部署指南
+- [阿里云部署](../knowledge-api/ALIYUN_DEPLOY.md) - 阿里云快速部署
 
-### 📋 优化计划文档
+### 优化文档
 
-| 文档 | 说明 | 适合人群 |
-|------|------|----------|
-| [渐进式优化计划](./OPTIMIZATION_PLAN.md) | 完整的优化计划和时间表 | 项目管理者 |
-| [UI优化建议](./UI_OPTIMIZATION.md) | 详细的UI优化方案 | UI设计师、前端开发 |
-| [优化总结](./OPTIMIZATION_SUMMARY.md) | 已完成的优化总结 | 所有人 |
+- [包体积优化](./PACKAGE_SIZE_OPTIMIZATION.md) - 小程序包体积优化方案
+- [UI 优化](./UI_OPTIMIZATION.md) - 界面优化文档
+- [优化计划](./OPTIMIZATION_PLAN.md) - 整体优化计划
+- [优化进度](./OPTIMIZATION_PROGRESS.md) - 优化进度跟踪
+- [优化总结](./OPTIMIZATION_SUMMARY.md) - 优化工作总结
 
-### 📖 技术文档
+### 功能文档
 
-| 文档 | 说明 | 适合人群 |
-|------|------|----------|
-| [系统架构文档](./technical/ARCHITECTURE.md) | 系统架构说明 | 技术负责人 |
-| API文档 | API接口文档（待创建） | 后端开发 |
-| 部署文档 | 部署指南（待创建） | 运维人员 |
+- [知识库功能](./KNOWLEDGE_INDEX_OPTIMIZATION.md) - 知识库页面优化
+- [Markdown 渲染](./KNOWLEDGE_MARKDOWN_RENDER.md) - Markdown 渲染实现
+- [Mermaid 图表](./MERMAID_FIX.md) - Mermaid 图表支持
+- [表格修复](./MARKDOWN_TABLE_FIX.md) - Markdown 表格渲染修复
 
----
+### 页面优化
 
-## 🚀 快速开始
-
-### 新手入门
-
-1. **了解项目**
-   - 阅读 [系统架构文档](./technical/ARCHITECTURE.md)
-   - 了解项目结构和技术栈
-
-2. **学习设计系统**
-   - 阅读 [设计系统完整指南](./DESIGN_SYSTEM.md)
-   - 查看 [设计系统速查表](./DESIGN_SYSTEM_CHEATSHEET.md)
-
-3. **开始开发**
-   - 新页面直接使用设计系统
-   - 参考 [优化计划](./OPTIMIZATION_PLAN.md)
-
-### 现有开发者
-
-1. **了解设计系统**
-   - 快速浏览 [设计系统速查表](./DESIGN_SYSTEM_CHEATSHEET.md)
-   - 查看 [可视化预览](./DESIGN_SYSTEM_PREVIEW.md)
-
-2. **迁移现有页面**
-   - 阅读 [迁移指南](./MIGRATION_GUIDE.md)
-   - 按优先级逐步迁移
-
-3. **参与优化**
-   - 查看 [优化计划](./OPTIMIZATION_PLAN.md)
-   - 认领优化任务
-
----
-
-## 📊 项目状态
-
-### 已完成 ✅
-
-- [x] 全局样式系统建立
-- [x] 设计系统文档完善
-- [x] 知识库详情页优化
-- [x] Markdown 渲染功能
-
-### 进行中 🔄
-
-- [ ] 知识库首页优化
-- [ ] 岗位分析页优化
-- [ ] 其他页面迁移
-
-### 计划中 📝
-
-- [ ] 性能优化
-- [ ] 功能增强
-- [ ] 深色模式支持
-
----
-
-## 🎯 核心特性
+- [登录页面](./LOGIN_PAGE_OPTIMIZATION.md)
+- [个人中心](./MY_INDEX_OPTIMIZATION.md)
+- [简历分析](./RESUME_ANALYSIS_OPTIMIZATION.md)
+- [职位分析](./JOB_ANALYSIS_OPTIMIZATION.md)
+- [心情小屋](./MOOD_HOUSE_OPTIMIZATION.md)
 
 ### 设计系统
 
-- ✅ 80+ CSS 变量
-- ✅ 30+ 组件样式
-- ✅ 150+ 工具类
-- ✅ 完整的文档支持
+- [设计系统](./DESIGN_SYSTEM.md) - 完整的设计系统文档
+- [设计速查表](./DESIGN_SYSTEM_CHEATSHEET.md) - 快速参考
+- [设计预览](./DESIGN_SYSTEM_PREVIEW.md) - 视觉预览
+- [设计总结](./DESIGN_SYSTEM_SUMMARY.md) - 设计总结
 
-### 优化效果
+### 技术文档
 
-- 📈 开发效率提升 80%
-- 📉 代码量减少 50%
-- 🎨 视觉一致性 100%
-- 🚀 用户体验提升 90%
+- [架构文档](./technical/ARCHITECTURE.md) - 系统架构说明
+- [迁移指南](./MIGRATION_GUIDE.md) - 版本迁移指南
 
----
+## 🗂️ 文档分类
 
-## 📖 使用示例
+### 按用途分类
 
-### 创建一个卡片
+**开发文档**
+- API 集成文档
+- 技术架构文档
+- 功能实现文档
 
-```xml
-<view class="card p-lg mb-md">
-  <text class="text-lg text-bold mb-sm">标题</text>
-  <text class="text-secondary">内容</text>
-</view>
-```
+**部署文档**
+- 部署指南
+- 阿里云部署
+- 环境配置
 
-### 创建一个按钮组
+**优化文档**
+- 性能优化
+- UI 优化
+- 包体积优化
 
-```xml
-<view class="flex-between p-lg">
-  <button class="btn btn-outline flex-1 mr-sm">取消</button>
-  <button class="btn btn-primary flex-1 ml-sm">确定</button>
-</view>
-```
+**设计文档**
+- 设计系统
+- 组件库
+- 样式规范
 
-### 创建一个渐变头部
+## 📖 快速导航
 
-```xml
-<view class="gradient-header">
-  <text class="text-2xl text-bold text-white">页面标题</text>
-  <text class="text-sm text-white mt-sm" style="opacity: 0.9;">
-    页面描述
-  </text>
-</view>
-```
+### 新手入门
 
----
+1. 阅读 [项目 README](../README.md)
+2. 查看 [API 集成文档](./KNOWLEDGE_API_INTEGRATION.md)
+3. 参考 [部署文档](../knowledge-api/DEPLOYMENT.md)
 
-## 🛠️ 开发工具
+### 开发指南
 
-### 推荐工具
+1. [设计系统](./DESIGN_SYSTEM.md) - 了解设计规范
+2. [架构文档](./technical/ARCHITECTURE.md) - 了解系统架构
+3. [API 文档](../knowledge-api/README.md) - API 使用说明
 
-- **微信开发者工具** - 小程序开发
-- **VS Code** - 代码编辑
-- **Git** - 版本控制
+### 部署运维
 
-### 推荐插件
+1. [部署文档](../knowledge-api/DEPLOYMENT.md) - 完整部署流程
+2. [阿里云部署](../knowledge-api/ALIYUN_DEPLOY.md) - 阿里云快速部署
+3. [优化指南](./OPTIMIZATION_SUMMARY.md) - 性能优化建议
 
-- **WXML** - 语法高亮
-- **WXSS** - 样式提示
-- **Prettier** - 代码格式化
+## 🔄 文档更新
 
----
+- **最后更新**: 2024-11-14
+- **维护者**: [@zhangleigang](https://github.com/zhangleigang)
 
 ## 📝 贡献指南
 
-### 如何贡献
+如需添加或更新文档，请遵循以下规范：
 
-1. **报告问题**
-   - 发现 Bug 或问题
-   - 提出改进建议
-
-2. **完善文档**
-   - 补充使用示例
-   - 修正文档错误
-
-3. **优化代码**
-   - 优化现有页面
-   - 添加新功能
-
-4. **扩展设计系统**
-   - 添加新组件
-   - 添加新工具类
-
-### 代码规范
-
-- 使用设计系统中的样式
-- 遵循命名规范
-- 添加必要的注释
-- 编写清晰的提交信息
+1. 使用 Markdown 格式
+2. 添加清晰的标题和目录
+3. 包含代码示例和截图
+4. 更新本索引文档
 
 ---
 
-## 🔗 相关链接
-
-### 官方文档
-
-- [微信小程序官方文档](https://developers.weixin.qq.com/miniprogram/dev/framework/)
-- [Vant Weapp 文档](https://vant-contrib.gitee.io/vant-weapp/)
-
-### 设计资源
-
-- [设计规范](https://developers.weixin.qq.com/miniprogram/design/)
-- [图标库](https://www.iconfont.cn/)
-
----
-
-## 💬 联系方式
-
-### 技术支持
-
-- 项目负责人：[待填写]
-- 技术咨询：[待填写]
-- 问题反馈：[待填写]
-
-### 团队协作
-
-- 项目管理：[待填写]
-- 代码仓库：[待填写]
-- 文档协作：[待填写]
-
----
-
-## 📅 更新日志
-
-### 2024-11-13
-
-- ✅ 建立全局样式系统
-- ✅ 完善设计系统文档
-- ✅ 优化知识库详情页
-- ✅ 实现 Markdown 渲染
-
-### 待更新
-
-- 📝 持续优化其他页面
-- 📝 添加更多功能
-- 📝 完善文档
-
----
-
-## 🎉 致谢
-
-感谢所有参与项目开发和优化的团队成员！
-
----
-
-**让我们一起打造更好的 AI 面试助手！** 🚀
+**提示**: 所有文档都使用 Markdown 格式编写，可以在 GitHub 或任何 Markdown 编辑器中查看。
