@@ -3,12 +3,12 @@ const AUTH = require('../../utils/auth')
 const TOOLS = require('../../utils/tools.js')
 const CONFIG = require('../../config.js')
 Page({
-	data: {
-    balance:0.00,
-    freeze:0,
-    score:0,
-    growth:0,
-    score_sign_continuous:0,
+  data: {
+    balance: 0.00,
+    freeze: 0,
+    score: 0,
+    growth: 0,
+    score_sign_continuous: 0,
     rechargeOpen: false, // 是否开启充值[预存]功能
 
     // 用户订单统计数据
@@ -19,13 +19,13 @@ Page({
     nick: undefined,
     memberExpireDate: '',
   },
-	onLoad() {
+  onLoad() {
     this.readConfigVal()
     // 补偿写法
     getApp().configLoadOK = () => {
       this.readConfigVal()
     }
-	},
+  },
   onShow() {
     AUTH.checkHasLogined().then(isLogined => {
       if (isLogined) {
@@ -139,7 +139,7 @@ Page({
       url: "/pages/order-list/index?type=" + e.currentTarget.dataset.type
     })
   },
-  scanOrderCode(){
+  scanOrderCode() {
     wx.scanCode({
       success(res) {
         console.log('res', res);
@@ -251,9 +251,9 @@ Page({
   },
   customerService() {
     wx.openCustomerServiceChat({
-      extInfo: {url: wx.getStorageSync('customerServiceChatUrl')},
+      extInfo: { url: wx.getStorageSync('customerServiceChatUrl') },
       corpId: wx.getStorageSync('customerServiceChatCorpId'),
-      success: res => {},
+      success: res => { },
       fail: err => {
         console.error(err)
       }
@@ -265,8 +265,19 @@ Page({
     })
   },
   login() {
+    console.log('login 方法被调用')
     wx.navigateTo({
-      url: '/pages/login/index',
+      url: '/pages/login/simple',
+      success: () => {
+        console.log('跳转登录页面成功')
+      },
+      fail: (err) => {
+        console.error('跳转登录页面失败:', err)
+        wx.showToast({
+          title: '跳转失败: ' + err.errMsg,
+          icon: 'none'
+        })
+      }
     })
   },
 })

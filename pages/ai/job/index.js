@@ -1,5 +1,6 @@
 const AI = require('../../../utils/ai.js')
 const AUTH = require('../../../utils/auth.js')
+const SimpleAuth = require('../../../utils/simpleAuth.js')
 
 Page({
   data: {
@@ -48,9 +49,19 @@ Page({
     const text = (this.data.inputVal || '').trim()
     if (!text || this.data.sending) return
 
-    // 检查登录状态
-    if (!AUTH.checkHasLogined()) {
-      wx.navigateTo({ url: '/pages/login/index' })
+    // 检查登录状态（使用简化认证）
+    const isLogined = await SimpleAuth.checkHasLogined()
+    if (!isLogined) {
+      wx.showModal({
+        title: '需要登录',
+        content: '请先登录后使用此功能',
+        confirmText: '去登录',
+        success: (res) => {
+          if (res.confirm) {
+            wx.navigateTo({ url: '/pages/login/simple' })
+          }
+        }
+      })
       return
     }
 

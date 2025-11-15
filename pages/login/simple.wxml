@@ -1,0 +1,67 @@
+<view class="login-container">
+  <!-- 顶部装饰 -->
+  <view class="login-header">
+    <view class="header-decoration"></view>
+  </view>
+  
+  <!-- Logo和标题 -->
+  <view class="login-brand">
+    <view class="brand-icon">🎯</view>
+    <text class="brand-title">AI面试助手</text>
+    <text class="brand-subtitle">智能陪伴，助力求职</text>
+  </view>
+  
+  <!-- 登录卡片 -->
+  <view class="login-card">
+    <view class="card-title">
+      <text class="title-text">欢迎使用</text>
+      <text class="title-desc">选择登录方式继续使用</text>
+    </view>
+    
+    <!-- 登录按钮 -->
+    <view class="login-buttons">
+      <!-- 快速登录（静默登录） -->
+      <button 
+        class="login-btn primary-btn"
+        bindtap="handleQuickLogin"
+        disabled="{{loading}}"
+      >
+        <text class="btn-icon">⚡</text>
+        <text class="btn-text">{{loading ? '登录中...' : '快速登录'}}</text>
+      </button>
+      
+      <!-- 手机号登录 -->
+      <button 
+        wx:if="{{showPhoneLogin}}"
+        class="login-btn secondary-btn"
+        open-type="getPhoneNumber" 
+        bindgetphonenumber="handlePhoneLogin"
+        disabled="{{loading}}"
+      >
+        <text class="btn-icon">📱</text>
+        <text class="btn-text">手机号登录</text>
+      </button>
+    </view>
+    
+    <!-- 协议 -->
+    <view class="agreement-section">
+      <view class="agreement-checkbox" bindtap="toggleAgreement">
+        <view class="checkbox {{agreed ? 'checked' : ''}}">
+          <text wx:if="{{agreed}}" class="check-icon">✓</text>
+        </view>
+        <text class="agreement-text">
+          我已阅读并同意
+          <text class="agreement-link" catchtap="showAgreement" data-type="user">《用户协议》</text>
+          和
+          <text class="agreement-link" catchtap="showAgreement" data-type="privacy">《隐私政策》</text>
+        </text>
+      </view>
+    </view>
+  </view>
+  
+  <!-- 底部提示 -->
+  <view class="login-footer">
+    <text class="footer-text">登录即表示您同意我们的服务条款</text>
+    <text class="footer-hint">本系统使用本地认证，数据安全可靠</text>
+  </view>
+</view>

@@ -11,6 +11,7 @@
     "pages/my/feedback",
     "pages/my/info-menu",
     "pages/my/user-code",
+    "pages/login/simple",
     "pages/login/index",
     "pages/about/index"
   ],

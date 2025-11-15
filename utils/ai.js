@@ -1,19 +1,36 @@
 const CONFIG = require('../config.js')
+const SimpleAuth = require('./simpleAuth.js')
 
 function _headers() {
   const headers = {
     'Content-Type': 'application/json'
   }
+
+  // 优先使用配置的 API key
   if (CONFIG.ai_api_key) {
     headers['Authorization'] = 'Bearer ' + CONFIG.ai_api_key
+  } else {
+    // 否则使用用户 token
+    const token = wx.getStorageSync('token')
+    if (token) {
+      headers['Authorization'] = 'Bearer ' + token
+    }
   }
+
+  // 添加用户ID
+  const userId = wx.getStorageSync('userId')
+  if (userId) {
+    headers['X-User-Id'] = userId
+  }
+
   return headers
 }
 
 function chat({ scene, messages, sessionId }) {
   const base = CONFIG.ai_api_base
-  const uid = wx.getStorageSync('uid')
+  const userId = wx.getStorageSync('userId') || wx.getStorageSync('uid')
   const token = wx.getStorageSync('token')
+
   return new Promise((resolve, reject) => {
     wx.request({
       url: `${base}/chat`,
@@ -22,7 +39,7 @@ function chat({ scene, messages, sessionId }) {
       data: {
         scene, // 'job' | 'resume' | 'mood'
         sessionId,
-        userId: uid,
+        userId,
         token,
         messages
       },
@@ -53,7 +70,7 @@ function uploadResume(filePath) {
         let data = {}
         try {
           data = JSON.parse(res.data)
-        } catch (e) {}
+        } catch (e) { }
         if (res.statusCode === 200) {
           resolve(data)
         } else {

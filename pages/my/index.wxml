@@ -10,7 +10,7 @@
       <text class="login-icon">👤</text>
       <text class="login-title">欢迎使用 AI 面试助手</text>
       <text class="login-desc">登录后可使用更多功能</text>
-      <button class="btn btn-primary btn-block btn-lg mt-xl" bind:click="login">
+      <button class="btn btn-primary btn-block btn-lg mt-xl" bindtap="login">
         立即登录
       </button>
     </view>
