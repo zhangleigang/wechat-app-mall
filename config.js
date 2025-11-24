@@ -12,12 +12,12 @@ module.exports = {
   ai_api_key: '', // 若需要服务端鉴权，可填密钥或留空
 
   // 知识库 API 配置（包含认证服务）
-  knowledgeApiUrl: 'http://47.95.196.190:8080/api', // 生产环境
+  knowledgeApiUrl: 'https://api.feelnow.cn:8443/api', // 生产环境（HTTPS已启用）
   // knowledgeApiUrl: 'http://localhost:3000/api', // 本地开发环境
+  // knowledgeApiUrl: 'http://47.95.196.190:8080/api', // 旧的HTTP地址（已弃用）
 
   // 认证API已集成到知识库API中
-  // 登录接口: http://47.95.196.190:8080/api/auth/login
-  // 验证接口: http://47.95.196.190:8080/api/auth/check
-  // knowledgeApiUrl: 'https://api.feelnow.cn:8443/api', // HTTPS（配置证书后使用）
+  // 登录接口: https://api.feelnow.cn:8443/api/auth/login
+  // 验证接口: https://api.feelnow.cn:8443/api/auth/check
   useLocalKnowledge: false // false: 使用 API 加载, true: 使用本地数据（降级方案）
 }
