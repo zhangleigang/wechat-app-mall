@@ -27,8 +27,8 @@ module.exports = {
 
   // === 收款码支付配置 ===
   paymentQrcode: {
-    url: 'https://your-domain.com/qrcode.jpg', // 收款码图片URL（需要替换为实际的收款码图片地址）
-    accountName: '收款人姓名', // 收款账户名（需要替换为实际的收款人姓名）
+    url: 'https://api.feelnow.cn:8443/static/images/payment-qrcode.png', // 收款码图片URL
+    accountName: '请填写收款人姓名', // 收款账户名（⚠️ 需要替换为实际的收款人姓名）
     enabled: true // 是否启用收款码支付
   }
 }
