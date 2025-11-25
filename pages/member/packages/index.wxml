@@ -1,0 +1,77 @@
+<view class="page-container">
+  <!-- 头部介绍 -->
+  <view class="header-section">
+    <view class="header-content">
+      <text class="header-icon">💎</text>
+      <text class="header-title">开通会员，解锁全部功能</text>
+      <text class="header-desc">专业AI助手，助力求职成功</text>
+    </view>
+  </view>
+
+  <!-- 套餐列表 -->
+  <view class="packages-section">
+    <view 
+      wx:for="{{ packages }}" 
+      wx:key="id"
+      class="package-card {{ selectedPackage === item.id ? 'selected' : '' }} {{ item.recommended ? 'recommended' : '' }}"
+      bindtap="selectPackage"
+      data-id="{{ item.id }}"
+    >
+      <!-- 推荐标签 -->
+      <view wx:if="{{ item.badge }}" class="package-badge {{ item.recommended ? 'badge-recommended' : 'badge-best' }}">
+        {{ item.badge }}
+      </view>
+
+      <!-- 选中标识 -->
+      <view class="package-check">
+        <view class="check-icon {{ selectedPackage === item.id ? 'checked' : '' }}">
+          <van-icon wx:if="{{ selectedPackage === item.id }}" name="success" color="#fff" size="16px" />
+        </view>
+      </view>
+
+      <!-- 套餐信息 -->
+      <view class="package-header">
+        <view class="package-name-row">
+          <text class="package-name">{{ item.name }}</text>
+          <text class="package-duration">{{ item.duration }}</text>
+        </view>
+        
+        <view class="package-price-row">
+          <view class="price-main">
+            <text class="price-symbol">¥</text>
+            <text class="price-value">{{ item.price }}</text>
+          </view>
+          <view wx:if="{{ item.discount }}" class="price-info">
+            <text class="original-price">¥{{ item.originalPrice }}</text>
+            <text class="discount-tag">{{ item.discount }}</text>
+          </view>
+        </view>
+      </view>
+
+      <!-- 权益列表 -->
+      <view class="package-features">
+        <view wx:for="{{ item.features }}" wx:key="index" wx:for-item="feature" class="feature-item">
+          <text class="feature-icon">✓</text>
+          <text class="feature-text">{{ feature }}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 权益说明 -->
+  <view class="benefits-link" bindtap="viewBenefits">
+    <text class="benefits-text">查看完整会员权益</text>
+    <text class="benefits-arrow">→</text>
+  </view>
+
+  <!-- 底部按钮 -->
+  <view class="bottom-action">
+    <button class="btn btn-primary btn-block btn-lg" bindtap="handlePurchase">
+      立即开通
+    </button>
+    <view class="agreement-text">
+      <text class="text-tertiary text-sm">开通即表示同意</text>
+      <text class="text-link text-sm">《会员服务协议》</text>
+    </view>
+  </view>
+</view>

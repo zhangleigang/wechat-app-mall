@@ -1,0 +1,104 @@
+<view class="page-container">
+  <!-- 头部 -->
+  <view class="header-section">
+    <text class="header-icon">💎</text>
+    <text class="header-title">会员专享权益</text>
+    <text class="header-desc">解锁全部功能，助力求职成功</text>
+    
+    <!-- 会员状态 -->
+    <view wx:if="{{ memberInfo && memberInfo.isValid }}" class="member-status-card">
+      <view class="status-row">
+        <text class="status-label">会员状态：</text>
+        <text class="status-value active">已开通</text>
+      </view>
+      <view class="status-row">
+        <text class="status-label">到期时间：</text>
+        <text class="status-value">{{ memberExpireDate }}</text>
+      </view>
+      <view class="status-row">
+        <text class="status-label">剩余天数：</text>
+        <text class="status-value highlight">{{ memberDaysRemaining }}天</text>
+      </view>
+    </view>
+    
+    <view wx:else class="member-status-card inactive">
+      <text class="status-inactive">您还不是会员，开通后即可享受全部权益</text>
+    </view>
+  </view>
+
+  <!-- 权益列表 -->
+  <view class="benefits-section">
+    <view class="section-title">
+      <text class="title-text">全部权益</text>
+    </view>
+    
+    <view class="benefits-grid">
+      <view 
+        wx:for="{{ benefits }}" 
+        wx:key="title"
+        class="benefit-card"
+        style="border-left-color: {{ item.color }}"
+      >
+        <view class="benefit-icon" style="background: {{ item.color }}20">
+          <text style="color: {{ item.color }}">{{ item.icon }}</text>
+        </view>
+        <view class="benefit-content">
+          <text class="benefit-title">{{ item.title }}</text>
+          <text class="benefit-desc">{{ item.desc }}</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 对比表格 -->
+  <view class="comparison-section">
+    <view class="section-title">
+      <text class="title-text">会员对比</text>
+    </view>
+
+    <view class="comparison-table">
+      <!-- 表头 -->
+      <view class="table-header">
+        <view class="header-cell feature-col">
+          <text class="header-text">功能</text>
+        </view>
+        <view class="header-cell">
+          <text class="header-text">{{ comparison.free.title }}</text>
+        </view>
+        <view class="header-cell member-col">
+          <text class="header-text member-text">{{ comparison.member.title }}</text>
+        </view>
+      </view>
+
+      <!-- 表格内容 -->
+      <view class="table-body">
+        <view 
+          wx:for="{{ comparison.free.features }}" 
+          wx:key="index"
+          class="table-row"
+        >
+          <view class="table-cell feature-col">
+            <text class="feature-name">{{ item.text }}</text>
+          </view>
+          <view class="table-cell">
+            <text class="status-icon {{ item.available ? 'available' : 'unavailable' }}">
+              {{ item.available ? '✓' : '✗' }}
+            </text>
+          </view>
+          <view class="table-cell member-col">
+            <text class="status-icon available">
+              {{ comparison.member.features[index].available ? '✓' : '✗' }}
+            </text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部按钮 -->
+  <view class="bottom-action">
+    <button class="btn btn-primary btn-block btn-lg" bindtap="handlePurchase">
+      {{ memberInfo && memberInfo.isValid ? '续费会员' : '立即开通会员' }}
+    </button>
+  </view>
+</view>

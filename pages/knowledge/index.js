@@ -27,11 +27,6 @@ Page({
 
     onLoad() {
         wx.setNavigationBarTitle({ title: '面试知识' });
-
-        console.log('=== 知识库页面加载 ===');
-        console.log('配置:', CONFIG);
-        console.log('使用 API:', !CONFIG.useLocalKnowledge);
-
         this.initKnowledge();
     },
 
@@ -81,13 +76,7 @@ Page({
                 topics: result.list || [],
                 loading: false
             });
-
-            console.log('从 API 加载成功:', {
-                categories: categories.length,
-                topics: result.list.length
-            });
         } catch (error) {
-            console.error('从 API 加载失败:', error);
             throw error;
         }
     },
@@ -117,37 +106,15 @@ Page({
         const active = this.data.activeCategoryKey;
         const topics = this.data.topics || [];
 
-        console.log('=== 加载题目 ===');
-        console.log('当前分类:', active);
-        console.log('总主题数:', topics.length);
-
         // 筛选符合条件的主题
         const filteredTopics = topics.filter(t => t.categoryKey === active);
-        console.log('筛选后主题数:', filteredTopics.length);
-
-        // 调试：查看第一个主题的结构
-        if (filteredTopics.length > 0) {
-            const firstTopic = filteredTopics[0];
-            console.log('第一个主题:', {
-                id: firstTopic.id,
-                title: firstTopic.title,
-                categoryKey: firstTopic.categoryKey,
-                faqsCount: firstTopic.faqs ? firstTopic.faqs.length : 0,
-                answersCount: firstTopic.answers ? firstTopic.answers.length : 0,
-                firstFaq: firstTopic.faqs ? firstTopic.faqs[0] : null,
-                firstAnswerLength: firstTopic.answers && firstTopic.answers[0] ? firstTopic.answers[0].length : 0
-            });
-        }
 
         // 将所有问题展平成一个列表
         const allQuestions = [];
-        filteredTopics.forEach((topic, topicIndex) => {
-            console.log(`处理主题 ${topicIndex}:`, topic.title);
+        filteredTopics.forEach((topic) => {
             if (topic.faqs && topic.answers) {
-                console.log(`  - FAQs: ${topic.faqs.length}, Answers: ${topic.answers.length}`);
                 topic.faqs.forEach((question, index) => {
                     const answer = topic.answers[index] || '答案加载中...';
-                    console.log(`  - 题目 ${index}: 问题长度=${question.length}, 答案长度=${answer.length}, 答案类型=${typeof answer}`);
                     allQuestions.push({
                         id: `${topic.id}-${index}`,
                         question: question,
@@ -156,18 +123,9 @@ Page({
                         expanded: false
                     });
                 });
-            } else {
-                console.warn(`  - 主题缺少 faqs 或 answers:`, {
-                    hasFaqs: !!topic.faqs,
-                    hasAnswers: !!topic.answers
-                });
             }
         });
 
-        console.log('生成题目数:', allQuestions.length);
-        if (allQuestions.length > 0) {
-            console.log('第一个题目:', allQuestions[0]);
-        }
         this.setData({ allQuestions });
     },
 
@@ -175,27 +133,16 @@ Page({
      * 查看题目详情
      */
     viewDetail(e) {
-        console.log('=== 点击查看详情 ===');
-        console.log('事件对象:', e);
-        console.log('dataset:', e.currentTarget.dataset);
-
         const { index } = e.currentTarget.dataset;
-        console.log('题目索引:', index);
-        console.log('题目总数:', this.data.allQuestions.length);
-
         const question = this.data.allQuestions[index];
-        console.log('题目数据:', question);
 
         if (!question) {
-            console.error('题目不存在:', index);
             wx.showToast({
                 title: '题目不存在',
                 icon: 'none'
             });
             return;
         }
-
-        console.log('准备跳转到详情页');
 
         // 将完整数据存储到全局变量，避免 URL 过长
         const app = getApp();
@@ -204,11 +151,7 @@ Page({
 
         wx.navigateTo({
             url: `/pages/knowledge/detail?id=${question.id}`,
-            success: () => {
-                console.log('跳转成功');
-            },
-            fail: (err) => {
-                console.error('跳转失败:', err);
+            fail: () => {
                 wx.showToast({
                     title: '跳转失败',
                     icon: 'none'

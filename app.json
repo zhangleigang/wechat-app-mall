@@ -6,14 +6,13 @@
     "pages/ai/resume/index",
     "pages/ai/mood/index",
     "pages/my/index",
-    "pages/my/info",
     "pages/my/setting",
     "pages/my/feedback",
-    "pages/my/info-menu",
-    "pages/my/user-code",
     "pages/login/simple",
-    "pages/login/index",
-    "pages/about/index"
+    "pages/member/packages/index",
+    "pages/member/benefits/index",
+    "pages/member/payment/index",
+    "pages/member/payment-result/index"
   ],
   "requiredPrivateInfos": [
     "getLocation",
@@ -73,10 +72,6 @@
   },
   "usingComponents": {
     "fuwuxieyi": "/components/fuwuxieyi/index",
-    "goods-pop": "/components/goods-pop/index",
-    "login": "/components/login/index",
-    "bind-mobile": "/components/bind-mobile/index",
-    "payment": "/components/payment/index",
     "mp-html": "mp-html",
     "van-notice-bar": "@vant/weapp/notice-bar/index",
     "van-search": "@vant/weapp/search/index",

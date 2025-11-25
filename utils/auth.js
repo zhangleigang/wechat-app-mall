@@ -1,252 +1,46 @@
-const WXAPI = require('apifm-wxapi')
-const CONFIG = require('../config.js')
-async function checkSession(){
-  return new Promise((resolve, reject) => {
-    wx.checkSession({
-      success() {
-        return resolve(true)
-      },
-      fail() {
-        return resolve(false)
-      }
-    })
-  })
-}
+/**
+ * 认证模块兼容层
+ * 
+ * 本文件已废弃，仅保留兼容层以避免现有代码引用错误
+ * 新代码请直接使用 simpleAuth.js
+ * 
+ * @deprecated 请使用 simpleAuth.js 替代
+ */
 
-async function bindSeller() {
-  const token = wx.getStorageSync('token')
-  const referrer = wx.getStorageSync('referrer')
-  if (!token) {
-    return
-  }
-  if (!referrer) {
-    return
-  }
-  const res = await WXAPI.bindSeller({
-    token,
-    uid: referrer
-  })
-}
+const SimpleAuth = require('./simpleAuth.js')
 
-// 检测登录状态，返回 true / false
+/**
+ * 检测登录状态，返回 true / false
+ * 兼容方法：转发到 simpleAuth.checkHasLogined()
+ */
 async function checkHasLogined() {
-  const token = wx.getStorageSync('token')
-  if (!token) {
-    return false
-  }
-  const loggined = await checkSession()
-  if (!loggined) {
-    wx.removeStorageSync('token')
-    return false
-  }
-  const checkTokenRes = await WXAPI.checkToken(token)
-  if (checkTokenRes.code != 0) {
-    wx.removeStorageSync('token')
-    return false
-  }
-  return true
+  console.log('[auth.js] 兼容层：转发到 simpleAuth.checkHasLogined()')
+  return await SimpleAuth.checkHasLogined()
 }
 
-async function wxaCode(){
-  return new Promise((resolve, reject) => {
-    wx.login({
-      success(res) {
-        return resolve(res.code)
-      },
-      fail() {
-        wx.showToast({
-          title: '获取code失败',
-          icon: 'none'
-        })
-        return resolve('获取code失败')
-      }
-    })
-  })
+/**
+ * 退出登录
+ * 兼容方法：转发到 simpleAuth.logout()
+ */
+function loginOut() {
+  console.log('[auth.js] 兼容层：转发到 simpleAuth.logout()')
+  SimpleAuth.logout()
 }
 
-async function login(page){
-  const _this = this
-  wx.login({
-    success: function (res) {
-      const extConfigSync = wx.getExtConfigSync()
-      if (extConfigSync.subDomain) {
-        WXAPI.wxappServiceLogin({
-          code: res.code
-        }).then(function (res) {        
-          if (res.code == 10000) {
-            // 去注册
-            return;
-          }
-          if (res.code != 0) {
-            // 登录错误
-            wx.showModal({
-              title: '无法登录',
-              content: res.msg,
-              showCancel: false
-            })
-            return;
-          }
-          wx.setStorageSync('token', res.data.token)
-          wx.setStorageSync('uid', res.data.uid)
-          if (CONFIG.bindSeller) {
-            _this.bindSeller()
-          }
-          if ( page ) {
-            page.onShow()
-          }
-        })
-      } else {
-        WXAPI.login_wx(res.code).then(function (res) {        
-          if (res.code == 10000) {
-            // 去注册
-            return;
-          }
-          if (res.code != 0) {
-            // 登录错误
-            wx.showModal({
-              title: '无法登录',
-              content: res.msg,
-              showCancel: false
-            })
-            return;
-          }
-          wx.setStorageSync('token', res.data.token)
-          wx.setStorageSync('uid', res.data.uid)
-          if (CONFIG.bindSeller) {
-            _this.bindSeller()
-          }
-          if ( page ) {
-            page.onShow()
-          }
-        })
-      }
-    }
-  })
+/**
+ * 获取微信登录 code
+ * 兼容方法：转发到 simpleAuth.getWxCode()
+ */
+async function wxaCode() {
+  console.log('[auth.js] 兼容层：转发到 simpleAuth.getWxCode()')
+  return await SimpleAuth.getWxCode()
 }
 
-async function authorize() {
-  // const code = await wxaCode()
-  // const resLogin = await WXAPI.login_wx(code)
-  // if (resLogin.code == 0) {
-  //   wx.setStorageSync('token', resLogin.data.token)
-  //   wx.setStorageSync('uid', resLogin.data.uid)
-  //   return resLogin
-  // }
-  return new Promise((resolve, reject) => {
-    wx.login({
-      success: function (res) {
-        const code = res.code
-        let referrer = '' // 推荐人
-        let referrer_storge = wx.getStorageSync('referrer');
-        if (referrer_storge) {
-          referrer = referrer_storge;
-        }
-        // 下面开始调用注册接口
-        const extConfigSync = wx.getExtConfigSync()
-        if (extConfigSync.subDomain) {
-          WXAPI.wxappServiceAuthorize({
-            code: code,
-            referrer: referrer
-          }).then(function (res) {
-            if (res.code == 0) {
-              wx.setStorageSync('token', res.data.token)
-              wx.setStorageSync('uid', res.data.uid)
-              resolve(res)
-            } else {
-              wx.showToast({
-                title: res.msg,
-                icon: 'none'
-              })
-              reject(res.msg)
-            }
-          })
-        } else {
-          WXAPI.authorize({
-            code: code,
-            referrer: referrer
-          }).then(function (res) {
-            if (res.code == 0) {
-              wx.setStorageSync('token', res.data.token)
-              wx.setStorageSync('uid', res.data.uid)
-              resolve(res)
-            } else {
-              wx.showToast({
-                title: res.msg,
-                icon: 'none'
-              })
-              reject(res.msg)
-            }
-          })
-        }
-      },
-      fail: err => {
-        reject(err)
-      }
-    })
-  })
-}
-
-// 最新的登陆接口，建议用这个
-async function login20241025() {
-  const code = await wxaCode()
-  const extConfigSync = wx.getExtConfigSync()
-  if (extConfigSync.subDomain) {
-    // 服务商模式
-    const res = await WXAPI.wxappServiceLogin({ code })
-    if (res.code == 10000) {
-      // 去注册
-      return res
-    }
-    if (res.code != 0) {
-      // 登录错误
-      wx.showModal({
-        content: res.msg,
-        showCancel: false
-      })
-      return res
-    }
-    wx.setStorageSync('token', res.data.token)
-    wx.setStorageSync('uid', res.data.uid)
-    wx.setStorageSync('openid', res.data.openid)
-    wx.setStorageSync('mobile', res.data.mobile)
-    if (CONFIG.bindSeller) {
-      this.bindSeller()
-    }
-    return res
-  } else {
-    // 非服务商模式
-    const res = await WXAPI.login_wx(code)
-    if (res.code == 10000) {
-      // 去注册
-      return res;
-    }
-    if (res.code != 0) {
-      // 登录错误
-      wx.showModal({
-        content: res.msg,
-        showCancel: false
-      })
-      return res;
-    }
-    wx.setStorageSync('token', res.data.token)
-    wx.setStorageSync('uid', res.data.uid)
-    wx.setStorageSync('openid', res.data.openid)
-    wx.setStorageSync('mobile', res.data.mobile)
-    if (CONFIG.bindSeller) {
-      this.bindSeller()
-    }
-    return res
-  }
-}
-
-function loginOut(){
-  wx.removeStorageSync('token')
-  wx.removeStorageSync('uid')
-  wx.removeStorageSync('openid')
-  wx.removeStorageSync('mobile')
-}
-
-async function checkAndAuthorize (scope) {
+/**
+ * 检查并授权
+ * 保留原有实现，因为这是微信小程序特定功能
+ */
+async function checkAndAuthorize(scope) {
   return new Promise((resolve, reject) => {
     wx.getSetting({
       success(res) {
@@ -256,14 +50,8 @@ async function checkAndAuthorize (scope) {
             success() {
               resolve() // 无返回参数
             },
-            fail(e){
+            fail(e) {
               console.error(e)
-              // if (e.errMsg.indexof('auth deny') != -1) {
-              //   wx.showToast({
-              //     title: e.errMsg,
-              //     icon: 'none'
-              //   })
-              // }
               wx.showModal({
                 title: '无权操作',
                 content: '需要获得您的授权',
@@ -271,9 +59,9 @@ async function checkAndAuthorize (scope) {
                 confirmText: '立即授权',
                 confirmColor: '#e64340',
                 success(res) {
-                  wx.openSetting();
+                  wx.openSetting()
                 },
-                fail(e){
+                fail(e) {
                   console.error(e)
                   reject(e)
                 },
@@ -284,21 +72,81 @@ async function checkAndAuthorize (scope) {
           resolve() // 无返回参数
         }
       },
-      fail(e){
+      fail(e) {
         console.error(e)
         reject(e)
       }
     })
-  })  
+  })
+}
+
+// ============ 以下方法已废弃但保留兼容 ============
+
+/**
+ * @deprecated 已废弃，请使用 simpleAuth.silentLogin()
+ * 兼容实现：转发到 simpleAuth.silentLogin()
+ */
+async function login(page) {
+  console.warn('[auth.js] login() 方法已废弃，请使用 simpleAuth.silentLogin()，当前调用已转发')
+  const result = await SimpleAuth.silentLogin()
+  // 返回兼容格式
+  return {
+    code: result.success ? 0 : -1,
+    data: result.data,
+    msg: result.success ? 'success' : result.error
+  }
+}
+
+/**
+ * @deprecated 已废弃，请使用 simpleAuth.silentLogin()
+ * 兼容实现：转发到 simpleAuth.silentLogin()
+ */
+async function authorize() {
+  console.warn('[auth.js] authorize() 方法已废弃，请使用 simpleAuth.silentLogin()，当前调用已转发')
+  const result = await SimpleAuth.silentLogin()
+  // 返回兼容格式
+  return {
+    code: result.success ? 0 : -1,
+    data: result.data,
+    msg: result.success ? 'success' : result.error
+  }
+}
+
+/**
+ * @deprecated 已废弃，请使用 simpleAuth.silentLogin()
+ * 兼容实现：转发到 simpleAuth.silentLogin()
+ */
+async function login20241025() {
+  console.warn('[auth.js] login20241025() 方法已废弃，请使用 simpleAuth.silentLogin()，当前调用已转发')
+  const result = await SimpleAuth.silentLogin()
+  // 返回兼容格式
+  return {
+    code: result.success ? 0 : -1,
+    data: result.data,
+    msg: result.success ? 'success' : result.error
+  }
+}
+
+/**
+ * @deprecated 已废弃，apifm 相关功能不再支持
+ * 兼容实现：静默忽略，不抛出错误
+ */
+async function bindSeller() {
+  console.warn('[auth.js] bindSeller() 方法已废弃，apifm 相关功能不再支持，调用已忽略')
+  // 不抛出错误，静默忽略，返回成功以保持兼容
+  return Promise.resolve()
 }
 
 module.exports = {
+  // 兼容方法（转发到 simpleAuth）
   checkHasLogined: checkHasLogined,
-  wxaCode: wxaCode,
-  login: login,
-  login20241025: login20241025,
   loginOut: loginOut,
+  wxaCode: wxaCode,
   checkAndAuthorize: checkAndAuthorize,
+
+  // 已废弃方法（抛出错误提示）
+  login: login,
   authorize: authorize,
+  login20241025: login20241025,
   bindSeller: bindSeller
 }

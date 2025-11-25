@@ -1,4 +1,5 @@
-const WXAPI = require('apifm-wxapi')
+// apifm-wxapi 已移除，此组件已废弃
+// const WXAPI = require('apifm-wxapi')
 
 Component({
   options: {

@@ -1,7 +1,8 @@
-const WXAPI = require('apifm-wxapi')
+// apifm-wxapi 已移除，购物车功能已废弃
+// const WXAPI = require('apifm-wxapi')
 
 // 显示购物车tabBar的Badge
-async function showTabBarBadge(noTabBarPage){
+async function showTabBarBadge(noTabBarPage) {
   const token = wx.getStorageSync('token')
   if (!token) {
     return 0

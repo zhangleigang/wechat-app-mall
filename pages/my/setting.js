@@ -1,44 +1,56 @@
+// 简化版设置页面 - 移除了 apifm 依赖
 const CONFIG = require('../../config.js')
-const WXAPI = require('apifm-wxapi')
 const AUTH = require('../../utils/auth')
+const SimpleAuth = require('../../utils/simpleAuth')
+
 Page({
   data: {
-    enableDebug: wx.getSystemInfoSync().enableDebug
+    enableDebug: wx.getSystemInfoSync().enableDebug,
+    version: CONFIG.version || '1.0.0'
   },
+
   onLoad: function (options) {
     this.setData({
-      version: CONFIG.version
+      version: CONFIG.version || '1.0.0'
     })
   },
+
   onShow: function () {
-    this.getUserApiInfo()
+    // 加载用户信息
+    this.loadUserInfo()
   },
-  async getUserApiInfo() {
-    const res = await WXAPI.userDetail(wx.getStorageSync('token'))
-    if (res.code == 0) {
-      let _data = {}
-      _data.apiUserInfoMap = res.data
-      if (res.data.base.mobile) {
-        _data.userMobile = res.data.base.mobile
-      }
-      if (this.data.order_hx_uids && this.data.order_hx_uids.indexOf(res.data.base.id) != -1) {
-        _data.canHX = true // 具有扫码核销的权限
-      }
-      if (res.data.peisongMember && res.data.peisongMember.status == 1) {
-        _data.memberChecked = false
-      } else {
-        _data.memberChecked = true
-      }
-      this.setData(_data);
+
+  loadUserInfo() {
+    const userInfo = wx.getStorageSync('userInfo')
+    if (userInfo) {
+      this.setData({
+        userMobile: userInfo.phone || '',
+        userInfo: userInfo
+      })
     }
   },
-  clearStorage(){
-    wx.clearStorageSync()
-    wx.showToast({
-      title: '已清除',
-      icon: 'success'
+
+  clearStorage() {
+    wx.showModal({
+      title: '确认清除',
+      content: '清除缓存后需要重新登录，确定继续吗？',
+      success: (res) => {
+        if (res.confirm) {
+          wx.clearStorageSync()
+          wx.showToast({
+            title: '已清除',
+            icon: 'success'
+          })
+          setTimeout(() => {
+            wx.reLaunch({
+              url: '/pages/login/simple'
+            })
+          }, 1000)
+        }
+      }
     })
   },
+
   setEnableDebug() {
     const enableDebug = wx.getSystemInfoSync().enableDebug
     if (enableDebug) {
@@ -50,16 +62,35 @@ Page({
         enableDebug: true
       })
     }
+    this.setData({
+      enableDebug: !enableDebug
+    })
   },
+
   openSetting() {
     wx.openSetting({
       withSubscriptions: true
     })
   },
+
   loginOut() {
-    AUTH.loginOut()
-    wx.navigateTo({
-      url: '/pages/login/index',
+    wx.showModal({
+      title: '确认退出',
+      content: '退出登录后需要重新登录才能使用，确定继续吗？',
+      success: (res) => {
+        if (res.confirm) {
+          SimpleAuth.logout()
+          wx.showToast({
+            title: '已退出登录',
+            icon: 'success'
+          })
+          setTimeout(() => {
+            wx.reLaunch({
+              url: '/pages/login/simple'
+            })
+          }, 1000)
+        }
+      }
     })
   },
 })

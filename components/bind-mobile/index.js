@@ -1,4 +1,5 @@
-const WXAPI = require('apifm-wxapi')
+// apifm-wxapi 已移除，此组件已废弃
+// const WXAPI = require('apifm-wxapi')
 const AUTH = require('../../utils/auth')
 Component({
   options: {
@@ -17,14 +18,14 @@ Component({
    * 组件的内部数据，和 properties 一同用于组件的模板渲染
    */
   data: {
-    
+
   },
   // 组件数据字段监听器，用于监听 properties 和 data 的变化
   observers: {
   },
   lifetimes: {
     attached() {
-      
+
     },
     detached() {
       // 在组件实例被从页面节点树移除时执行
@@ -43,7 +44,7 @@ Component({
           content: '请阅读并同意隐私条款以后才能继续本操作',
           confirmText: '阅读协议',
           cancelText: '取消',
-          success (res) {
+          success(res) {
             if (res.confirm) {
               wx.requirePrivacyAuthorize() // 弹出用户隐私授权框
             }

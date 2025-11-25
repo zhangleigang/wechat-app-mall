@@ -1,0 +1,314 @@
+/* 页面容器 */
+.page-container {
+  min-height: 100vh;
+  background: var(--bg-page);
+  padding-bottom: 100px;
+}
+
+/* 头部区域 */
+.header-section {
+  background: var(--primary-gradient);
+  padding: var(--space-3xl) var(--space-lg) var(--space-2xl);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.header-icon {
+  font-size: 64px;
+  margin-bottom: var(--space-md);
+  animation: rotate 3s ease-in-out infinite;
+}
+
+@keyframes rotate {
+  0%, 100% {
+    transform: rotate(0deg);
+  }
+  25% {
+    transform: rotate(-10deg);
+  }
+  75% {
+    transform: rotate(10deg);
+  }
+}
+
+.header-title {
+  font-size: var(--font-2xl);
+  font-weight: var(--font-bold);
+  color: var(--text-white);
+  margin-bottom: var(--space-sm);
+}
+
+.header-desc {
+  font-size: var(--font-md);
+  color: var(--text-white);
+  opacity: 0.9;
+}
+
+/* 会员状态卡片 */
+.member-status-card {
+  margin-top: var(--space-lg);
+  background: rgba(255, 255, 255, 0.95);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  width: 90%;
+  box-shadow: var(--shadow-md);
+}
+
+.member-status-card.inactive {
+  text-align: center;
+  padding: var(--space-md);
+}
+
+.status-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-sm);
+}
+
+.status-row:last-child {
+  margin-bottom: 0;
+}
+
+.status-label {
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+}
+
+.status-value {
+  font-size: var(--font-sm);
+  color: var(--text-primary);
+  font-weight: var(--font-medium);
+}
+
+.status-value.active {
+  color: var(--success-color);
+}
+
+.status-value.highlight {
+  color: var(--primary-color);
+  font-weight: var(--font-bold);
+}
+
+.status-inactive {
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+}
+
+/* 区域标题 */
+.section-title {
+  padding: var(--space-xl) var(--space-lg) var(--space-md);
+}
+
+.title-text {
+  font-size: var(--font-xl);
+  font-weight: var(--font-bold);
+  color: var(--text-primary);
+  position: relative;
+  padding-left: var(--space-md);
+}
+
+.title-text::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 4px;
+  height: 20px;
+  background: var(--primary-gradient);
+  border-radius: var(--radius-sm);
+}
+
+/* 权益区域 */
+.benefits-section {
+  margin-bottom: var(--space-xl);
+}
+
+.benefits-grid {
+  padding: 0 var(--space-lg);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+}
+
+/* 权益卡片 */
+.benefit-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  gap: var(--space-md);
+  border-left: 4px solid var(--primary-color);
+  transition: all var(--transition-base);
+}
+
+.benefit-card:active {
+  transform: translateX(4px);
+  box-shadow: var(--shadow-md);
+}
+
+.benefit-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 24px;
+  flex-shrink: 0;
+}
+
+.benefit-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.benefit-title {
+  font-size: var(--font-lg);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+}
+
+.benefit-desc {
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+  line-height: var(--line-height-relaxed);
+}
+
+/* 对比区域 */
+.comparison-section {
+  margin-bottom: var(--space-xl);
+}
+
+.comparison-table {
+  margin: 0 var(--space-lg);
+  background: var(--bg-card);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+}
+
+/* 表头 */
+.table-header {
+  display: flex;
+  background: var(--bg-page);
+  border-bottom: 2px solid var(--border-light);
+}
+
+.header-cell {
+  flex: 1;
+  padding: var(--space-md);
+  text-align: center;
+}
+
+.header-cell.feature-col {
+  flex: 1.5;
+  text-align: left;
+}
+
+.header-cell.member-col {
+  background: linear-gradient(135deg, #667eea20 0%, #764ba220 100%);
+}
+
+.header-text {
+  font-size: var(--font-md);
+  font-weight: var(--font-semibold);
+  color: var(--text-primary);
+}
+
+.member-text {
+  color: var(--primary-color);
+}
+
+/* 表格内容 */
+.table-body {
+  display: flex;
+  flex-direction: column;
+}
+
+.table-row {
+  display: flex;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.table-row:last-child {
+  border-bottom: none;
+}
+
+.table-cell {
+  flex: 1;
+  padding: var(--space-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.table-cell.feature-col {
+  flex: 1.5;
+  justify-content: flex-start;
+}
+
+.table-cell.member-col {
+  background: linear-gradient(135deg, #667eea08 0%, #764ba208 100%);
+}
+
+.feature-name {
+  font-size: var(--font-sm);
+  color: var(--text-secondary);
+}
+
+.status-icon {
+  width: 24px;
+  height: 24px;
+  border-radius: var(--radius-circle);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: var(--font-bold);
+}
+
+.status-icon.available {
+  background: var(--success-light);
+  color: var(--success-color);
+}
+
+.status-icon.unavailable {
+  background: var(--bg-page);
+  color: var(--text-disabled);
+}
+
+/* 底部操作区 */
+.bottom-action {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--bg-card);
+  padding: var(--space-lg);
+  box-shadow: 0 -2px 12px rgba(0, 0, 0, 0.08);
+  z-index: 100;
+}
+
+/* 响应式优化 */
+@media (max-width: 375px) {
+  .benefit-icon {
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+  }
+  
+  .benefit-title {
+    font-size: var(--font-md);
+  }
+  
+  .benefit-desc {
+    font-size: var(--font-xs);
+  }
+}

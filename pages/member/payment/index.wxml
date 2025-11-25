@@ -1,0 +1,162 @@
+<view class="payment-container">
+  <!-- 套餐信息 -->
+  <view class="package-section" wx:if="{{packageInfo}}">
+    <view class="section-title">
+      <van-icon name="gift-o" size="20px" />
+      <text>套餐信息</text>
+    </view>
+    
+    <view class="package-card">
+      <view class="package-header">
+        <text class="package-name">{{packageInfo.name}}</text>
+        <text class="package-duration">{{packageInfo.duration}}</text>
+      </view>
+      
+      <view class="package-price">
+        <text class="price-symbol">¥</text>
+        <text class="price-value">{{packageInfo.price}}</text>
+      </view>
+      
+      <view class="package-features">
+        <view class="feature-item">
+          <van-icon name="passed" color="#07c160" size="16px" />
+          <text>无限次AI功能使用</text>
+        </view>
+        <view class="feature-item">
+          <van-icon name="passed" color="#07c160" size="16px" />
+          <text>完整知识库访问</text>
+        </view>
+        <view class="feature-item">
+          <van-icon name="passed" color="#07c160" size="16px" />
+          <text>优先客服支持</text>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 订单信息 -->
+  <view class="order-section" wx:if="{{orderInfo}}">
+    <view class="section-title">
+      <van-icon name="orders-o" size="20px" />
+      <text>订单信息</text>
+    </view>
+    
+    <view class="order-card">
+      <view class="order-row">
+        <text class="label">订单号</text>
+        <view class="value-box">
+          <text class="value order-number">{{orderInfo.orderNumber}}</text>
+          <van-button 
+            size="mini" 
+            type="primary" 
+            bind:click="copyOrderNumber"
+          >
+            复制
+          </van-button>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 收款码 -->
+  <view class="qrcode-section" wx:if="{{showQrcode && qrcodeUrl}}">
+    <view class="section-title">
+      <van-icon name="qr" size="20px" />
+      <text>扫码支付</text>
+    </view>
+    
+    <view class="qrcode-card">
+      <image 
+        class="qrcode-image" 
+        src="{{qrcodeUrl}}" 
+        mode="aspectFit"
+        bind:tap="previewQrcode"
+      />
+      
+      <view class="qrcode-info">
+        <view class="info-row">
+          <text class="info-label">收款账户：</text>
+          <text class="info-value">{{accountName}}</text>
+        </view>
+        <view class="info-row">
+          <text class="info-label">支付金额：</text>
+          <text class="info-value price">¥{{packageInfo.price}}</text>
+        </view>
+      </view>
+      
+      <view class="qrcode-actions">
+        <van-button 
+          size="small" 
+          type="default"
+          icon="photo-o"
+          bind:click="saveQrcode"
+        >
+          保存收款码
+        </van-button>
+      </view>
+    </view>
+  </view>
+
+  <!-- 支付说明 -->
+  <view class="tips-section">
+    <view class="section-title">
+      <van-icon name="info-o" size="20px" />
+      <text>支付说明</text>
+    </view>
+    
+    <view class="tips-card">
+      <view class="tip-item">
+        <view class="tip-number">1</view>
+        <text class="tip-text">长按上方二维码，选择"识别图中二维码"</text>
+      </view>
+      
+      <view class="tip-item">
+        <view class="tip-number">2</view>
+        <text class="tip-text">使用微信扫码完成支付：<text class="highlight">¥{{packageInfo.price}}</text></text>
+      </view>
+      
+      <view class="tip-item">
+        <view class="tip-number">3</view>
+        <text class="tip-text">完成支付后，点击下方"我已完成支付"按钮</text>
+      </view>
+      
+      <view class="tip-item">
+        <view class="tip-number">4</view>
+        <text class="tip-text">系统将立即激活您的会员权益</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 重要提示 -->
+  <view class="notice-section">
+    <van-notice-bar
+      left-icon="volume-o"
+      text="请使用微信扫码支付，支付完成后点击确认按钮即可立即开通会员"
+      color="#ed6a0c"
+      background="#fffbe8"
+    />
+  </view>
+
+  <!-- 操作按钮 -->
+  <view class="action-section">
+    <van-button 
+      type="primary" 
+      size="large" 
+      block
+      bind:click="handlePaid"
+      loading="{{checking}}"
+      disabled="{{checking}}"
+    >
+      我已完成支付
+    </van-button>
+    
+    <van-button 
+      type="default" 
+      size="large" 
+      block
+      bind:click="handleCancel"
+    >
+      取消
+    </van-button>
+  </view>
+</view>

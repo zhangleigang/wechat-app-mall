@@ -17,7 +17,6 @@
 - `/components` 目录下的自定义业务组件
 
 **核心依赖**
-- `apifm-wxapi` 24.06.19 - 后端API SDK，用于用户认证、订单管理、配置管理
 - `dayjs` 1.11.6 - 轻量级日期处理库
 - `mp-html` 2.3.1 - 富文本/HTML渲染组件，支持Markdown
 - `wxa-plugin-canvas` 1.1.12 - 海报/图片生成插件

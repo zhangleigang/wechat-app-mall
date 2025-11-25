@@ -1,11 +1,12 @@
-const WXAPI = require('apifm-wxapi')
+// apifm-wxapi 已移除，此页面已废弃
+// const WXAPI = require('apifm-wxapi')
 const AUTH = require('../../utils/auth')
 Page({
   data: {
     avatarUrl: undefined,
     avatarUrlTmpFile: undefined,
     gender: undefined,
-    genderArray: [ '男性', '女性'],
+    genderArray: ['男性', '女性'],
     genderIndex: -1
   },
   onLoad: function (options) {
@@ -46,7 +47,7 @@ Page({
       if (res.data.base.gender == 2) {
         _data.gender = '女性'
       }
-      
+
       this.setData(_data)
     }
   },
@@ -63,7 +64,7 @@ Page({
       }
     }
     if (this.data.genderIndex != -1) {
-      postData.gender = this.data.genderIndex*1 + 1
+      postData.gender = this.data.genderIndex * 1 + 1
     }
     postData.extJsonStr = JSON.stringify(e.detail.value)
     console.log(postData);
@@ -92,7 +93,7 @@ Page({
       avatarUrlTmpFile: avatarUrl
     })
   },
-  bindPickerChange: function(e) {
+  bindPickerChange: function (e) {
     this.setData({
       genderIndex: e.detail.value,
       gender: this.data.genderArray[e.detail.value]

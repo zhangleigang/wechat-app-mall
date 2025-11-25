@@ -5,7 +5,6 @@
     "backgroundColor": "#f8fafc",
     "enablePullDownRefresh": false,
     "usingComponents": {
-        "flowchart": "/components/flowchart/flowchart",
         "mermaid-chart": "/components/mermaid-chart/mermaid-chart",
         "mp-html": "mp-html"
     }

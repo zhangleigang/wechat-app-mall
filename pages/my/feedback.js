@@ -1,4 +1,5 @@
-const WXAPI = require('apifm-wxapi')
+// 简化版反馈页面 - 移除了 apifm 依赖
+// 反馈信息将保存在本地，供用户查看
 const dayjs = require("dayjs")
 
 Page({
@@ -6,57 +7,28 @@ Page({
     autosize: {
       minHeight: 100
     },
-    day: dayjs().format('YYYY-MM-DD')
+    day: dayjs().format('YYYY-MM-DD'),
+    feedbackCount: 0,
+    maxFeedbackPerDay: 5
   },
 
-  /**
-   * 生命周期函数--监听页面加载
-   */
-  onLoad: function(options) {
-    
+  onLoad: function (options) {
+
   },
-  onShow: function() {
-    this.checkTodayComments()
+  onShow: function () {
+    this.checkTodayFeedbackCount()
   },
-  async checkTodayComments() {
-    // 判断一天只能留言5次
-    const res = await WXAPI.jsonList({
-      token: wx.getStorageSync('token'),
-      type: 'feedback_times_' + this.data.day
+
+  // 检查今日反馈次数（本地存储）
+  checkTodayFeedbackCount() {
+    const key = 'feedback_count_' + this.data.day
+    const count = wx.getStorageSync(key) || 0
+    this.setData({
+      feedbackCount: count
     })
-    if (res.code === 0) {
-      this.setData({
-        feedbackTimes: res.data[0]
-      })
-    }
   },
+
   async bindSave() {
-    const comment_subscribe_ids = wx.getStorageSync('comment_subscribe_ids')
-    if (comment_subscribe_ids) {
-      wx.requestSubscribeMessage({
-        tmplIds: comment_subscribe_ids.split(','),
-        success(res) {
-          console.log(res)
-        },
-        fail(err) {
-          console.error(err)
-        },
-        complete: (res) => {
-          this._bindSave()
-        },
-      })
-    } else {
-      this._bindSave()
-    }
-  },
-  async _bindSave() {    
-    if (!this.data.name) {
-      wx.showToast({
-        title: '请填写您的姓名',
-        icon: 'none',
-      })
-      return
-    }
     if (!this.data.content) {
       wx.showToast({
         title: '请填写反馈信息',
@@ -64,76 +36,67 @@ Page({
       })
       return
     }
-    const extJsonStr = {}
-    extJsonStr['姓名'] = this.data.name
-    extJsonStr['联系电话'] = this.data.mobile
-    extJsonStr['微信'] = this.data.wx
 
-    // 批量上传附件
-    if (this.data.picsList) {
-      for (let index = 0; index < this.data.picsList.length; index++) {
-        const pic = this.data.picsList[index];
-        const res = await WXAPI.uploadFileV2(wx.getStorageSync('token'), pic.url)
-        if (res.code == 0) {
-          extJsonStr['file' + index] = res.data.url
-        }
-      }
-    }
-
-    const res = await WXAPI.addComment({
-      token: wx.getStorageSync('token'),
-      type: 1,
-      extJsonStr: JSON.stringify(extJsonStr),
-      content: this.data.content
-    })
-    if (res.code == 0) {
-      // 提交次数 + 1 
-      let feedbackTimes = this.data.feedbackTimes
-      if (!feedbackTimes) {
-        feedbackTimes = {
-          id: '',
-          refId: 0,
-          content: '{}'
-        }
-      }
-      await WXAPI.jsonSet({
-        token: wx.getStorageSync('token'),
-        id: feedbackTimes.id,
-        type: 'feedback_times_' + this.data.day,
-        refId: feedbackTimes.refId + 1,
-        content: feedbackTimes.content
-      })
-      await this.checkTodayComments()
+    // 检查今日反馈次数
+    if (this.data.feedbackCount >= this.data.maxFeedbackPerDay) {
       wx.showToast({
-        title: '提交成功',
-      })
-      setTimeout(() => {
-        wx.navigateBack({
-          delta: 0,
-        })
-      }, 1000);
-    } else {
-      wx.showToast({
-        title: res.msg,
+        title: '今日反馈次数已达上限',
         icon: 'none'
       })
+      return
     }
+
+    // 保存反馈到本地
+    const feedback = {
+      name: this.data.name || '匿名',
+      mobile: this.data.mobile || '',
+      wx: this.data.wx || '',
+      content: this.data.content,
+      date: new Date().toISOString(),
+      day: this.data.day
+    }
+
+    // 获取历史反馈
+    let feedbackList = wx.getStorageSync('feedback_list') || []
+    feedbackList.unshift(feedback)
+
+    // 只保留最近50条
+    if (feedbackList.length > 50) {
+      feedbackList = feedbackList.slice(0, 50)
+    }
+
+    wx.setStorageSync('feedback_list', feedbackList)
+
+    // 更新今日反馈次数
+    const key = 'feedback_count_' + this.data.day
+    wx.setStorageSync(key, this.data.feedbackCount + 1)
+
+    wx.showToast({
+      title: '反馈已保存',
+      icon: 'success'
+    })
+
+    setTimeout(() => {
+      wx.navigateBack({
+        delta: 1,
+      })
+    }, 1000)
   },
+
   afterPicRead(e) {
-    let picsList = this.data.picsList
-    if (!picsList) {
-      picsList = []
-    }
-    picsList = picsList.concat(e.detail.file)
-    this.setData({
-      picsList
+    wx.showToast({
+      title: '图片上传功能暂不可用',
+      icon: 'none'
     })
   },
+
   afterPicDel(e) {
     let picsList = this.data.picsList
-    picsList.splice(e.detail.index, 1)
-    this.setData({
-      picsList
-    })
+    if (picsList) {
+      picsList.splice(e.detail.index, 1)
+      this.setData({
+        picsList
+      })
+    }
   }
 })

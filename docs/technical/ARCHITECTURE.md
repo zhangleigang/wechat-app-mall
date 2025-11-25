@@ -101,7 +101,6 @@ AI驱动的智能简历分析功能：
 #### 2.1.3 核心依赖库
 | 依赖库 | 版本 | 用途 | 说明 |
 |--------|------|------|------|
-| apifm-wxapi | 24.06.19 | 后端接口SDK | 封装用户认证、订单管理等接口 |
 | dayjs | 1.11.6 | 日期处理 | 轻量级日期库，体积小性能优 |
 | mp-html | 2.3.1 | 富文本渲染 | 支持HTML在小程序中展示 |
 | wxa-plugin-canvas | 1.1.12 | 海报生成 | 用于生成分享海报 |
@@ -120,9 +119,9 @@ AI驱动的智能简历分析功能：
 - **数据格式**: JSON
 
 #### 2.2.2 业务后端服务
-- **服务提供商**: API工厂（apifm）
+- **服务提供商**: 自有知识库API（已移除apifm依赖）
 - **主要功能**:
-  - 用户管理（注册、登录、信息管理）
+  - 用户认证（JWT Token）
   - 订单管理（订单创建、支付、查询）
   - 配置管理（系统配置、商户配置）
   - 数据统计（用户行为、业务数据）
@@ -221,9 +220,8 @@ graph TB
 ```javascript
 // 核心功能
 - onLaunch()          // 应用启动时初始化
-  - SDK初始化（WXAPI）
   - 配置加载（config.js）
-  - 自动登录逻辑
+  - 自动登录逻辑（simpleAuth）
   - 版本检查
   
 - onShow()            // 应用显示时处理
@@ -295,11 +293,10 @@ pages/
 **3. 用户中心页面组**
 | 页面 | 路径 | 核心功能 | 依赖服务 |
 |------|------|----------|----------|
-| 个人中心 | pages/my/index | 信息展示、统计、功能入口 | apifm后端 |
-| 个人信息 | pages/my/info | 信息编辑、头像上传 | apifm后端 |
+| 个人中心 | pages/my/index | 信息展示、会员状态、功能入口 | 本地存储 + 知识库API |
 | 系统设置 | pages/my/setting | 主题、字体、通知设置 | 本地存储 |
-| 意见反馈 | pages/my/feedback | 问题提交、建议收集 | apifm后端 |
-| 登录页面 | pages/login/index | 微信授权、手机号绑定 | 微信API + apifm |
+| 意见反馈 | pages/my/feedback | 问题提交、建议收集 | 本地存储 |
+| 登录页面 | pages/login/simple | 微信授权登录 | 微信API + 知识库API |
 
 **页面生命周期**:
 ```javascript
@@ -512,8 +509,8 @@ export default {
     // 1. 获取微信code
     const { code } = await wx.login()
     
-    // 2. 调用后端登录接口
-    const res = await WXAPI.login_wx({ code })
+    // 2. 调用知识库API登录接口
+    const res = await SimpleAuth.silentLogin()
     
     // 3. 存储token和用户信息
     if (res.code === 0) {
@@ -529,9 +526,10 @@ export default {
    * @param {Object} userInfo - 用户信息
    */
   async authorize(userInfo) {
-    const res = await WXAPI.authorize(userInfo)
-    if (res.code === 0) {
-      wx.setStorageSync('userInfo', res.data)
+    // 已废弃 - 使用 SimpleAuth.silentLogin() 替代
+    const res = await SimpleAuth.silentLogin()
+    if (res) {
+      wx.setStorageSync('userInfo', res)
     }
     return res
   },
@@ -916,7 +914,6 @@ wechat-app-mall/
 │
 ├── miniprogram_npm/               # npm依赖编译目录
 │   ├── @vant/weapp/              # Vant UI组件库
-│   ├── apifm-wxapi/              # API工厂SDK
 │   ├── dayjs/                    # 日期处理库
 │   ├── mp-html/                  # 富文本渲染组件
 │   ├── wxa-plugin-canvas/        # 海报生成插件
@@ -1333,9 +1330,9 @@ module.exports = AI
 - **简历解读**: 解析文件，分析内容，提供建议
 - **情绪支持**: 理解情绪，提供心理支持
 
-**apifm服务**:
-- **用户管理**: 注册、登录、信息管理
-- **订单管理**: 创建、支付、查询
+**知识库API服务**:
+- **用户认证**: JWT Token认证
+- **会员管理**: 本地会员状态管理
 - **配置管理**: 系统配置、商户配置
 
 **接口规范**:
@@ -1436,18 +1433,18 @@ module.exports = Storage
 sequenceDiagram
     participant U as 用户
     participant P as 登录页面
-    participant A as auth.js
+    participant A as simpleAuth.js
     participant W as 微信API
-    participant B as apifm后端
+    participant B as 知识库API
     participant S as Storage
     
     U->>P: 点击登录按钮
-    P->>A: 调用 login20241025()
+    P->>A: 调用 silentLogin()
     A->>W: wx.login() 获取code
     W-->>A: 返回 code
-    A->>B: WXAPI.login_wx(code)
-    B-->>A: 返回 token + uid
-    A->>S: 存储 token, uid
+    A->>B: POST /api/auth/login
+    B-->>A: 返回 token + userId
+    A->>S: 存储 token, userId
     A-->>P: 返回登录成功
     P->>P: 更新登录状态
     P-->>U: 跳转到首页
@@ -1455,11 +1452,11 @@ sequenceDiagram
 
 **详细步骤**:
 1. 用户点击"微信登录"按钮
-2. 页面调用 `auth.login20241025()`
+2. 页面调用 `SimpleAuth.checkHasLogined()`
 3. 工具层调用 `wx.login()` 获取临时code
-4. 工具层将code发送到apifm后端
-5. 后端验证code，生成token和uid
-6. 工具层将token和uid存储到本地
+4. 工具层将code发送到知识库API
+5. 后端验证code，生成token和userId
+6. 工具层将token和userId存储到本地
 7. 页面更新登录状态，显示用户信息
 8. 自动跳转到首页或返回上一页
 
@@ -2519,8 +2516,8 @@ const AuthFlow = {
     // 1. 获取微信code
     const { code } = await wx.login()
     
-    // 2. 发送到后端换取token
-    const res = await WXAPI.login_wx({ code })
+    // 2. 发送到知识库API换取token
+    const res = await SimpleAuth.silentLogin()
     
     // 3. 存储token和用户信息
     wx.setStorageSync('token', res.data.token)

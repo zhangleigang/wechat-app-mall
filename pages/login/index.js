@@ -1,4 +1,5 @@
-const WXAPI = require('apifm-wxapi')
+// apifm-wxapi 已移除，此页面已废弃，请使用 pages/login/simple.js
+// const WXAPI = require('apifm-wxapi')
 const AUTH = require('../../utils/auth')
 Page({
   data: {

@@ -1,107 +1,182 @@
-# 项目文档索引
+# AI面试助手 - 项目文档
 
-## 📚 文档结构
+## 📚 核心文档
 
-### 知识库 API
+### 实现方案
+- 📄 [个人收款码支付方案](./PERSONAL_QRCODE_IMPLEMENTATION.md) - 会员支付实现指南
+- 📄 [配置指南](./SETUP_GUIDE.md) - 项目配置说明
+- 📄 [最终验证报告](./FINAL_VERIFICATION_REPORT.md) - 项目验证结果
 
-- [API 集成文档](./KNOWLEDGE_API_INTEGRATION.md) - 小程序集成 API 的完整指南
-- [API 服务文档](../knowledge-api/README.md) - API 服务的使用说明
-- [部署文档](../knowledge-api/DEPLOYMENT.md) - 完整的部署指南
-- [阿里云部署](../knowledge-api/ALIYUN_DEPLOY.md) - 阿里云快速部署
-
-### 优化文档
-
-- [包体积优化](./PACKAGE_SIZE_OPTIMIZATION.md) - 小程序包体积优化方案
-- [UI 优化](./UI_OPTIMIZATION.md) - 界面优化文档
-- [优化计划](./OPTIMIZATION_PLAN.md) - 整体优化计划
-- [优化进度](./OPTIMIZATION_PROGRESS.md) - 优化进度跟踪
-- [优化总结](./OPTIMIZATION_SUMMARY.md) - 优化工作总结
-
-### 功能文档
-
-- [知识库功能](./KNOWLEDGE_INDEX_OPTIMIZATION.md) - 知识库页面优化
-- [Markdown 渲染](./KNOWLEDGE_MARKDOWN_RENDER.md) - Markdown 渲染实现
-- [Mermaid 图表](./MERMAID_FIX.md) - Mermaid 图表支持
-- [表格修复](./MARKDOWN_TABLE_FIX.md) - Markdown 表格渲染修复
-
-### 页面优化
-
-- [登录页面](./LOGIN_PAGE_OPTIMIZATION.md)
-- [个人中心](./MY_INDEX_OPTIMIZATION.md)
-- [简历分析](./RESUME_ANALYSIS_OPTIMIZATION.md)
-- [职位分析](./JOB_ANALYSIS_OPTIMIZATION.md)
-- [心情小屋](./MOOD_HOUSE_OPTIMIZATION.md)
-
-### 设计系统
-
-- [设计系统](./DESIGN_SYSTEM.md) - 完整的设计系统文档
-- [设计速查表](./DESIGN_SYSTEM_CHEATSHEET.md) - 快速参考
-- [设计预览](./DESIGN_SYSTEM_PREVIEW.md) - 视觉预览
-- [设计总结](./DESIGN_SYSTEM_SUMMARY.md) - 设计总结
-
-### 技术文档
-
-- [架构文档](./technical/ARCHITECTURE.md) - 系统架构说明
-- [迁移指南](./MIGRATION_GUIDE.md) - 版本迁移指南
-
-## 🗂️ 文档分类
-
-### 按用途分类
-
-**开发文档**
-- API 集成文档
-- 技术架构文档
-- 功能实现文档
-
-**部署文档**
-- 部署指南
-- 阿里云部署
-- 环境配置
-
-**优化文档**
-- 性能优化
-- UI 优化
-- 包体积优化
-
-**设计文档**
-- 设计系统
-- 组件库
-- 样式规范
-
-## 📖 快速导航
-
-### 新手入门
-
-1. 阅读 [项目 README](../README.md)
-2. 查看 [API 集成文档](./KNOWLEDGE_API_INTEGRATION.md)
-3. 参考 [部署文档](../knowledge-api/DEPLOYMENT.md)
-
-### 开发指南
-
-1. [设计系统](./DESIGN_SYSTEM.md) - 了解设计规范
-2. [架构文档](./technical/ARCHITECTURE.md) - 了解系统架构
-3. [API 文档](../knowledge-api/README.md) - API 使用说明
-
-### 部署运维
-
-1. [部署文档](../knowledge-api/DEPLOYMENT.md) - 完整部署流程
-2. [阿里云部署](../knowledge-api/ALIYUN_DEPLOY.md) - 阿里云快速部署
-3. [优化指南](./OPTIMIZATION_SUMMARY.md) - 性能优化建议
-
-## 🔄 文档更新
-
-- **最后更新**: 2024-11-14
-- **维护者**: [@zhangleigang](https://github.com/zhangleigang)
-
-## 📝 贡献指南
-
-如需添加或更新文档，请遵循以下规范：
-
-1. 使用 Markdown 格式
-2. 添加清晰的标题和目录
-3. 包含代码示例和截图
-4. 更新本索引文档
+### 测试文档
+- 📄 [测试总结](../tests/test-summary.md) - 完整测试报告（73个测试用例）
+- 📄 [测试说明](../tests/README.md) - 如何运行测试
 
 ---
 
-**提示**: 所有文档都使用 Markdown 格式编写，可以在 GitHub 或任何 Markdown 编辑器中查看。
+## 🚀 快速开始
+
+### 1. 配置收款码（5分钟）
+
+```javascript
+// config.js
+module.exports = {
+  paymentQrcode: {
+    url: 'https://your-image-url.com/qrcode.jpg', // 你的收款码URL
+    accountName: '张三', // 收款人姓名
+    enabled: true
+  }
+}
+```
+
+### 2. 配置知识库API（可选）
+
+```javascript
+// config.js
+module.exports = {
+  knowledgeApiUrl: 'https://api.feelnow.cn:8443/api', // 知识库API地址
+  // 或使用本地开发: 'http://localhost:3000/api'
+}
+```
+
+### 3. 运行测试
+
+```bash
+# 安装依赖
+npm install
+
+# 运行所有测试
+npm test
+
+# 查看测试覆盖率
+npm run test:coverage
+```
+
+---
+
+## 💡 核心功能
+
+### 用户功能
+- ✅ **AI岗位分析** - 分析职位描述，生成面试问题
+- ✅ **简历解读** - AI驱动的简历分析和优化建议
+- ✅ **情绪小屋** - 面试压力管理和心理支持
+- ✅ **知识库** - 200+大数据面试题库
+
+### 会员系统
+- ✅ **本地会员管理** - 不依赖第三方服务
+- ✅ **收款码支付** - 零成本支付方案
+- ✅ **会员验证** - 自动验证会员状态
+- ✅ **到期提醒** - 会员到期自动提醒
+
+### 认证系统
+- ✅ **自动登录** - 首次启动自动登录
+- ✅ **Token管理** - 30天有效期，自动续期
+- ✅ **本地降级** - 网络失败时本地登录
+
+---
+
+## 📊 技术架构
+
+### 前端技术栈
+- 微信小程序 SDK 8.4.0
+- Vant Weapp 1.11.6（UI组件）
+- Day.js 1.11.6（日期处理）
+- mp-html 2.3.1（富文本渲染）
+
+### 后端服务
+- **AI服务** - 自定义AI后端
+- **知识库API** - Node.js/Express服务
+- **会员管理** - 本地存储方案
+
+### 核心模块
+```
+utils/
+├── simpleAuth.js      # 认证模块（登录/登出/Token管理）
+├── memberLocal.js     # 会员管理（激活/验证/状态查询）
+├── ai.js              # AI服务接口
+├── knowledge-api.js   # 知识库API接口
+└── tools.js           # 通用工具函数
+```
+
+---
+
+## 🧪 测试覆盖
+
+| 测试类别 | 测试用例数 | 状态 |
+|---------|-----------|------|
+| 认证流程 | 12 | ✅ 通过 |
+| 会员购买 | 24 | ✅ 通过 |
+| 会员验证 | 12 | ✅ 通过 |
+| 边界情况 | 25 | ✅ 通过 |
+| **总计** | **73** | **✅ 100%** |
+
+---
+
+## 📦 项目结构
+
+```
+wechat-app-mall/
+├── pages/              # 页面模块
+│   ├── ai/            # AI功能（岗位/简历/情绪）
+│   ├── knowledge/     # 知识库
+│   ├── member/        # 会员系统
+│   ├── my/            # 个人中心
+│   └── login/         # 登录
+├── utils/             # 工具模块
+├── components/        # 自定义组件
+├── tests/             # 测试文件
+├── docs/              # 文档
+├── knowledge-api/     # 知识库后端
+├── config.js          # 应用配置
+└── app.js             # 应用入口
+```
+
+---
+
+## ⚠️ 注意事项
+
+### 会员支付
+- 当前使用个人收款码方案（零成本）
+- 需要手动确认收款并激活会员
+- 适合初期用户量 < 50人
+
+### 数据存储
+- 会员数据存储在本地（wx.storage）
+- 用户数据存储在本地（wx.storage）
+- 总存储限制：10MB
+
+### 包体积
+- 当前代码包：约1.5MB
+- 小程序限制：2MB
+- 已排除 docs/ 文件夹
+
+---
+
+## 🔄 升级路径
+
+### 当前阶段（0-50用户）
+✅ 个人收款码 - 零成本快速上线
+
+### 成长期（50-200用户）
+可选升级：
+- 商家收款码（0.6%手续费）
+- 第三方支付服务
+
+### 成熟期（>200用户）
+推荐升级：
+- 微信云开发（¥240/年）
+- 完全自主可控
+
+---
+
+## 📞 相关链接
+
+- [个人收款码实现指南](./PERSONAL_QRCODE_IMPLEMENTATION.md)
+- [配置指南](./SETUP_GUIDE.md)
+- [测试文档](../tests/README.md)
+- [最终验证报告](./FINAL_VERIFICATION_REPORT.md)
+
+---
+
+**最后更新**：2025-11-25  
+**当前版本**：8.4.0  
+**状态**：✅ 生产就绪

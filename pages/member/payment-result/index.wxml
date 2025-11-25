@@ -1,0 +1,102 @@
+<view class="page-container">
+  <!-- 成功状态 -->
+  <view wx:if="{{ status === 'success' }}" class="result-container success">
+    <view class="result-icon success-icon">
+      <van-icon name="checked" size="80px" color="#07c160" />
+    </view>
+    <text class="result-title">开通成功</text>
+    <text class="result-desc">恭喜您成为会员，开始享受专属权益</text>
+    
+    <!-- 订单信息 -->
+    <view class="order-info-card">
+      <view class="info-row" wx:if="{{ orderNumber }}">
+        <text class="info-label">订单号</text>
+        <text class="info-value">{{ orderNumber }}</text>
+      </view>
+      <view class="info-row" wx:if="{{ packageName }}">
+        <text class="info-label">套餐类型</text>
+        <text class="info-value">{{ packageName }}</text>
+      </view>
+    </view>
+
+    <!-- 会员信息 -->
+    <view wx:if="{{ memberInfo && memberInfo.isValid }}" class="member-info-card">
+      <view class="card-title">
+        <van-icon name="passed" color="#07c160" size="20px" />
+        <text class="title-text">会员信息</text>
+      </view>
+      <view class="info-row">
+        <text class="info-label">会员类型</text>
+        <text class="info-value highlight">{{ memberInfo.memberType }}</text>
+      </view>
+      <view class="info-row">
+        <text class="info-label">到期时间</text>
+        <text class="info-value">{{ memberInfo.expireDate }}</text>
+      </view>
+      <view class="info-row">
+        <text class="info-label">剩余天数</text>
+        <text class="info-value success">{{ memberInfo.daysRemaining }}天</text>
+      </view>
+    </view>
+
+    <!-- 加载中 -->
+    <view wx:if="{{ loading }}" class="loading-container">
+      <van-loading type="spinner" size="24px">加载会员信息中...</van-loading>
+    </view>
+
+    <view class="action-buttons">
+      <van-button 
+        type="primary" 
+        size="large" 
+        bind:click="goHome"
+        custom-class="action-btn"
+      >
+        开始使用
+      </van-button>
+      <van-button 
+        type="default" 
+        size="large" 
+        bind:click="viewMember"
+        custom-class="action-btn"
+      >
+        查看会员信息
+      </van-button>
+    </view>
+  </view>
+
+  <!-- 失败状态 -->
+  <view wx:else class="result-container fail">
+    <view class="result-icon fail-icon">
+      <van-icon name="close" size="80px" color="#ee0a24" />
+    </view>
+    <text class="result-title">支付失败</text>
+    <text class="result-desc">很抱歉，支付过程中出现问题</text>
+
+    <!-- 订单信息 -->
+    <view class="order-info-card" wx:if="{{ orderNumber }}">
+      <view class="info-row">
+        <text class="info-label">订单号</text>
+        <text class="info-value">{{ orderNumber }}</text>
+      </view>
+    </view>
+
+    <view class="action-buttons">
+      <van-button 
+        type="primary" 
+        size="large" 
+        bind:click="retryPayment"
+        custom-class="action-btn"
+      >
+        重新支付
+      </van-button>
+      <van-button 
+        type="default" 
+        size="large" 
+        bind:click="goHome"
+        custom-class="action-btn"
+      >
+        返回首页
+      </van-button>
+    </view>
+  </view>
+</view>

@@ -128,9 +128,7 @@ const CONFIG = require('../../config.js')
 // 工具函数
 const AI = require('../../utils/ai.js')
 const AUTH = require('../../utils/auth.js')
-
-// SDK
-const WXAPI = require('apifm-wxapi')
+const SimpleAuth = require('../../utils/simpleAuth.js')
 
 // 应用实例
 const app = getApp()

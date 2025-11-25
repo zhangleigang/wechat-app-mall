@@ -1,6 +1,7 @@
 const AI = require('../../../utils/ai.js')
 const AUTH = require('../../../utils/auth.js')
 const SimpleAuth = require('../../../utils/simpleAuth.js')
+const MemberLocal = require('../../../utils/memberLocal.js')
 
 Page({
   data: {
@@ -59,6 +60,27 @@ Page({
         success: (res) => {
           if (res.confirm) {
             wx.navigateTo({ url: '/pages/login/simple' })
+          }
+        }
+      })
+      return
+    }
+
+    // 检查会员状态
+    const memberInfo = await MemberLocal.checkMemberStatus()
+    if (!memberInfo.isValid) {
+      const messages = {
+        'not_login': '请先登录后使用此功能',
+        'not_member': '此功能需要开通会员',
+        'expired': '您的会员已过期，请续费后继续使用'
+      }
+      wx.showModal({
+        title: '需要会员',
+        content: messages[memberInfo.reason] || '需要开通会员才能使用此功能',
+        confirmText: '去开通',
+        success: (res) => {
+          if (res.confirm) {
+            wx.navigateTo({ url: '/pages/member/payment/index' })
           }
         }
       })
