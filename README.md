@@ -62,27 +62,75 @@ module.exports = {
 
 ## 🧪 测试
 
+### 运行测试
+
 ```bash
+# 安装依赖
+npm install
+
 # 运行所有测试
 npm test
 
 # 运行特定测试
-npm run test:auth          # 认证流程测试
-npm run test:payment       # 会员购买流程测试
-npm run test:verification  # 会员验证测试
+npm run test:auth          # 认证流程测试（12个用例）
+npm run test:payment       # 会员购买流程测试（24个用例）
+npm run test:verification  # 会员验证测试（12个用例）
+npm test edge-cases.test.js  # 边界情况测试（25个用例）
 
 # 查看测试覆盖率
 npm run test:coverage
 ```
 
-**测试统计**：73个测试用例，100%通过率
+### 测试文件
+
+- `tests/auth-flow.test.js` - 认证流程测试
+  - 首次启动自动登录
+  - Token过期重新登录
+  - 网络断开本地降级
+
+- `tests/member-payment-flow.test.js` - 会员购买流程测试
+  - 套餐选择功能
+  - 收款码展示
+  - 支付确认和会员激活
+  - 会员信息显示
+
+- `tests/member-verification.test.js` - 会员验证测试
+  - 有效会员访问AI功能
+  - 无效会员跳转购买页面
+  - 会员过期提示
+  - 会员状态刷新
+
+- `tests/edge-cases.test.js` - 边界情况测试
+  - 删除本地存储后的行为
+  - 会员到期边界时间
+  - 并发访问情况
+  - 异常数据处理
+
+### 测试统计
+
+| 测试类别 | 测试用例数 | 状态 |
+|---------|-----------|------|
+| 认证流程 | 12 | ✅ 通过 |
+| 会员购买 | 24 | ✅ 通过 |
+| 会员验证 | 12 | ✅ 通过 |
+| 边界情况 | 25 | ✅ 通过 |
+| **总计** | **73** | **✅ 100%** |
+
+详细测试报告请查看：[tests/test-summary.md](./tests/test-summary.md)
 
 ## 📖 文档
 
-- [项目文档](./docs/README.md) - 完整的项目文档
+### 配置文档
 - [配置指南](./docs/SETUP_GUIDE.md) - 详细配置说明
 - [支付方案](./docs/PERSONAL_QRCODE_IMPLEMENTATION.md) - 会员支付实现
-- [测试文档](./tests/README.md) - 测试说明和报告
+
+### 技术文档
+- [系统架构](./docs/technical/ARCHITECTURE.md) - 架构设计文档
+
+### 测试文档
+- [测试总结](./tests/test-summary.md) - 完整测试报告（73个测试用例）
+
+### 验证文档
 - [最终验证报告](./docs/FINAL_VERIFICATION_REPORT.md) - 项目验证结果
 
 ## 📂 项目结构
