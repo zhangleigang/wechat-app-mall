@@ -30,11 +30,30 @@ Page({
 
   // 加载用户信息
   loadUserInfo() {
-    const userInfo = wx.getStorageSync('userInfo')
+    // 尝试从 userInfo 读取
+    let userInfo = wx.getStorageSync('userInfo')
+
+    // 如果没有 userInfo，从 simpleAuth 的存储中构建
+    if (!userInfo) {
+      const userId = wx.getStorageSync('userId')
+      const nickName = wx.getStorageSync('nickName')
+      const avatarUrl = wx.getStorageSync('avatarUrl')
+      const phone = wx.getStorageSync('phone')
+
+      if (userId) {
+        userInfo = {
+          userId: userId,
+          nickName: nickName || '用户',
+          avatarUrl: avatarUrl || '/images/default.png',
+          phone: phone || ''
+        }
+      }
+    }
+
     if (userInfo) {
       this.setData({
         userInfo: userInfo,
-        nick: userInfo.nickName || '未设置'
+        nick: userInfo.nickName || '用户'
       })
     }
   },
@@ -81,10 +100,10 @@ Page({
     })
   },
 
-  // 跳转会员购买页面
+  // 跳转会员购买页面（先跳转到套餐选择页面）
   goMemberPayment() {
     wx.navigateTo({
-      url: '/pages/member/payment/index'
+      url: '/pages/member/packages/index'
     })
   },
 

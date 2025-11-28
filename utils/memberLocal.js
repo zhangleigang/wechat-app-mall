@@ -51,8 +51,31 @@ function getMemberInfo() {
         }
     }
 
+    // 检查数据完整性
+    if (!memberData.expireDate) {
+        console.error('会员数据不完整，缺少 expireDate')
+        return {
+            isValid: false,
+            reason: 'invalid_data'
+        }
+    }
+
     // 检查是否过期
-    const expireDate = new Date(memberData.expireDate)
+    let expireDate
+    try {
+        expireDate = new Date(memberData.expireDate)
+        // 检查日期是否有效
+        if (isNaN(expireDate.getTime())) {
+            throw new Error('Invalid date')
+        }
+    } catch (error) {
+        console.error('解析到期时间失败:', memberData.expireDate, error)
+        return {
+            isValid: false,
+            reason: 'invalid_date'
+        }
+    }
+
     const now = new Date()
 
     if (expireDate < now) {
@@ -91,20 +114,50 @@ function activateMember(packageId, days) {
     const token = wx.getStorageSync('token')
 
     if (!token) {
-        throw new Error('请先登录')
+        return {
+            success: false,
+            msg: '请先登录'
+        }
     }
 
     const packageInfo = MEMBER_PACKAGES[packageId]
     if (!packageInfo) {
-        throw new Error('无效的套餐类型')
+        return {
+            success: false,
+            msg: '无效的套餐类型'
+        }
     }
 
     // 使用传入的天数或套餐默认天数
     const duration = days || packageInfo.duration
 
+    // 验证天数
+    if (!duration || duration <= 0) {
+        return {
+            success: false,
+            msg: '无效的会员天数'
+        }
+    }
+
     // 计算到期时间
     const now = new Date()
     const expireDate = new Date(now.getTime() + duration * 24 * 60 * 60 * 1000)
+
+    // 验证日期是否有效
+    if (isNaN(expireDate.getTime())) {
+        console.error('日期计算失败:', { now, duration, expireDate })
+        return {
+            success: false,
+            msg: '日期计算失败'
+        }
+    }
+
+    console.log('激活会员:', {
+        packageId,
+        duration,
+        now: now.toISOString(),
+        expireDate: expireDate.toISOString()
+    })
 
     // 生成本地订单ID
     const orderId = `local_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
@@ -120,7 +173,14 @@ function activateMember(packageId, days) {
         orderId: orderId
     }
 
-    wx.setStorageSync('memberData', memberData)
+    // 保存会员信息（确保正确序列化）
+    try {
+        wx.setStorageSync('memberData', memberData)
+        console.log('会员信息已保存:', memberData)
+    } catch (error) {
+        console.error('保存会员信息失败:', error)
+        throw new Error('保存会员信息失败')
+    }
 
     // 清除会员信息缓存
     clearMemberCache()

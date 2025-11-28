@@ -52,6 +52,7 @@
       </view>
       
       <view class="member-body">
+        <!-- 已开通会员 -->
         <view wx:if="{{ memberInfo && memberInfo.isValid }}" class="member-info-grid">
           <view class="member-info">
             <text class="info-label">有效期至</text>
@@ -61,13 +62,16 @@
             <text class="info-label">剩余天数</text>
             <text class="info-value">{{ memberDaysRemaining }}天</text>
           </view>
+          <view class="member-actions">
+            <button class="btn-text" bindtap="refreshMemberInfo">刷新状态</button>
+          </view>
         </view>
+        
+        <!-- 未开通会员 -->
         <view wx:else class="member-empty">
           <text class="empty-text">暂未开通会员</text>
-          <button class="btn btn-primary btn-sm" bindtap="goMemberPayment">立即开通</button>
-        </view>
-        <view class="member-actions">
-          <button class="btn-text" bindtap="refreshMemberInfo">刷新状态</button>
+          <text class="empty-desc">开通会员后可使用所有 AI 功能</text>
+          <button class="btn btn-primary" bindtap="goMemberPayment">立即开通会员</button>
         </view>
       </view>
     </view>

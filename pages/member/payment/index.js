@@ -139,10 +139,16 @@ Page({
         try {
             const { packageInfo } = this.data
 
-            // 激活会员
+            // 从套餐配置中获取正确的天数（数字类型）
+            const packageConfig = MemberLocal.getPackageInfo(packageInfo.id)
+            if (!packageConfig) {
+                throw new Error('套餐配置不存在')
+            }
+
+            // 激活会员（使用配置中的数字天数）
             const result = MemberLocal.activateMember(
                 packageInfo.id,
-                packageInfo.duration
+                packageConfig.duration
             )
 
             wx.hideLoading()

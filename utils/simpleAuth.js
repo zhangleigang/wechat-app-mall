@@ -82,9 +82,16 @@ async function silentLogin() {
  * 使用后端API登录
  */
 async function loginWithBackend(code) {
+    // 构建登录 URL
+    // 如果 knowledgeApiUrl 以 /api 结尾，去掉 /api
+    // 例如：https://api.feelnow.cn:8443/api -> https://api.feelnow.cn:8443
+    const baseUrl = CONFIG.knowledgeApiUrl.endsWith('/api')
+        ? CONFIG.knowledgeApiUrl.slice(0, -4)
+        : CONFIG.knowledgeApiUrl
+
     return new Promise((resolve, reject) => {
         wx.request({
-            url: `${CONFIG.knowledgeApiUrl.replace('/api', '')}/api/auth/login`,
+            url: `${baseUrl}/api/auth/login`,
             method: 'POST',
             data: { code },
             success: (res) => {
