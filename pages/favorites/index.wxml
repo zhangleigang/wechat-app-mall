@@ -1,0 +1,55 @@
+<view class="favorites-container">
+  <!-- 加载中 -->
+  <view class="loading" wx:if="{{loading}}">
+    <van-loading size="24px" vertical>加载中...</van-loading>
+  </view>
+
+  <!-- 收藏列表 -->
+  <view class="favorites-list" wx:if="{{!loading && !isEmpty}}">
+    <view class="list-header">
+      <text class="count">共 {{favorites.length}} 条收藏</text>
+      <text class="clear-btn" bind:tap="clearAll">清空</text>
+    </view>
+
+    <view 
+      class="favorite-item"
+      wx:for="{{favorites}}"
+      wx:key="id"
+      bind:tap="viewDetail"
+      data-item="{{item}}"
+    >
+      <view class="item-header">
+        <view class="category-tag">{{item.categoryName}}</view>
+        <van-icon 
+          name="star" 
+          size="20px" 
+          color="#ff6b00"
+          catchtap="removeFavorite"
+          data-index="{{index}}"
+        />
+      </view>
+      
+      <view class="item-question">{{item.question}}</view>
+      
+      <view class="item-footer">
+        <text class="time">{{item.favoriteTime}}</text>
+      </view>
+    </view>
+  </view>
+
+  <!-- 空状态 -->
+  <view class="empty-state" wx:if="{{!loading && isEmpty}}">
+    <van-icon name="star-o" size="80px" color="#ccc" />
+    <text class="empty-text">暂无收藏</text>
+    <text class="empty-tip">在知识库中点击收藏按钮即可添加</text>
+    <van-button 
+      type="primary" 
+      size="small"
+      round
+      bind:tap="goLogin"
+      wx:if="{{!isLogined}}"
+    >
+      去登录
+    </van-button>
+  </view>
+</view>

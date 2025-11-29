@@ -475,3 +475,14 @@
 .page-container {
   padding-bottom: var(--space-2xl);
 }
+
+/* 订单管理徽章 */
+.menu-badge {
+  margin-left: 10rpx;
+  padding: 4rpx 12rpx;
+  background: #ff6b00;
+  color: #fff;
+  font-size: 20rpx;
+  border-radius: 20rpx;
+  font-weight: 600;
+}

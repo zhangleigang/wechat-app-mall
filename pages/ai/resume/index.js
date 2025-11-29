@@ -74,7 +74,7 @@ Page({
         confirmText: '去开通',
         success: (res) => {
           if (res.confirm) {
-            wx.navigateTo({ url: '/pages/member/payment/index' })
+            wx.navigateTo({ url: '/pages/member/packages/index' })
           }
         }
       })
@@ -214,7 +214,7 @@ Page({
         confirmText: '去开通',
         success: (res) => {
           if (res.confirm) {
-            wx.navigateTo({ url: '/pages/member/payment/index' })
+            wx.navigateTo({ url: '/pages/member/packages/index' })
           }
         }
       })

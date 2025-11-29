@@ -1,10 +1,9 @@
 {
   "pages": [
-    "pages/ai/job/index",
     "pages/knowledge/index",
     "pages/knowledge/detail",
     "pages/ai/resume/index",
-    "pages/ai/mood/index",
+    "pages/favorites/index",
     "pages/my/index",
     "pages/my/setting",
     "pages/my/feedback",
@@ -12,7 +11,10 @@
     "pages/member/packages/index",
     "pages/member/benefits/index",
     "pages/member/payment/index",
-    "pages/member/payment-result/index"
+    "pages/member/payment-result/index",
+    "pages/admin/orders/index",
+    "pages/ai/job/index",
+    "pages/ai/mood/index"
   ],
   "requiredPrivateInfos": [
     "getLocation",
@@ -29,16 +31,10 @@
   },
   "tabBar": {
     "color": "#6e6d6b",
-    "selectedColor": "#e64340",
+    "selectedColor": "#1989fa",
     "borderStyle": "white",
     "backgroundColor": "#fff",
     "list": [
-      {
-        "pagePath": "pages/ai/job/index",
-        "iconPath": "images/nav/home-off.png",
-        "selectedIconPath": "images/nav/home-on.png",
-        "text": "岗位分析"
-      },
       {
         "pagePath": "pages/knowledge/index",
         "iconPath": "images/nav/fl-off.png",
@@ -52,10 +48,10 @@
         "text": "简历解读"
       },
       {
-        "pagePath": "pages/ai/mood/index",
+        "pagePath": "pages/favorites/index",
         "iconPath": "images/nav/coupon-off.png",
         "selectedIconPath": "images/nav/coupon-on.png",
-        "text": "情绪小屋"
+        "text": "我的收藏"
       },
       {
         "pagePath": "pages/my/index",

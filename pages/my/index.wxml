@@ -86,6 +86,15 @@
         <text class="menu-arrow">→</text>
       </view>
       
+      <view class="menu-item-card" bindtap="goOrderManage">
+        <view class="menu-item-left">
+          <text class="menu-icon">📋</text>
+          <text class="menu-title">订单管理</text>
+          <text class="menu-badge" wx:if="{{pendingOrderCount > 0}}">{{pendingOrderCount}}</text>
+        </view>
+        <text class="menu-arrow">→</text>
+      </view>
+      
       <view class="menu-item-card" bindtap="goSettings">
         <view class="menu-item-left">
           <text class="menu-icon">⚙️</text>

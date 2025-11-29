@@ -1,0 +1,152 @@
+<view class="admin-container">
+  <!-- 头部统计 -->
+  <view class="stats-section">
+    <view class="stats-card">
+      <view class="stat-item">
+        <view class="stat-value">{{stats.total}}</view>
+        <view class="stat-label">总订单</view>
+      </view>
+      <view class="stat-item">
+        <view class="stat-value pending">{{stats.pending}}</view>
+        <view class="stat-label">待核实</view>
+      </view>
+      <view class="stat-item">
+        <view class="stat-value verified">{{stats.verified}}</view>
+        <view class="stat-label">已核实</view>
+      </view>
+      <view class="stat-item">
+        <view class="stat-value amount">¥{{stats.totalAmount}}</view>
+        <view class="stat-label">总金额</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 筛选标签 -->
+  <view class="filter-section">
+    <view 
+      class="filter-tab {{filterStatus === 'all' ? 'active' : ''}}"
+      data-status="all"
+      bind:tap="filterOrders"
+    >
+      全部
+    </view>
+    <view 
+      class="filter-tab {{filterStatus === 'pending_verify' ? 'active' : ''}}"
+      data-status="pending_verify"
+      bind:tap="filterOrders"
+    >
+      待核实
+    </view>
+    <view 
+      class="filter-tab {{filterStatus === 'verified' ? 'active' : ''}}"
+      data-status="verified"
+      bind:tap="filterOrders"
+    >
+      已核实
+    </view>
+  </view>
+
+  <!-- 订单列表 -->
+  <view class="orders-section">
+    <block wx:for="{{orders}}" wx:key="orderNumber">
+      <view 
+        class="order-card {{item.status === 'verified' ? 'verified' : ''}}"
+        wx:if="{{filterStatus === 'all' || item.status === filterStatus}}"
+      >
+        <!-- 订单头部 -->
+        <view class="order-header">
+          <view class="order-number">
+            <text>{{item.orderNumber}}</text>
+            <van-icon 
+              name="copy" 
+              size="16px" 
+              color="#1989fa"
+              data-order="{{item.orderNumber}}"
+              bind:tap="copyOrderNumber"
+            />
+          </view>
+          <view class="order-status {{item.status}}">
+            {{item.status === 'pending_verify' ? '待核实' : '已核实'}}
+          </view>
+        </view>
+
+        <!-- 订单信息 -->
+        <view class="order-body">
+          <view class="order-row">
+            <text class="label">套餐：</text>
+            <text class="value">{{item.packageName}}</text>
+          </view>
+          <view class="order-row">
+            <text class="label">金额：</text>
+            <text class="value price">¥{{item.amount}}</text>
+          </view>
+          <view class="order-row">
+            <text class="label">时间：</text>
+            <text class="value">{{item.date}}</text>
+          </view>
+          <view class="order-row">
+            <text class="label">用户：</text>
+            <text class="value">{{item.userId}}</text>
+          </view>
+        </view>
+
+        <!-- 操作按钮 -->
+        <view class="order-actions">
+          <van-button 
+            size="small" 
+            type="default"
+            data-index="{{index}}"
+            bind:click="viewDetail"
+          >
+            详情
+          </van-button>
+          <van-button 
+            wx:if="{{item.status === 'pending_verify'}}"
+            size="small" 
+            type="primary"
+            data-index="{{index}}"
+            bind:click="markAsVerified"
+          >
+            标记已核实
+          </van-button>
+        </view>
+      </view>
+    </block>
+
+    <!-- 空状态 -->
+    <view class="empty-state" wx:if="{{orders.length === 0}}">
+      <van-icon name="orders-o" size="80px" color="#ccc" />
+      <text class="empty-text">暂无订单记录</text>
+    </view>
+  </view>
+
+  <!-- 底部操作 -->
+  <view class="bottom-actions">
+    <van-button 
+      type="primary" 
+      size="large"
+      block
+      icon="down"
+      bind:click="exportOrders"
+    >
+      导出订单数据
+    </van-button>
+    
+    <view class="action-row">
+      <van-button 
+        type="default" 
+        size="small"
+        bind:click="clearVerified"
+      >
+        清空已核实
+      </van-button>
+      <van-button 
+        type="danger" 
+        size="small"
+        bind:click="clearAll"
+      >
+        清空全部
+      </van-button>
+    </view>
+  </view>
+</view>

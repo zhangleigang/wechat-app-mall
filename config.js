@@ -25,6 +25,10 @@ module.exports = {
   // 验证接口: https://api.feelnow.cn:8443/api/auth/check
   useLocalKnowledge: false, // false: 使用 API 加载, true: 使用本地数据（降级方案）
 
+  // === 会员服务 API 配置 ===
+  memberApiUrl: 'https://api.feelnow.cn/api', // 会员服务API地址（生产环境）
+  // memberApiUrl: 'http://localhost:3001/api', // 本地开发环境
+
   // === 收款码支付配置 ===
   paymentQrcode: {
     url: 'https://api.feelnow.cn:8443/static/images/payment-qrcode.png', // 收款码图片URL

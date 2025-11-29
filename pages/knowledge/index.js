@@ -147,10 +147,18 @@ Page({
         // 将完整数据存储到全局变量，避免 URL 过长
         const app = getApp();
         app.globalData = app.globalData || {};
-        app.globalData.currentQuestion = question;
+
+        // 添加分类信息
+        const questionWithCategory = {
+            ...question,
+            category: this.data.activeCategoryKey,
+            categoryName: this.getCategoryName(this.data.activeCategoryKey)
+        };
+
+        app.globalData.currentQuestion = questionWithCategory;
 
         wx.navigateTo({
-            url: `/pages/knowledge/detail?id=${question.id}`,
+            url: `/pages/knowledge/detail?id=${question.id}&category=${this.data.activeCategoryKey}`,
             fail: () => {
                 wx.showToast({
                     title: '跳转失败',
@@ -173,6 +181,14 @@ Page({
         });
 
         this.setData({ allQuestions: questions });
+    },
+
+    /**
+     * 获取分类名称
+     */
+    getCategoryName(categoryKey) {
+        const category = this.data.categories.find(c => c.key === categoryKey);
+        return category ? category.name : categoryKey;
     },
 
     /**

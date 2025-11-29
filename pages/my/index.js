@@ -9,6 +9,7 @@ Page({
     memberInfo: null,
     memberDaysRemaining: 0,
     userInfo: null,
+    pendingOrderCount: 0,  // 待核实订单数量
   },
   onLoad() {
     // 初始化
@@ -19,13 +20,28 @@ Page({
       if (isLogined) {
         this.loadUserInfo();
         this.loadMemberInfo();
+        this.loadPendingOrderCount();
       } else {
         getApp().loginOK = () => {
           this.loadUserInfo();
           this.loadMemberInfo();
+          this.loadPendingOrderCount();
         }
       }
     })
+  },
+
+  // 加载待核实订单数量
+  loadPendingOrderCount() {
+    try {
+      const orders = wx.getStorageSync('pending_orders') || []
+      const pendingCount = orders.filter(o => o.status === 'pending_verify').length
+      this.setData({
+        pendingOrderCount: pendingCount
+      })
+    } catch (error) {
+      console.error('加载订单数量失败:', error)
+    }
   },
 
   // 加载用户信息
@@ -111,6 +127,13 @@ Page({
   goMemberBenefits() {
     wx.navigateTo({
       url: '/pages/member/benefits/index'
+    })
+  },
+
+  // 跳转订单管理页面
+  goOrderManage() {
+    wx.navigateTo({
+      url: '/pages/admin/orders/index'
     })
   },
 

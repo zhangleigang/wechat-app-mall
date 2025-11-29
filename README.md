@@ -1,252 +1,161 @@
 # AI面试助手 - 微信小程序
 
-基于微信小程序的智能职业发展工具，专注于大数据领域的技术面试准备。
+基于微信小程序的智能职业发展工具，专注于大数据领域的面试准备。
 
-## ✨ 核心功能
+## 核心功能
 
-- 🎯 **AI岗位分析** - 智能分析职位描述，生成预测面试问题
-- 📝 **简历解读** - AI驱动的简历分析和优化建议
+- 🎯 **岗位分析** - AI分析职位描述，生成预测面试问题
+- 📄 **简历解读** - 智能简历分析和优化建议
 - 💭 **情绪小屋** - 面试压力管理和心理支持
-- 📚 **知识库** - 200+大数据技术面试题库（HDFS、Spark、Flink、Kafka等）
+- 📚 **知识库** - 200+大数据面试题库，10+技术分类
+- 👤 **会员系统** - 收款码支付，本地会员管理
 
-## 🚀 快速开始
+## 快速开始
 
-### 1. 克隆项目
+### 环境要求
+
+- 微信开发者工具 1.06+
+- Node.js 14+
+- MySQL 8.0+（member-service需要）
+
+### 安装依赖
 
 ```bash
-git clone https://github.com/your-repo/wechat-app-mall.git
-cd wechat-app-mall
-```
-
-### 2. 安装依赖
-
-```bash
+# 小程序依赖
 npm install
+
+# 在微信开发者工具中构建npm
+工具 → 构建 npm
 ```
 
-### 3. 配置项目
+### 配置项目
 
-编辑 `config.js` 文件：
-
+1. **配置config.js**
 ```javascript
 module.exports = {
-  // AI服务配置
-  aiApiUrl: 'https://your-ai-api.com',
-  
-  // 知识库API配置
+  // 知识库API（已部署）
   knowledgeApiUrl: 'https://api.feelnow.cn:8443/api',
   
-  // 收款码配置（会员支付）
+  // AI服务（需要配置）
+  ai_api_base: 'https://your-ai-backend.example.com',
+  
+  // 收款码配置（需要配置）
   paymentQrcode: {
-    url: 'https://your-image-url.com/qrcode.jpg',
+    url: 'https://your-domain.com/qrcode.jpg',
     accountName: '你的姓名',
     enabled: true
   }
 }
 ```
 
-### 4. 在微信开发者工具中打开
+2. **配置微信小程序**
+- 在`project.config.json`中填入AppID
+- 在微信公众平台配置服务器域名白名单
 
-1. 打开微信开发者工具
-2. 导入项目
-3. 填写 AppID
-4. 开始开发
+3. **启动后端服务**
+```bash
+# 启动所有后端服务
+pm2 start ecosystem.config.js
 
-## 📦 技术栈
+# 或分别启动
+cd knowledge-api && npm start
+cd member-service && npm start
+```
 
-- **前端框架**：微信小程序原生开发
-- **UI组件**：Vant Weapp 1.11.6
-- **日期处理**：Day.js 1.11.6
-- **富文本渲染**：mp-html 2.3.1
-- **后端服务**：Node.js + Express（知识库API）
+## 项目结构
 
-## 🧪 测试
+```
+wechat-app-mall/
+├── pages/              # 页面
+│   ├── ai/            # AI功能（岗位、简历、情绪）
+│   ├── knowledge/     # 知识库
+│   ├── member/        # 会员相关
+│   └── my/            # 个人中心
+├── components/        # 自定义组件
+├── utils/             # 工具模块
+│   ├── ai.js         # AI服务
+│   ├── auth.js       # 认证
+│   ├── simpleAuth.js # 简化认证
+│   ├── memberLocal.js # 会员管理
+│   └── knowledge.js  # 知识库数据
+├── knowledge-api/     # 知识库后端服务
+├── member-service/    # 会员后端服务
+├── docs/              # 文档
+└── tests/             # 测试
+```
 
-### 运行测试
+## 后端服务
+
+### knowledge-api (端口3000)
+- 知识库数据API
+- 用户认证（JWT）
+- 微信登录
+
+### member-service (端口3001)
+- 会员状态管理
+- 订单记录
+- 对账功能
+
+详见：[部署架构文档](./docs/DEPLOYMENT_ARCHITECTURE.md)
+
+## 测试
 
 ```bash
-# 安装依赖
-npm install
-
 # 运行所有测试
 npm test
 
 # 运行特定测试
-npm run test:auth          # 认证流程测试（12个用例）
-npm run test:payment       # 会员购买流程测试（24个用例）
-npm run test:verification  # 会员验证测试（12个用例）
-npm test edge-cases.test.js  # 边界情况测试（25个用例）
-
-# 查看测试覆盖率
-npm run test:coverage
+npm test -- auth-flow
+npm test -- member-payment-flow
 ```
 
-### 测试文件
+测试覆盖：73个测试用例，100%通过率
 
-- `tests/auth-flow.test.js` - 认证流程测试
-  - 首次启动自动登录
-  - Token过期重新登录
-  - 网络断开本地降级
+## 文档
 
-- `tests/member-payment-flow.test.js` - 会员购买流程测试
-  - 套餐选择功能
-  - 收款码展示
-  - 支付确认和会员激活
-  - 会员信息显示
+- [部署架构](./docs/DEPLOYMENT_ARCHITECTURE.md) - 后端服务部署架构
+- [数据库设计](./docs/DATABASE_DESIGN_FINAL.md) - 会员系统数据库设计
+- [会员服务部署](./docs/MEMBER_SERVICE_DEPLOYMENT.md) - 会员服务部署指南
+- [文档索引](./docs/README.md) - 完整文档列表
 
-- `tests/member-verification.test.js` - 会员验证测试
-  - 有效会员访问AI功能
-  - 无效会员跳转购买页面
-  - 会员过期提示
-  - 会员状态刷新
+## 技术栈
 
-- `tests/edge-cases.test.js` - 边界情况测试
-  - 删除本地存储后的行为
-  - 会员到期边界时间
-  - 并发访问情况
-  - 异常数据处理
+**前端**
+- 微信小程序 SDK 8.4.0
+- Vant Weapp 1.11.6
+- mp-html 2.3.1
 
-### 测试统计
+**后端**
+- Node.js 18+
+- Express.js 4.x
+- MySQL 8.0+
+- PM2进程管理
 
-| 测试类别 | 测试用例数 | 状态 |
-|---------|-----------|------|
-| 认证流程 | 12 | ✅ 通过 |
-| 会员购买 | 24 | ✅ 通过 |
-| 会员验证 | 12 | ✅ 通过 |
-| 边界情况 | 25 | ✅ 通过 |
-| **总计** | **73** | **✅ 100%** |
+## 部署
 
-详细测试报告请查看：[tests/test-summary.md](./tests/test-summary.md)
-
-## 📖 文档
-
-### 配置文档
-- [配置指南](./docs/SETUP_GUIDE.md) - 详细配置说明
-- [支付方案](./docs/PERSONAL_QRCODE_IMPLEMENTATION.md) - 会员支付实现
-
-### 技术文档
-- [系统架构](./docs/technical/ARCHITECTURE.md) - 架构设计文档
-
-### 测试文档
-- [测试总结](./tests/test-summary.md) - 完整测试报告（73个测试用例）
-
-### 验证文档
-- [最终验证报告](./docs/FINAL_VERIFICATION_REPORT.md) - 项目验证结果
-
-## 📂 项目结构
-
-```
-wechat-app-mall/
-├── pages/              # 页面模块
-│   ├── ai/            # AI功能（岗位/简历/情绪）
-│   ├── knowledge/     # 知识库
-│   ├── member/        # 会员系统
-│   ├── my/            # 个人中心
-│   └── login/         # 登录
-├── utils/             # 工具模块
-│   ├── simpleAuth.js  # 认证模块
-│   ├── memberLocal.js # 会员管理
-│   ├── ai.js          # AI服务接口
-│   └── knowledge-api.js # 知识库API
-├── components/        # 自定义组件
-├── tests/             # 测试文件
-├── docs/              # 文档
-├── knowledge-api/     # 知识库后端服务
-├── config.js          # 应用配置
-└── app.js             # 应用入口
-```
-
-## 💡 核心特性
-
-### 会员系统
-- ✅ 本地会员管理（不依赖第三方）
-- ✅ 收款码支付方案（零成本）
-- ✅ 自动会员验证
-- ✅ 到期提醒
-
-### 认证系统
-- ✅ 自动静默登录
-- ✅ Token自动管理（30天有效期）
-- ✅ 网络失败本地降级
-
-### 知识库
-- ✅ 10+技术分类
-- ✅ 200+面试问题
-- ✅ 详细答案解析
-- ✅ 关键词搜索
-
-## 🔧 开发
-
-### 本地开发
+### 快速部署
 
 ```bash
-# 启动知识库API（可选）
-cd knowledge-api
-npm install
-npm start
+# 1. 部署后端服务
+pm2 start ecosystem.config.js
+
+# 2. 配置Nginx
+sudo cp docs/nginx.conf /etc/nginx/conf.d/api.conf
+sudo nginx -t && sudo nginx -s reload
+
+# 3. 配置小程序
+# - 填写config.js
+# - 配置微信域名白名单
+# - 在开发者工具中测试
 ```
 
-### 构建npm包
+详见：[部署架构文档](./docs/DEPLOYMENT_ARCHITECTURE.md)
 
-在微信开发者工具中：
-1. 工具 → 构建 npm
-2. 等待构建完成
+## 许可证
 
-### 代码规范
-
-- 使用 ES6+ 语法
-- 遵循微信小程序开发规范
-- 保持代码简洁清晰
-
-## 📊 性能指标
-
-- **代码包大小**：约1.5MB（限制2MB）
-- **测试覆盖率**：100%（73个测试用例）
-- **页面数量**：17个核心页面
-- **组件数量**：3个自定义组件
-
-## ⚠️ 注意事项
-
-1. **会员支付**：当前使用个人收款码方案，适合初期用户量 < 50人
-2. **数据存储**：使用微信本地存储，总限制10MB
-3. **包体积**：已排除docs文件夹，注意控制图片大小
-
-## 🔄 升级路径
-
-### 当前阶段（0-50用户）
-✅ 个人收款码 - 零成本快速上线
-
-### 成长期（50-200用户）
-- 商家收款码（0.6%手续费）
-- 第三方支付服务
-
-### 成熟期（>200用户）
-- 微信云开发（¥240/年）
-- 完全自主可控
-
-## 📝 更新日志
-
-### v8.4.0 (2025-11-25)
-- ✅ 移除 apifm 依赖
-- ✅ 实现本地会员管理
-- ✅ 添加收款码支付方案
-- ✅ 完善测试覆盖（73个测试用例）
-- ✅ 优化项目结构和文档
-
-## 🤝 贡献
-
-欢迎提交 Issue 和 Pull Request！
-
-## 📄 许可证
-
-ISC License
-
-## 📞 联系方式
-
-如有问题，请查看[项目文档](./docs/README.md)或提交 Issue。
+MIT License
 
 ---
 
-**最后更新**：2025-11-25  
-**当前版本**：8.4.0  
-**状态**：✅ 生产就绪
+**版本**: 8.4.0  
+**最后更新**: 2025-11-29
