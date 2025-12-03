@@ -9,8 +9,8 @@ wechat-app-mall/
 ├── utils/              # 业务逻辑和服务接口
 ├── images/             # 静态图片资源
 ├── miniprogram_npm/    # 编译后的npm依赖
-├── knowledge-api/      # 知识库Node.js后端
-├── docs/               # 项目文档
+├── knowledge-api/      # 知识库Node.js后端（端口3000/8443）
+├── member-service/     # 会员服务后端（端口3001）
 ├── app.js              # 应用入口和生命周期
 ├── app.json            # 全局配置
 ├── app.wxss            # 全局样式
@@ -32,6 +32,10 @@ wechat-app-mall/
 - `index.js` - 分类浏览和搜索
 - `detail.js` - 问答展示，支持Markdown渲染
 
+**会员中心** (`pages/member/`)
+- `payment/` - 收款码支付页面
+- `payment-result/` - 支付结果页面
+
 **个人中心** (`pages/my/`)
 - `index.js` - 个人信息概览
 - `info.js` - 个人信息编辑
@@ -39,8 +43,8 @@ wechat-app-mall/
 - `feedback.js` - 意见反馈
 
 **登录认证** (`pages/login/`)
-- `index.js` - 微信授权登录
-- `simple.js` - 简化登录流程
+- `index.js` - 微信授权登录（已废弃）
+- `simple.js` - 简化登录流程（基于OpenID）
 
 ### `/components` - 自定义组件
 
@@ -55,12 +59,13 @@ wechat-app-mall/
 
 **核心工具**（单一职责）：
 - `ai.js` - AI服务HTTP客户端（对话、上传）
-- `auth.js` - 认证流程（登录、登出、token管理）
-- `knowledge.js` - 知识库数据结构
+- `auth.js` - 认证流程（登录、登出、token管理，基于OpenID）
+- `simpleAuth.js` - 知识库API简化认证（JWT + OpenID）
+- `member-api.js` - 会员服务API客户端（状态查询、开通、续费）
+- `knowledge.js` - 知识库数据结构（已废弃，使用API）
 - `knowledge-api.js` - 知识库API客户端
 - `tools.js` - 通用工具函数（日期格式化、防抖、节流）
 - `markdown.js` - Markdown渲染辅助函数
-- `simpleAuth.js` - 知识库API简化认证
 
 ### `/images` - 静态资源
 
@@ -70,20 +75,26 @@ wechat-app-mall/
 - `home/` - 首页资源
 - `order/` - 订单相关图标（遗留）
 
-### `/knowledge-api` - 后端服务
+### `/knowledge-api` - 知识库后端服务
 
-Node.js/Express后端：
+Node.js/Express后端（端口3000，HTTPS 8443）：
 - `server.js` - 主服务文件
-- `routes/` - API路由处理器
-- `middleware/` - 认证中间件
-- `utils/` - 后端工具函数
-- `data/` - 知识库JSON数据
+- `routes/auth.js` - 认证路由（微信登录、JWT）
+- `middleware/auth.js` - JWT认证中间件
+- `utils/` - 后端工具函数（JWT、用户存储、知识库）
+- `data/` - 知识库JSON数据和用户数据
+- 生产地址：https://api.feelnow.cn:8443
 
-### `/docs` - 文档
+### `/member-service` - 会员服务后端
 
-- `technical/ARCHITECTURE.md` - 系统架构文档
-- 各种优化和功能文档
-- 部署指南
+Node.js/Express后端（端口3001）：
+- `server.js` - 主服务文件（会员管理、订单管理）
+- `init.sql` - 数据库初始化脚本
+- `deploy.sh` - 自动化部署脚本
+- `check-env.sh` - 环境检查脚本
+- `pack.sh` - 打包脚本
+- 数据库：MySQL（members表、orders表）
+- 生产地址：http://47.95.196.190:3001
 
 ## 文件命名规范
 
@@ -129,6 +140,7 @@ const CONFIG = require('../../config.js')
 const AI = require('../../utils/ai.js')
 const AUTH = require('../../utils/auth.js')
 const SimpleAuth = require('../../utils/simpleAuth.js')
+const MemberAPI = require('../../utils/member-api.js')
 
 // 应用实例
 const app = getApp()

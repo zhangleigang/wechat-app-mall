@@ -1,0 +1,340 @@
+/* 使用全局样式系统 */
+
+/* ==================== 页面容器 ==================== */
+page {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  min-height: 100vh;
+}
+
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: var(--space-2xl) var(--space-lg);
+  padding-bottom: calc(var(--space-2xl) + env(safe-area-inset-bottom));
+}
+
+/* ==================== 顶部装饰 ==================== */
+.login-header {
+  height: 80px;
+  margin-bottom: var(--space-xl);
+}
+
+.header-decoration {
+  width: 60px;
+  height: 60px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: var(--radius-circle);
+  backdrop-filter: blur(10px);
+}
+
+/* ==================== 品牌区域 ==================== */
+.login-brand {
+  text-align: center;
+  margin-bottom: var(--space-2xl);
+}
+
+.brand-icon {
+  font-size: 64px;
+  margin-bottom: var(--space-md);
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.brand-title {
+  display: block;
+  font-size: var(--font-2xl);
+  font-weight: var(--font-bold);
+  color: var(--text-white);
+  margin-bottom: var(--space-xs);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.brand-subtitle {
+  display: block;
+  font-size: var(--font-md);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+/* ==================== 登录卡片 ==================== */
+.login-card {
+  background: var(--bg-card);
+  border-radius: var(--radius-xl);
+  padding: var(--space-2xl);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  margin-bottom: var(--space-xl);
+}
+
+.card-title {
+  text-align: center;
+  margin-bottom: var(--space-2xl);
+}
+
+.title-text {
+  display: block;
+  font-size: var(--font-xl);
+  font-weight: var(--font-bold);
+  color: var(--text-primary);
+  margin-bottom: var(--space-xs);
+}
+
+.title-desc {
+  display: block;
+  font-size: var(--font-sm);
+  color: var(--text-tertiary);
+}
+
+/* ==================== 用户信息填写表单 ==================== */
+.user-profile-form {
+  padding: var(--space-xl);
+  background: var(--bg-card);
+  border-radius: var(--radius-xl);
+  margin-bottom: var(--space-lg);
+}
+
+.form-title {
+  font-size: var(--font-lg);
+  font-weight: var(--font-bold);
+  color: var(--text-primary);
+  margin-bottom: var(--space-xl);
+  text-align: center;
+}
+
+.form-item {
+  margin-bottom: var(--space-xl);
+}
+
+.form-label {
+  display: block;
+  font-size: var(--font-md);
+  font-weight: var(--font-bold);
+  color: var(--text-primary);
+  margin-bottom: var(--space-sm);
+}
+
+/* 头像选择器 */
+.avatar-picker {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--space-sm);
+  padding: var(--space-lg);
+  background: var(--bg-page);
+  border-radius: var(--radius-lg);
+  border: 2px dashed var(--border-color);
+  transition: all var(--transition-base);
+}
+
+.avatar-picker::after {
+  border: none;
+}
+
+.avatar-picker:active {
+  transform: scale(0.98);
+  border-color: var(--primary-color);
+}
+
+.avatar-image {
+  width: 80px;
+  height: 80px;
+  border-radius: var(--radius-circle);
+  border: 3px solid var(--primary-color);
+  box-shadow: var(--shadow-md);
+}
+
+.avatar-tip {
+  font-size: var(--font-sm);
+  color: var(--text-tertiary);
+}
+
+/* 昵称输入框 */
+.nickname-input {
+  width: 100%;
+  height: 48px;
+  padding: 0 var(--space-md);
+  background: var(--bg-page);
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  font-size: var(--font-md);
+  color: var(--text-primary);
+  transition: all var(--transition-base);
+}
+
+.nickname-input:focus {
+  border-color: var(--primary-color);
+  background: var(--bg-card);
+}
+
+.form-hint {
+  display: block;
+  margin-top: var(--space-xs);
+  font-size: var(--font-xs);
+  color: var(--text-tertiary);
+}
+
+/* 分隔线 */
+.divider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: var(--space-xl) 0;
+  position: relative;
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border-color);
+}
+
+.divider-text {
+  padding: 0 var(--space-md);
+  font-size: var(--font-sm);
+  color: var(--text-tertiary);
+}
+
+/* ==================== 登录按钮 ==================== */
+.login-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-md);
+  margin-bottom: var(--space-xl);
+}
+
+.login-btn {
+  width: 100%;
+  height: 52px;
+  border-radius: var(--radius-round);
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  font-size: var(--font-md);
+  font-weight: var(--font-bold);
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-md);
+  padding: 0;
+}
+
+.login-btn:active {
+  transform: scale(0.98);
+  box-shadow: var(--shadow-sm);
+}
+
+.login-btn[disabled] {
+  opacity: 0.6;
+  transform: none !important;
+}
+
+.info-btn {
+  background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+  color: var(--text-white);
+}
+
+.primary-btn {
+  background: var(--primary-gradient);
+  color: var(--text-white);
+}
+
+.secondary-btn {
+  background: var(--bg-page);
+  color: var(--text-primary);
+  border: 2px solid var(--border-light);
+}
+
+.btn-icon {
+  font-size: 20px;
+}
+
+.btn-text {
+  font-size: var(--font-md);
+  font-weight: var(--font-bold);
+}
+
+.primary-btn .btn-text {
+  color: var(--text-white);
+}
+
+.secondary-btn .btn-text {
+  color: var(--text-primary);
+}
+
+/* ==================== 协议区域 ==================== */
+.agreement-section {
+  padding: var(--space-md);
+  background: var(--bg-page);
+  border-radius: var(--radius-lg);
+}
+
+.agreement-checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-sm);
+}
+
+.checkbox {
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+  transition: all var(--transition-fast);
+}
+
+.checkbox.checked {
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.check-icon {
+  color: var(--text-white);
+  font-size: 12px;
+  font-weight: var(--font-bold);
+}
+
+.agreement-text {
+  font-size: var(--font-xs);
+  color: var(--text-secondary);
+  line-height: var(--line-height-relaxed);
+  flex: 1;
+}
+
+.agreement-link {
+  color: var(--primary-color);
+  font-weight: var(--font-bold);
+}
+
+/* ==================== 底部提示 ==================== */
+.login-footer {
+  text-align: center;
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-xs);
+}
+
+.footer-text {
+  font-size: var(--font-xs);
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.footer-hint {
+  font-size: var(--font-xs);
+  color: rgba(255, 255, 255, 0.6);
+}

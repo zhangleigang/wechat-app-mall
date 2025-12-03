@@ -1,161 +1,235 @@
-# AI面试助手 - 微信小程序
+# 🎯 AI面试助手
 
-基于微信小程序的智能职业发展工具，专注于大数据领域的面试准备。
+<div align="center">
 
-## 核心功能
+**基于微信小程序的智能职业发展工具，专注于大数据领域的面试准备**
 
-- 🎯 **岗位分析** - AI分析职位描述，生成预测面试问题
-- 📄 **简历解读** - 智能简历分析和优化建议
-- 💭 **情绪小屋** - 面试压力管理和心理支持
-- 📚 **知识库** - 200+大数据面试题库，10+技术分类
-- 👤 **会员系统** - 收款码支付，本地会员管理
+[![License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+[![Node.js](https://img.shields.io/badge/node-%3E%3D14.0.0-brightgreen.svg)](https://nodejs.org/)
+[![WeChat](https://img.shields.io/badge/WeChat-MiniProgram-07C160.svg)](https://developers.weixin.qq.com/miniprogram/dev/framework/)
 
-## 快速开始
+[功能特性](#-核心功能) • [快速开始](#-快速开始) • [技术栈](#️-技术栈) • [文档](#-文档)
 
-### 环境要求
-
-- 微信开发者工具 1.06+
-- Node.js 14+
-- MySQL 8.0+（member-service需要）
-
-### 安装依赖
-
-```bash
-# 小程序依赖
-npm install
-
-# 在微信开发者工具中构建npm
-工具 → 构建 npm
-```
-
-### 配置项目
-
-1. **配置config.js**
-```javascript
-module.exports = {
-  // 知识库API（已部署）
-  knowledgeApiUrl: 'https://api.feelnow.cn:8443/api',
-  
-  // AI服务（需要配置）
-  ai_api_base: 'https://your-ai-backend.example.com',
-  
-  // 收款码配置（需要配置）
-  paymentQrcode: {
-    url: 'https://your-domain.com/qrcode.jpg',
-    accountName: '你的姓名',
-    enabled: true
-  }
-}
-```
-
-2. **配置微信小程序**
-- 在`project.config.json`中填入AppID
-- 在微信公众平台配置服务器域名白名单
-
-3. **启动后端服务**
-```bash
-# 启动所有后端服务
-pm2 start ecosystem.config.js
-
-# 或分别启动
-cd knowledge-api && npm start
-cd member-service && npm start
-```
-
-## 项目结构
-
-```
-wechat-app-mall/
-├── pages/              # 页面
-│   ├── ai/            # AI功能（岗位、简历、情绪）
-│   ├── knowledge/     # 知识库
-│   ├── member/        # 会员相关
-│   └── my/            # 个人中心
-├── components/        # 自定义组件
-├── utils/             # 工具模块
-│   ├── ai.js         # AI服务
-│   ├── auth.js       # 认证
-│   ├── simpleAuth.js # 简化认证
-│   ├── memberLocal.js # 会员管理
-│   └── knowledge.js  # 知识库数据
-├── knowledge-api/     # 知识库后端服务
-├── member-service/    # 会员后端服务
-├── docs/              # 文档
-└── tests/             # 测试
-```
-
-## 后端服务
-
-### knowledge-api (端口3000)
-- 知识库数据API
-- 用户认证（JWT）
-- 微信登录
-
-### member-service (端口3001)
-- 会员状态管理
-- 订单记录
-- 对账功能
-
-详见：[部署架构文档](./docs/DEPLOYMENT_ARCHITECTURE.md)
-
-## 测试
-
-```bash
-# 运行所有测试
-npm test
-
-# 运行特定测试
-npm test -- auth-flow
-npm test -- member-payment-flow
-```
-
-测试覆盖：73个测试用例，100%通过率
-
-## 文档
-
-- [部署架构](./docs/DEPLOYMENT_ARCHITECTURE.md) - 后端服务部署架构
-- [数据库设计](./docs/DATABASE_DESIGN_FINAL.md) - 会员系统数据库设计
-- [会员服务部署](./docs/MEMBER_SERVICE_DEPLOYMENT.md) - 会员服务部署指南
-- [文档索引](./docs/README.md) - 完整文档列表
-
-## 技术栈
-
-**前端**
-- 微信小程序 SDK 8.4.0
-- Vant Weapp 1.11.6
-- mp-html 2.3.1
-
-**后端**
-- Node.js 18+
-- Express.js 4.x
-- MySQL 8.0+
-- PM2进程管理
-
-## 部署
-
-### 快速部署
-
-```bash
-# 1. 部署后端服务
-pm2 start ecosystem.config.js
-
-# 2. 配置Nginx
-sudo cp docs/nginx.conf /etc/nginx/conf.d/api.conf
-sudo nginx -t && sudo nginx -s reload
-
-# 3. 配置小程序
-# - 填写config.js
-# - 配置微信域名白名单
-# - 在开发者工具中测试
-```
-
-详见：[部署架构文档](./docs/DEPLOYMENT_ARCHITECTURE.md)
-
-## 许可证
-
-MIT License
+</div>
 
 ---
 
-**版本**: 8.4.0  
-**最后更新**: 2025-11-29
+## 📖 项目简介
+
+AI面试助手是一款专为大数据领域求职者打造的智能面试准备工具，提供：
+
+- 🤖 **AI智能分析** - 岗位描述分析、简历优化建议
+- 📚 **面试题库** - 200+ 精选大数据技术面试题
+- 💎 **会员服务** - 灵活的付费套餐（月度/季度/年度）
+- 🎯 **情绪支持** - AI驱动的面试压力管理
+
+## 📦 项目结构
+
+```
+ai-interview-helper/
+├── miniprogram/              # 📱 小程序前端
+│   ├── pages/               # 页面模块
+│   │   ├── ai/             # AI功能（岗位分析、简历解读、情绪小屋）
+│   │   ├── knowledge/      # 知识库（题目浏览、搜索）
+│   │   ├── member/         # 会员中心（购买、管理）
+│   │   ├── my/             # 个人中心
+│   │   └── login/          # 登录认证
+│   ├── components/          # 可复用组件
+│   ├── utils/              # 工具函数
+│   │   ├── simpleAuth.js   # 认证工具
+│   │   ├── member-api.js   # 会员API
+│   │   └── knowledge-api.js # 知识库API
+│   ├── images/             # 图片资源
+│   ├── app.js              # 应用入口
+│   ├── config.js           # 配置文件
+│   └── README.md           # 前端文档
+│
+├── server/                  # 🚀 后端服务
+│   ├── src/
+│   │   ├── routes/         # API路由
+│   │   │   ├── auth.js     # 认证接口
+│   │   │   ├── member.js   # 会员接口
+│   │   │   ├── knowledge.js # 知识库接口
+│   │   │   ├── order.js    # 订单接口
+│   │   │   ├── admin.js    # 管理接口
+│   │   │   └── upload.js   # 文件上传
+│   │   ├── middleware/     # 中间件
+│   │   ├── utils/          # 工具函数
+│   │   ├── data/           # 知识库数据
+│   │   └── static/         # 静态文件（头像、收款码）
+│   ├── config/             # 配置文件
+│   ├── database/           # 数据库脚本
+│   ├── server.js           # 服务入口
+│   └── README.md           # 后端文档
+│
+├── docs/                    # 📚 文档
+│   ├── TESTING_CHECKLIST.md      # 测试清单
+│   ├── OPTIMIZATION_GUIDE.md     # 优化指南
+│   ├── DEPLOYMENT_CHECKLIST.md   # 部署清单
+│   └── ...
+│
+├── .gitignore
+└── README.md               # 本文件
+```
+
+## 🎯 核心功能
+
+### 用户端功能
+
+| 功能模块 | 描述 | 状态 |
+|---------|------|------|
+| 🔐 **用户认证** | 基于微信OpenID的无感登录 | ✅ |
+| 👤 **个人中心** | 昵称、头像管理，会员状态查看 | ✅ |
+| 💎 **会员服务** | 月度/季度/年度套餐，收款码支付 | ✅ |
+| 📚 **知识库** | 200+ 大数据面试题，分类浏览和搜索 | ✅ |
+| 🤖 **岗位分析** | AI分析职位描述，提取核心技能 | ✅ |
+| 📄 **简历解读** | AI驱动的简历优化建议 | ✅ |
+| 💭 **情绪小屋** | 面试压力管理和心理支持 | ✅ |
+| 🖼️ **头像上传** | 支持自定义头像，永久存储 | ✅ |
+
+### 管理端功能
+
+| 功能模块 | 描述 | 状态 |
+|---------|------|------|
+| 📊 **订单管理** | 查看、导出订单记录 | ✅ |
+| 👥 **会员管理** | 会员列表、状态管理 | ✅ |
+| 📈 **数据统计** | 用户数据、收入统计 | 🚧 |
+
+## 🚀 快速开始
+
+### 环境要求
+
+- **Node.js** >= 14.0.0
+- **MySQL** >= 8.0
+- **微信开发者工具** 最新版
+- **PM2** (生产环境)
+
+### 前端开发
+
+```bash
+# 1. 进入前端目录
+cd miniprogram
+
+# 2. 安装依赖
+npm install
+
+# 3. 使用微信开发者工具打开 miniprogram 目录
+# 4. 工具 → 构建 npm
+# 5. 开始开发
+```
+
+📖 详细文档：[miniprogram/README.md](miniprogram/README.md)
+
+### 后端开发
+
+```bash
+# 1. 进入后端目录
+cd server
+
+# 2. 安装依赖
+npm install
+
+# 3. 配置环境变量
+cp .env.example .env
+vi .env  # 修改数据库密码等配置
+
+# 4. 初始化数据库
+mysql -u root -p < database/init.sql
+
+# 5. 启动服务
+npm start
+```
+
+📖 详细文档：[server/README.md](server/README.md)
+
+### 生产部署
+
+```bash
+# 1. 后端部署
+cd server
+pm2 start server.js --name ai-interview-helper
+pm2 save
+
+# 2. 配置 Nginx（参考 docs/nginx-config-fixed.conf）
+# 3. 配置 SSL 证书
+# 4. 小程序提交审核
+```
+
+📖 详细文档：[docs/DEPLOYMENT_CHECKLIST.md](docs/DEPLOYMENT_CHECKLIST.md)
+
+## 🛠️ 技术栈
+
+### 前端技术
+
+| 技术 | 版本 | 用途 |
+|------|------|------|
+| 微信小程序 SDK | 8.4.0 | 核心框架 |
+| Vant Weapp | 1.11.6 | UI组件库 |
+| mp-html | 2.3.1 | Markdown渲染 |
+| dayjs | 1.11.6 | 日期处理 |
+
+### 后端技术
+
+| 技术 | 版本 | 用途 |
+|------|------|------|
+| Node.js | 14+ | 运行环境 |
+| Express.js | 4.18.2 | Web框架 |
+| MySQL | 8.0+ | 数据库 |
+| JWT | 9.0.2 | 认证 |
+| Multer | 1.4.5 | 文件上传 |
+
+### 部署技术
+
+| 技术 | 用途 |
+|------|------|
+| PM2 | 进程管理 |
+| Nginx | 反向代理、静态文件服务 |
+| Let's Encrypt | SSL证书 |
+
+## 📚 文档
+
+### 开发文档
+- [前端开发指南](miniprogram/README.md)
+- [后端开发指南](server/README.md)
+- [API文档](docs/FINAL_DOCUMENTATION.md)
+
+### 运维文档
+- [部署清单](docs/DEPLOYMENT_CHECKLIST.md)
+- [测试清单](docs/TESTING_CHECKLIST.md)
+- [优化指南](docs/OPTIMIZATION_GUIDE.md)
+
+### 架构文档
+- [技术栈说明](.kiro/steering/tech.md)
+- [项目结构](.kiro/steering/structure.md)
+- [产品说明](.kiro/steering/product.md)
+
+## 🔗 相关链接
+
+- **生产环境**: https://api.feelnow.cn
+- **API文档**: https://api.feelnow.cn/api
+- **微信小程序**: [待发布]
+
+## 🤝 贡献
+
+欢迎提交 Issue 和 Pull Request！
+
+## 📄 开源协议
+
+本项目采用 [MIT](LICENSE) 协议开源。
+
+## 📞 联系方式
+
+- **问题反馈**: [GitHub Issues](https://github.com/your-repo/issues)
+- **技术支持**: [待添加]
+
+---
+
+<div align="center">
+
+**Made with ❤️ by AI Interview Helper Team**
+
+⭐ 如果这个项目对你有帮助，请给我们一个 Star！
+
+**最后更新**: 2024-12-03 | **版本**: 1.0.0
+
+</div>

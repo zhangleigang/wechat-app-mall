@@ -1,0 +1,25 @@
+<view class="container">
+  <view class="header">
+    <text class="title">会员服务测试</text>
+    <text class="user-id">OpenID: {{openid || '未登录'}}</text>
+  </view>
+
+  <view class="test-buttons">
+    <button bindtap="testGetStatus" type="primary">查询会员状态</button>
+    <button bindtap="testActivate" type="primary">激活会员（月度）</button>
+    <button bindtap="testRenew" type="primary">续费会员（季度）</button>
+    <button bindtap="testGetOrders" type="primary">查询订单记录</button>
+    <button bindtap="clearCache" type="warn">清除缓存</button>
+    <button bindtap="clearLog" type="default">清空日志</button>
+  </view>
+
+  <view class="results">
+    <view class="result-title">测试结果：</view>
+    <view class="result-list">
+      <view class="result-item" wx:for="{{testResults}}" wx:key="index">
+        <text class="time">[{{item.time}}]</text>
+        <text class="message">{{item.message}}</text>
+      </view>
+    </view>
+  </view>
+</view>

@@ -29,19 +29,26 @@
 - 认证：Bearer Token
 - 格式：JSON
 
-**业务后端** - API工厂（apifm）SaaS平台
-- 用户管理（注册、登录、个人信息）
-- 订单管理（创建、支付、查询）
-- 系统配置管理
-- 标识：`subDomain` + `merchantId`
-
-**知识库API** - Node.js/Express后端服务
+**知识库API** - Node.js/Express后端服务（端口3000/8443）
 - Express.js 4.x
 - 启用CORS跨域
 - Gzip压缩
-- JWT认证
+- JWT + OpenID认证
+- 微信登录（code2Session）
+- 静态文件服务（收款码图片）
 - PM2进程管理（生产环境）
-- Nginx反向代理（生产环境，用于端口转发和负载均衡）
+- Nginx反向代理（HTTP 8080 → 3000，HTTPS 8443 → 3000）
+- 生产地址：https://api.feelnow.cn:8443
+
+**会员服务API** - Node.js/Express后端服务（端口3001）
+- Express.js 4.x
+- MySQL 8.0+数据库
+- 基于OpenID的会员管理
+- 会员状态查询、开通、续费
+- 订单记录和管理
+- 管理员接口（订单列表、会员列表、导出）
+- PM2进程管理（生产环境）
+- 生产地址：http://47.95.196.190:3001
 
 ## 开发工具
 
@@ -53,28 +60,54 @@
 ## 常用命令
 
 ```bash
-# 安装依赖
-npm install
-
-# 构建npm包（在微信开发者工具中）
-微信开发者工具 -> 工具 -> 构建 npm
+# 小程序前端
+npm install                    # 安装依赖
+# 微信开发者工具 -> 工具 -> 构建 npm
 
 # 知识库API后端（本地开发）
 cd knowledge-api
 npm install
-npm start              # 启动开发服务器（http://localhost:3000）
+npm start                      # 启动开发服务器（http://localhost:3000）
+npm run dev                    # 开发模式（nodemon自动重启）
 
-# 生产环境部署
+# 知识库API生产环境部署
 pm2 start server.js --name knowledge-api
-# Nginx配置在服务器上，将8080端口转发到3000端口
+pm2 logs knowledge-api
+pm2 restart knowledge-api
+
+# 会员服务后端（本地开发）
+cd member-service
+npm install
+npm start                      # 启动开发服务器（http://localhost:3001）
+
+# 会员服务生产环境部署
+cd member-service
+bash pack.sh                   # 打包
+scp member-service-*.tar.gz root@47.95.196.190:/root/
+# 在服务器上：
+tar -xzf member-service-*.tar.gz
+cd member-service-temp
+./check-env.sh                 # 检查环境
+vi .env                        # 配置数据库
+./deploy.sh                    # 自动部署
 ```
 
 ## 配置文件
 
-- `config.js` - 应用配置（API地址、商户ID、功能开关）
+**小程序前端**：
+- `config.js` - 应用配置（API地址、收款码配置、功能开关）
 - `app.json` - 全局配置（页面路由、tabBar、权限、组件）
 - `project.config.json` - 微信开发者工具项目配置
 - `package.json` - npm依赖配置
+
+**知识库API后端**：
+- `.env` - 环境变量（微信AppID、Secret、JWT密钥）
+- `package.json` - 依赖配置
+
+**会员服务后端**：
+- `.env` - 环境变量（数据库配置）
+- `init.sql` - 数据库初始化脚本
+- `package.json` - 依赖配置
 
 ## 代码组织
 
@@ -82,8 +115,9 @@ pm2 start server.js --name knowledge-api
 1. 应用层 - `app.js`、`app.json`、`app.wxss`
 2. 页面层 - `/pages`（每个页面4个文件：.js、.json、.wxml、.wxss）
 3. 组件层 - `/components` + Vant UI组件
-4. 工具层 - `/utils`（ai.js、auth.js、knowledge.js、tools.js）
+4. 工具层 - `/utils`（ai.js、auth.js、member-api.js、knowledge-api.js、tools.js）
 5. 配置层 - `config.js`
+6. 后端服务层 - knowledge-api（知识库+认证）、member-service（会员管理）
 
 ## 包体积管理
 
@@ -116,7 +150,18 @@ pm2 start server.js --name knowledge-api
 
 ## 存储策略
 
-- 用户信息：使用`wx.setStorageSync`（退出登录时清除）
+**前端存储**（wx.setStorageSync）：
+- 用户信息：`userId`、`token`、`openid`（退出登录时清除）
+- 会员信息缓存：`memberInfo`、`memberInfoTime`（10分钟有效期）
 - 会话数据：7天过期
-- 缓存数据：按需清除
 - 存储限制：总计10MB
+
+**后端存储**：
+- 知识库数据：JSON文件（knowledge-api/data/knowledge.json）
+- 用户认证：JSON文件（knowledge-api/data/users.json，OpenID映射）
+- 会员数据：MySQL数据库（member-service，members表，主键OpenID）
+- 订单数据：MySQL数据库（member-service，orders表，关联OpenID）
+
+**缓存策略**：
+- 会员状态：前端缓存10分钟，减少API调用
+- 知识库数据：后端内存缓存，启动时加载
