@@ -15,41 +15,84 @@
     </view>
   </view>
   
-  <!-- 上传引导区域（未上传时显示） -->
-  <view wx:if="{{!resumeStatus.uploaded}}" class="upload-section">
-    <view class="upload-icon">📄</view>
-    <text class="upload-title">上传简历开始分析</text>
-    <text class="upload-desc">支持 PDF、Word、图片格式</text>
-    <button class="upload-btn" bindtap="uploadResume">
-      <text class="upload-btn-text">选择文件</text>
-    </button>
-  </view>
-  
-  <!-- 简历状态卡片（已上传时显示） -->
-  <view wx:if="{{resumeStatus.uploaded}}" class="resume-status-card">
-    <view class="status-icon">✅</view>
-    <view class="status-info">
-      <text class="file-name">{{resumeStatus.fileName}}</text>
-      <text class="upload-time">上传于 {{resumeStatus.uploadTime}}</text>
+  <!-- 简历列表区域 -->
+  <view class="resume-list-section">
+    <!-- 上传引导（无简历时显示） -->
+    <view wx:if="{{resumeList.length === 0}}" class="upload-guide">
+      <view class="upload-icon">📄</view>
+      <text class="upload-title">上传简历开始分析</text>
+      <text class="upload-desc">支持 PDF、Word、Markdown 格式</text>
+      <button class="upload-btn" bindtap="uploadResume">
+        <text class="upload-btn-text">选择文件</text>
+      </button>
     </view>
-    <button class="reupload-btn" bindtap="uploadResume">
-      <text class="reupload-text">重新上传</text>
-    </button>
+    
+    <!-- 简历卡片列表（有简历时显示） -->
+    <view wx:else class="resume-cards-container">
+      <view class="resume-cards-header">
+        <text class="cards-title">我的简历 ({{resumeList.length}}/3)</text>
+        <button 
+          wx:if="{{resumeList.length < 3}}" 
+          class="add-resume-btn" 
+          bindtap="uploadResume"
+        >
+          <text class="add-icon">➕</text>
+          <text class="add-text">添加</text>
+        </button>
+      </view>
+      
+      <scroll-view class="resume-cards-scroll" scroll-x="true" show-scrollbar="false">
+        <view class="resume-cards-list">
+          <view 
+            wx:for="{{resumeList}}" 
+            wx:key="id"
+            class="resume-card {{activeResumeId === item.id ? 'active' : ''}}"
+            bindtap="onResumeCardTap"
+            bindlongpress="onResumeCardLongPress"
+            data-id="{{item.id}}"
+            data-name="{{item.filename}}"
+          >
+            <!-- 选中标识 -->
+            <view wx:if="{{activeResumeId === item.id}}" class="card-badge">
+              <text class="badge-text">当前</text>
+            </view>
+            
+            <!-- 文件图标 -->
+            <view class="card-icon">📄</view>
+            
+            <!-- 文件信息 -->
+            <view class="card-info">
+              <text class="card-filename">{{item.filename}}</text>
+              <text class="card-time">{{item.uploadTime}}</text>
+            </view>
+            
+            <!-- 删除提示（长按显示） -->
+            <view class="card-delete-hint">
+              <text class="delete-hint-text">长按删除</text>
+            </view>
+          </view>
+        </view>
+      </scroll-view>
+      
+      <view class="upload-hint">
+        <text class="hint-text">💡 支持 PDF、Word、Markdown 格式，最多3个</text>
+      </view>
+    </view>
   </view>
   
-  <!-- 快捷分析选项（已上传时显示） -->
-  <view wx:if="{{resumeStatus.uploaded && messages.length === 0}}" class="quick-analysis-section">
-    <text class="quick-analysis-title">💡 快速分析</text>
-    <scroll-view class="quick-analysis-scroll" scroll-x="true" show-scrollbar="false">
-      <view class="quick-analysis-list">
+  <!-- 预设问题（仅在有activeResume时显示） -->
+  <view wx:if="{{activeResumeId && messages.length === 0}}" class="preset-questions-section">
+    <text class="preset-title">💡 快速分析</text>
+    <scroll-view class="preset-scroll" scroll-x="true" show-scrollbar="false">
+      <view class="preset-list">
         <view 
-          wx:for="{{quickAnalysis}}" 
+          wx:for="{{presetQuestions}}" 
           wx:key="index"
-          class="quick-analysis-item"
-          bindtap="selectAnalysis"
+          class="preset-item"
+          bindtap="selectPresetQuestion"
           data-question="{{item}}"
         >
-          <text class="quick-analysis-text">{{item}}</text>
+          <text class="preset-text">{{item}}</text>
         </view>
       </view>
     </scroll-view>

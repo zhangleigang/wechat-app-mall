@@ -9,7 +9,7 @@ const cors = require('cors');
 const compression = require('compression');
 const config = require('./config');
 const { pool, testConnection } = require('./config/database');
-const errorHandler = require('./src/middleware/errorHandler');
+const { errorHandler } = require('./src/middleware/errorHandler');
 
 const app = express();
 
@@ -32,6 +32,7 @@ const knowledgeRoutes = require('./src/routes/knowledge');
 const orderRoutes = require('./src/routes/order');
 const adminRoutes = require('./src/routes/admin');
 const uploadRoutes = require('./src/routes/upload');
+const resumeRoutes = require('./src/routes/resume');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/member', memberRoutes);
@@ -39,6 +40,7 @@ app.use('/api/knowledge', knowledgeRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/upload', uploadRoutes);
+app.use('/api/resume', resumeRoutes);
 
 // ============ 健康检查 ============
 app.get('/health', (req, res) => {

@@ -1,3 +1,10 @@
+#!/bin/bash
+
+# 快速修复脚本：在服务器上创建 .env.example 文件
+
+echo "🔧 创建 .env.example 文件..."
+
+cat > .env.example << 'EOF'
 # 服务配置
 NODE_ENV=production
 PORT=3000
@@ -22,6 +29,17 @@ CORS_ORIGIN=*
 
 # DeepSeek API 配置
 # 从 DeepSeek 平台获取: https://platform.deepseek.com/
-DEEPSEEK_API_KEY=sk-f2edaeb784ea45fd9708dbe4858dafca
+DEEPSEEK_API_KEY=your-deepseek-api-key-here
+EOF
 
-
+if [ -f ".env.example" ]; then
+    echo "✅ .env.example 文件已创建"
+    echo ""
+    echo "📝 下一步："
+    echo "  1. 复制为 .env: cp .env.example .env"
+    echo "  2. 编辑配置: vi .env"
+    echo "  3. 修改数据库密码和 DeepSeek API Key"
+else
+    echo "❌ 创建失败"
+    exit 1
+fi

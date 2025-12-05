@@ -48,8 +48,16 @@ else
 fi
 echo ""
 
-# 4. 初始化数据库
-echo -e "${GREEN}步骤3: 初始化数据库...${NC}"
+# 4. 创建必要的目录
+echo -e "${GREEN}步骤3: 创建必要的目录...${NC}"
+mkdir -p uploads/resumes
+mkdir -p src/static/avatars
+mkdir -p src/static/images
+echo -e "${GREEN}✓ 目录创建完成${NC}"
+echo ""
+
+# 5. 初始化数据库
+echo -e "${GREEN}步骤4: 初始化数据库...${NC}"
 echo "是否需要初始化数据库？（如果是首次部署请选择y）"
 read -p "输入 y 继续，其他键跳过: " -n 1 -r
 echo ""
@@ -59,8 +67,8 @@ if [[ $REPLY =~ ^[Yy]$ ]]; then
 fi
 echo ""
 
-# 5. 测试服务
-echo -e "${GREEN}步骤4: 测试服务...${NC}"
+# 6. 测试服务
+echo -e "${GREEN}步骤5: 测试服务...${NC}"
 echo "正在启动测试服务..."
 timeout 5 node server.js > /dev/null 2>&1 &
 TEST_PID=$!
@@ -80,8 +88,8 @@ else
 fi
 echo ""
 
-# 6. 使用PM2部署
-echo -e "${GREEN}步骤5: 部署服务...${NC}"
+# 7. 使用PM2部署
+echo -e "${GREEN}步骤6: 部署服务...${NC}"
 if ! command -v pm2 &> /dev/null; then
     echo -e "${YELLOW}PM2未安装，正在安装...${NC}"
     npm install -g pm2
@@ -98,7 +106,7 @@ pm2 save
 echo -e "${GREEN}✓ 服务已启动${NC}"
 echo ""
 
-# 7. 显示状态
+# 8. 显示状态
 echo -e "${GREEN}=========================================="
 echo "✅ 部署完成！"
 echo "==========================================${NC}"

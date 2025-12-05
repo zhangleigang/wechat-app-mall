@@ -1,6 +1,6 @@
 # 🚀 AI面试助手 - 后端服务
 
-统一的 Node.js 后端服务，提供认证、会员、知识库、订单、上传等所有API。
+统一的 Node.js 后端服务，整合认证、会员、知识库、订单、简历管理等所有功能。
 
 ## 📁 目录结构
 
@@ -276,12 +276,22 @@ ALTER TABLE orders ADD INDEX idx_openid (openid);
 connectionLimit: 10  // 根据实际负载调整
 ```
 
+## 📚 文档
+
+详细文档请查看 `docs/` 目录：
+
+- [部署指南](docs/DEPLOYMENT_GUIDE.md) - 完整部署流程
+- [快速部署](docs/QUICK_DEPLOY.md) - 快速部署命令
+- [简历功能部署](docs/RESUME_FEATURE_DEPLOY.md) - 简历管理功能部署
+- [简历部署检查清单](docs/RESUME_DEPLOY_CHECKLIST.md) - 部署检查清单
+- [简历 API 文档](docs/RESUME_API.md) - 简历管理 API 接口
+- [静态文件指南](docs/STATIC_FILES_GUIDE.md) - 静态文件配置
+
 ## 🔗 相关链接
 
 - 前端代码：`../miniprogram/`
-- 完整文档：`../docs/`
-- API详细文档：`../docs/FINAL_DOCUMENTATION.md`
+- 项目文档：`../docs/`
 
 ---
 
-**版本**: 1.0.0 | **最后更新**: 2024-12-03
+**版本**: 1.1.0 | **最后更新**: 2025-12-05

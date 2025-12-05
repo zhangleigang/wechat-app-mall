@@ -62,20 +62,24 @@
 }
 
 
-/* ==================== 上传引导区域 ==================== */
-.upload-section {
+/* ==================== 简历列表区域 ==================== */
+.resume-list-section {
   background: var(--bg-card);
-  border-radius: var(--radius-lg);
+  border-bottom: 1px solid var(--border-light);
+}
+
+/* ==================== 上传引导（无简历时） ==================== */
+.upload-guide {
   padding: var(--space-2xl);
-  margin: var(--space-lg);
   text-align: center;
-  box-shadow: var(--shadow-sm);
+  animation: fadeIn 0.5s ease-in;
 }
 
 .upload-icon {
   font-size: 64px;
   margin-bottom: var(--space-lg);
   opacity: 0.8;
+  animation: bounce 2s infinite;
 }
 
 .upload-title {
@@ -113,70 +117,181 @@
   color: var(--text-white);
 }
 
-/* ==================== 简历状态卡片 ==================== */
-.resume-status-card {
-  background: var(--success-lighter);
-  border: 2px solid var(--success-color);
-  border-radius: var(--radius-lg);
+/* ==================== 简历卡片容器 ==================== */
+.resume-cards-container {
   padding: var(--space-lg);
-  margin: var(--space-lg);
+  animation: fadeIn 0.5s ease-in;
+}
+
+.resume-cards-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-md);
+}
+
+.cards-title {
+  font-size: var(--font-md);
+  font-weight: var(--font-bold);
+  color: var(--text-primary);
+}
+
+.add-resume-btn {
+  background: var(--primary-lighter);
+  border: 2px solid var(--primary-color);
+  border-radius: var(--radius-round);
+  padding: var(--space-xs) var(--space-md);
   display: flex;
   align-items: center;
+  gap: 4px;
+  transition: all var(--transition-base);
+}
+
+.add-resume-btn:active {
+  transform: scale(0.95);
+  background: var(--primary-color);
+}
+
+.add-icon {
+  font-size: 14px;
+}
+
+.add-text {
+  font-size: var(--font-xs);
+  font-weight: var(--font-bold);
+  color: var(--primary-color);
+}
+
+.add-resume-btn:active .add-text {
+  color: var(--text-white);
+}
+
+/* ==================== 简历卡片滚动 ==================== */
+.resume-cards-scroll {
+  width: 100%;
+  white-space: nowrap;
+  margin-bottom: var(--space-md);
+}
+
+.resume-cards-list {
+  display: inline-flex;
   gap: var(--space-md);
+  padding-bottom: var(--space-xs);
+}
+
+/* ==================== 简历卡片 ==================== */
+.resume-card {
+  display: inline-block;
+  position: relative;
+  background: var(--bg-page);
+  border: 2px solid var(--border-light);
+  border-radius: var(--radius-lg);
+  padding: var(--space-lg);
+  min-width: 200px;
+  max-width: 240px;
+  white-space: normal;
+  transition: all var(--transition-base);
+  animation: slideInRight 0.3s ease-out;
+}
+
+.resume-card:active {
+  transform: scale(0.98);
+}
+
+/* 选中状态 */
+.resume-card.active {
+  background: var(--primary-lighter);
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px var(--primary-lighter);
+  animation: cardSelect 0.3s ease-out;
+}
+
+/* 选中标识 */
+.card-badge {
+  position: absolute;
+  top: -8px;
+  right: var(--space-md);
+  background: var(--primary-gradient);
+  border-radius: var(--radius-round);
+  padding: 2px 8px;
   box-shadow: var(--shadow-sm);
+  animation: badgeAppear 0.3s ease-out;
 }
 
-.status-icon {
+.badge-text {
+  font-size: 10px;
+  font-weight: var(--font-bold);
+  color: var(--text-white);
+}
+
+/* 文件图标 */
+.card-icon {
   font-size: 32px;
-  flex-shrink: 0;
+  margin-bottom: var(--space-sm);
+  text-align: center;
 }
 
-.status-info {
-  flex: 1;
+/* 文件信息 */
+.card-info {
   display: flex;
   flex-direction: column;
   gap: var(--space-xs);
 }
 
-.file-name {
-  font-size: var(--font-md);
+.card-filename {
+  font-size: var(--font-sm);
   font-weight: var(--font-bold);
-  color: var(--success-dark);
+  color: var(--text-primary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: block;
 }
 
-.upload-time {
+.resume-card.active .card-filename {
+  color: var(--primary-color);
+}
+
+.card-time {
   font-size: var(--font-xs);
-  color: var(--success-color);
+  color: var(--text-tertiary);
+  display: block;
 }
 
-.reupload-btn {
-  background: var(--bg-card);
-  border: 2px solid var(--success-color);
-  border-radius: var(--radius-md);
-  padding: var(--space-sm) var(--space-md);
-  transition: all var(--transition-base);
+/* 删除提示 */
+.card-delete-hint {
+  margin-top: var(--space-sm);
+  padding-top: var(--space-sm);
+  border-top: 1px solid var(--border-light);
+  text-align: center;
+  opacity: 0.5;
 }
 
-.reupload-btn:active {
-  transform: scale(0.95);
-  background: var(--bg-hover);
+.delete-hint-text {
+  font-size: 10px;
+  color: var(--text-tertiary);
 }
 
-.reupload-text {
+/* 上传提示 */
+.upload-hint {
+  text-align: center;
+  padding-top: var(--space-sm);
+}
+
+.hint-text {
   font-size: var(--font-xs);
-  color: var(--success-color);
-  font-weight: var(--font-bold);
+  color: var(--text-tertiary);
 }
 
-
-/* ==================== 快捷分析选项 ==================== */
-.quick-analysis-section {
+/* ==================== 预设问题区域 ==================== */
+.preset-questions-section {
   padding: var(--space-lg);
   background: var(--bg-card);
   border-bottom: 1px solid var(--border-light);
+  animation: fadeIn 0.5s ease-in;
 }
 
-.quick-analysis-title {
+.preset-title {
   font-size: var(--font-md);
   font-weight: var(--font-bold);
   color: var(--text-primary);
@@ -184,18 +299,18 @@
   margin-bottom: var(--space-md);
 }
 
-.quick-analysis-scroll {
+.preset-scroll {
   width: 100%;
   white-space: nowrap;
 }
 
-.quick-analysis-list {
+.preset-list {
   display: inline-flex;
   gap: var(--space-md);
   padding-bottom: var(--space-xs);
 }
 
-.quick-analysis-item {
+.preset-item {
   display: inline-block;
   background: var(--primary-lighter);
   border: 2px solid var(--primary-color);
@@ -205,18 +320,27 @@
   min-width: 160px;
   max-width: 200px;
   transition: all var(--transition-base);
+  animation: slideInRight 0.3s ease-out;
 }
 
-.quick-analysis-item:active {
+.preset-item:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.preset-item:nth-child(3) {
+  animation-delay: 0.2s;
+}
+
+.preset-item:active {
   transform: scale(0.95);
   background: var(--primary-color);
 }
 
-.quick-analysis-item:active .quick-analysis-text {
+.preset-item:active .preset-text {
   color: var(--text-white);
 }
 
-.quick-analysis-text {
+.preset-text {
   font-size: var(--font-sm);
   color: var(--primary-color);
   font-weight: var(--font-bold);
@@ -620,5 +744,65 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+/* 淡入动画 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* 弹跳动画 */
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
+}
+
+/* 从右侧滑入 */
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* 卡片选中动画 */
+@keyframes cardSelect {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* 徽章出现动画 */
+@keyframes badgeAppear {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
   }
 }

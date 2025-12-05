@@ -1,33 +1,84 @@
 const AI = require('../../../utils/ai.js')
 const SimpleAuth = require('../../../utils/simpleAuth.js')
 const MemberAPI = require('../../../utils/member-api.js')
+const ResumeAPI = require('../../../utils/resume-api.js')
 
 Page({
   data: {
     sessionId: '',
     inputVal: '',
-    resumeText: '',
-    resumeStatus: {
-      uploaded: false,
-      fileName: '',
-      uploadTime: ''
-    },
+    // 简历列表管理
+    resumeList: [],           // 简历列表
+    activeResumeId: null,     // 当前选中的简历ID
+    activeResumeText: '',     // 当前简历的文本内容
+    // 对话管理
     messages: [],
     sending: false,
     scrollTop: 0,
-    // 快捷分析选项
-    quickAnalysis: [
-      '分析简历亮点和优势',
-      '找出简历中的问题',
-      '针对数据分析岗位优化建议',
-      '生成面试问答清单'
+    // 预设问题（更新为新的三个问题）
+    presetQuestions: [
+      '整个简历最大的亮点是什么？',
+      '简历还有哪些可以优化的？',
+      '用STAR原则解读这份简历'
     ]
   },
-  onLoad() {
+  async onLoad() {
     this.setData({ sessionId: Date.now() + '' })
     wx.setNavigationBarTitle({ title: '简历解读' })
+
+    // 加载简历列表
+    await this.loadResumeList()
+
     // 加载历史对话
     this.loadConversation()
+  },
+
+  /**
+   * 加载简历列表
+   */
+  async loadResumeList() {
+    try {
+      // 检查登录状态
+      const isLogined = await SimpleAuth.checkHasLogined()
+      if (!isLogined) {
+        return
+      }
+
+      const openid = wx.getStorageSync('openid')
+      if (!openid) {
+        return
+      }
+
+      wx.showLoading({ title: '加载中...' })
+
+      const result = await ResumeAPI.getResumeList(openid)
+
+      wx.hideLoading()
+
+      if (result.success) {
+        this.setData({
+          resumeList: result.resumes || []
+        })
+
+        // 如果列表不为空，自动选中第一个简历
+        if (result.resumes && result.resumes.length > 0) {
+          await this.selectResume(result.resumes[0].id)
+        }
+      } else {
+        console.error('加载简历列表失败:', result.message)
+        // 网络错误时显示提示
+        if (result.message && result.message.includes('网络')) {
+          wx.showToast({
+            title: result.message,
+            icon: 'none',
+            duration: 2000
+          })
+        }
+      }
+    } catch (err) {
+      wx.hideLoading()
+      console.error('加载简历列表异常:', err)
+    }
   },
 
   /**
@@ -80,6 +131,16 @@ Page({
       return
     }
 
+    // 检查简历数量限制（最多3个）
+    if (this.data.resumeList.length >= 3) {
+      wx.showModal({
+        title: '简历数量已达上限',
+        content: '最多只能上传3个简历，请先删除旧简历后再上传',
+        showCancel: false
+      })
+      return
+    }
+
     // 添加触觉反馈
     wx.vibrateShort({ type: 'light' })
 
@@ -90,14 +151,25 @@ Page({
         const file = res.tempFiles[0]
 
         // 文件格式验证
-        const allowedTypes = ['.pdf', '.doc', '.docx', '.jpg', '.png', '.jpeg']
+        const allowedTypes = ['.pdf', '.doc', '.docx', '.md']
         const fileName = file.name || file.path
         const fileExt = fileName.substring(fileName.lastIndexOf('.')).toLowerCase()
 
         if (!allowedTypes.includes(fileExt)) {
           wx.showToast({
             title: '不支持的文件格式',
-            icon: 'none'
+            icon: 'none',
+            duration: 2000
+          })
+          return
+        }
+
+        // 文件大小验证（10MB）
+        if (file.size > 10 * 1024 * 1024) {
+          wx.showToast({
+            title: '文件过大，请上传小于10MB的文件',
+            icon: 'none',
+            duration: 2000
           })
           return
         }
@@ -105,46 +177,52 @@ Page({
         wx.showLoading({ title: '正在上传解析...' })
 
         try {
-          const parsed = await AI.uploadResume(file.path)
+          const openid = wx.getStorageSync('openid')
+          const result = await ResumeAPI.uploadResume(file.path, openid)
+
           wx.hideLoading()
 
-          const txt = parsed.resumeText || ''
-          that.setData({ resumeText: txt })
-
-          if (txt) {
-            // 更新简历状态
-            const now = new Date()
-            that.setData({
-              resumeStatus: {
-                uploaded: true,
-                fileName: file.name || '简历文件',
-                uploadTime: that.formatTime(now)
-              }
+          if (result.success) {
+            wx.showToast({
+              title: '上传成功',
+              icon: 'success'
             })
 
-            // 添加系统提示
-            const sysPrompt = {
-              role: 'system',
-              content: '候选人简历内容如下：\n' + txt,
-              time: that.formatTime(now),
-              timestamp: Date.now()
+            // 刷新简历列表
+            await that.loadResumeList()
+
+            // 自动选中新上传的简历
+            if (result.resume && result.resume.id) {
+              await that.selectResume(result.resume.id)
             }
-            that.setData({ messages: [sysPrompt] })
-
-            // 保存到本地
-            that.saveConversation()
-
-            wx.showToast({ title: '解析成功', icon: 'success' })
           } else {
-            wx.showToast({ title: '未解析到文本', icon: 'none' })
+            // 显示友好的错误提示
+            const errorMsg = result.message || '上传失败，请稍后重试'
+
+            wx.showModal({
+              title: '上传失败',
+              content: errorMsg,
+              showCancel: result.message && result.message.includes('网络'),
+              cancelText: '取消',
+              confirmText: result.message && result.message.includes('网络') ? '重试' : '确定',
+              success: (modalRes) => {
+                if (modalRes.confirm && result.message && result.message.includes('网络')) {
+                  // 网络错误时提供重试选项
+                  that.uploadResume()
+                }
+              }
+            })
           }
         } catch (e) {
           wx.hideLoading()
           console.error('上传失败:', e)
 
+          const errorMsg = e.message || '上传失败，请检查文件格式或网络连接'
+
           wx.showModal({
             title: '上传失败',
-            content: '请检查文件格式或网络连接',
+            content: errorMsg,
+            cancelText: '取消',
             confirmText: '重试',
             success: (res) => {
               if (res.confirm) {
@@ -161,10 +239,85 @@ Page({
   },
 
   /**
-   * 选择快捷分析
+   * 选择简历
    */
-  selectAnalysis(e) {
+  async selectResume(resumeId) {
+    try {
+      // 如果已经是当前选中的简历，不需要重新加载
+      if (this.data.activeResumeId === resumeId) {
+        return
+      }
+
+      wx.showLoading({ title: '加载中...' })
+
+      const openid = wx.getStorageSync('openid')
+      const result = await ResumeAPI.getResumeDetail(resumeId, openid)
+
+      wx.hideLoading()
+
+      if (result.success) {
+        // 更新activeResumeId和activeResumeText
+        this.setData({
+          activeResumeId: resumeId,
+          activeResumeText: result.resume.parsedText || ''
+        })
+
+        // 清空当前对话历史
+        this.setData({
+          messages: []
+        })
+
+        // 清除本地缓存的对话
+        wx.removeStorageSync('resume_conversation')
+
+        // 显示切换提示
+        wx.showToast({
+          title: '已切换简历',
+          icon: 'success'
+        })
+
+        // 添加触觉反馈
+        wx.vibrateShort({ type: 'light' })
+      } else {
+        wx.showToast({
+          title: result.message || '加载简历失败',
+          icon: 'none'
+        })
+      }
+    } catch (err) {
+      wx.hideLoading()
+      console.error('选择简历失败:', err)
+      const errorMsg = err.message || '加载简历失败，请稍后重试'
+      wx.showToast({
+        title: errorMsg,
+        icon: 'none',
+        duration: 2000
+      })
+    }
+  },
+
+  /**
+   * 处理简历卡片点击事件
+   */
+  onResumeCardTap(e) {
+    const resumeId = e.currentTarget.dataset.id
+    this.selectResume(resumeId)
+  },
+
+  /**
+   * 选择预设问题
+   */
+  selectPresetQuestion(e) {
     const question = e.currentTarget.dataset.question
+
+    // 检查是否有activeResume
+    if (!this.data.activeResumeId) {
+      wx.showToast({
+        title: '请先选择简历',
+        icon: 'none'
+      })
+      return
+    }
 
     // 添加触觉反馈
     wx.vibrateShort({ type: 'light' })
@@ -177,11 +330,107 @@ Page({
   },
 
   /**
+   * 处理简历长按事件（显示删除选项）
+   */
+  onResumeCardLongPress(e) {
+    const resumeId = e.currentTarget.dataset.id
+    const resumeName = e.currentTarget.dataset.name
+
+    wx.showActionSheet({
+      itemList: ['删除简历'],
+      itemColor: '#ee0a24',
+      success: (res) => {
+        if (res.tapIndex === 0) {
+          this.confirmDeleteResume(resumeId, resumeName)
+        }
+      }
+    })
+  },
+
+  /**
+   * 确认删除简历
+   */
+  confirmDeleteResume(resumeId, resumeName) {
+    wx.showModal({
+      title: '确认删除',
+      content: `确定要删除简历"${resumeName}"吗？删除后无法恢复。`,
+      confirmText: '删除',
+      confirmColor: '#ee0a24',
+      success: (res) => {
+        if (res.confirm) {
+          this.deleteResume(resumeId)
+        }
+      }
+    })
+  },
+
+  /**
+   * 删除简历
+   */
+  async deleteResume(resumeId) {
+    try {
+      wx.showLoading({ title: '删除中...' })
+
+      const openid = wx.getStorageSync('openid')
+      const result = await ResumeAPI.deleteResume(resumeId, openid)
+
+      wx.hideLoading()
+
+      if (result.success) {
+        wx.showToast({
+          title: '删除成功',
+          icon: 'success'
+        })
+
+        // 如果删除的是当前选中简历，清空activeResumeId
+        if (this.data.activeResumeId === resumeId) {
+          this.setData({
+            activeResumeId: null,
+            activeResumeText: '',
+            messages: []
+          })
+          wx.removeStorageSync('resume_conversation')
+        }
+
+        // 刷新简历列表
+        await this.loadResumeList()
+
+        // 添加触觉反馈
+        wx.vibrateShort({ type: 'medium' })
+      } else {
+        wx.showModal({
+          title: '删除失败',
+          content: result.message || '请稍后重试',
+          showCancel: false
+        })
+      }
+    } catch (err) {
+      wx.hideLoading()
+      console.error('删除简历失败:', err)
+      const errorMsg = err.message || '删除失败，请稍后重试'
+      wx.showModal({
+        title: '删除失败',
+        content: errorMsg,
+        showCancel: false
+      })
+    }
+  },
+
+  /**
    * 发送消息
    */
   async send() {
     const text = (this.data.inputVal || '').trim()
     if (!text || this.data.sending) return
+
+    // 检查是否有activeResume
+    if (!this.data.activeResumeId) {
+      wx.showToast({
+        title: '请先选择或上传简历',
+        icon: 'none'
+      })
+      return
+    }
 
     // 检查登录状态
     const isLogined = await SimpleAuth.checkHasLogined()
@@ -241,38 +490,65 @@ Page({
     this.scrollToBottom()
 
     try {
-      // 调用AI接口
-      const res = await AI.chat({
-        scene: 'resume',
-        sessionId: this.data.sessionId,
-        messages: [...this.data.messages, userMessage]
-      })
+      const openid = wx.getStorageSync('openid')
 
-      // 添加AI回复
-      const aiMessage = {
-        role: 'assistant',
-        content: res.answer || '（暂无回复）',
-        time: this.formatTime(new Date()),
-        timestamp: Date.now()
+      // 构建对话历史（只包含用户和AI的消息）
+      const conversationHistory = this.data.messages.map(msg => ({
+        role: msg.role,
+        content: msg.content
+      }))
+
+      // 调用新的chatWithResume API
+      const result = await ResumeAPI.chatWithResume(
+        this.data.activeResumeId,
+        text,
+        openid,
+        conversationHistory
+      )
+
+      if (result.success) {
+        // 添加AI回复
+        const aiMessage = {
+          role: 'assistant',
+          content: result.answer || '（暂无回复）',
+          time: this.formatTime(new Date()),
+          timestamp: Date.now()
+        }
+
+        this.setData({
+          messages: [...this.data.messages, aiMessage],
+          sending: false
+        })
+
+        // 滚动到底部
+        this.scrollToBottom()
+
+        // 保存对话历史
+        this.saveConversation()
+      } else {
+        throw new Error(result.message || 'AI服务异常')
       }
-
-      this.setData({
-        messages: [...this.data.messages, aiMessage],
-        sending: false
-      })
-
-      // 滚动到底部
-      this.scrollToBottom()
-
-      // 保存对话历史
-      this.saveConversation()
 
     } catch (err) {
       console.error('发送消息失败:', err)
-      wx.showToast({
-        title: err.message || 'AI服务异常',
-        icon: 'none'
+      const errorMsg = err.message || 'AI服务异常，请稍后重试'
+
+      // 显示错误提示
+      wx.showModal({
+        title: 'AI服务异常',
+        content: errorMsg,
+        showCancel: errorMsg.includes('网络'),
+        cancelText: '取消',
+        confirmText: errorMsg.includes('网络') ? '重试' : '确定',
+        success: (res) => {
+          if (res.confirm && errorMsg.includes('网络')) {
+            // 网络错误时提供重试选项
+            this.setData({ inputVal: text })
+            setTimeout(() => this.send(), 100)
+          }
+        }
       })
+
       this.setData({ sending: false })
     }
   },
@@ -337,9 +613,14 @@ Page({
     }
 
     let exportText = '简历解读对话记录\n\n'
-    if (this.data.resumeStatus.uploaded) {
-      exportText += `简历文件: ${this.data.resumeStatus.fileName}\n`
-      exportText += `上传时间: ${this.data.resumeStatus.uploadTime}\n\n`
+
+    // 查找当前选中的简历信息
+    if (this.data.activeResumeId) {
+      const activeResume = this.data.resumeList.find(r => r.id === this.data.activeResumeId)
+      if (activeResume) {
+        exportText += `简历文件: ${activeResume.filename}\n`
+        exportText += `上传时间: ${activeResume.uploadTime}\n\n`
+      }
     }
 
     this.data.messages.forEach((msg, index) => {
@@ -390,12 +671,14 @@ Page({
    */
   saveConversation() {
     try {
-      wx.setStorageSync('resume_conversation', {
-        messages: this.data.messages,
-        resumeStatus: this.data.resumeStatus,
-        resumeText: this.data.resumeText,
-        updateTime: Date.now()
-      })
+      // 只有在有activeResumeId时才保存
+      if (this.data.activeResumeId) {
+        wx.setStorageSync('resume_conversation', {
+          messages: this.data.messages,
+          activeResumeId: this.data.activeResumeId,
+          updateTime: Date.now()
+        })
+      }
     } catch (error) {
       console.error('保存对话失败:', error)
     }
@@ -411,12 +694,13 @@ Page({
         // 只加载24小时内的对话
         const dayAgo = Date.now() - 24 * 60 * 60 * 1000
         if (conversation.updateTime > dayAgo) {
-          this.setData({
-            messages: conversation.messages,
-            resumeStatus: conversation.resumeStatus || this.data.resumeStatus,
-            resumeText: conversation.resumeText || ''
-          })
-          this.scrollToBottom()
+          // 检查resumeId是否匹配
+          if (conversation.activeResumeId === this.data.activeResumeId) {
+            this.setData({
+              messages: conversation.messages
+            })
+            this.scrollToBottom()
+          }
         }
       }
     } catch (error) {

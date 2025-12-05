@@ -12,6 +12,18 @@ echo "📦 打包 AI面试助手后端服务"
 echo "================================"
 echo ""
 
+# 检查文档结构
+if [ -f "check-structure.sh" ]; then
+    echo "🔍 检查文档结构..."
+    bash check-structure.sh
+    if [ $? -ne 0 ]; then
+        echo ""
+        echo "❌ 文档结构检查失败，请修复后再打包"
+        exit 1
+    fi
+    echo ""
+fi
+
 # 清理旧的临时目录
 rm -rf $TEMP_DIR
 
@@ -23,11 +35,19 @@ echo "正在复制文件..."
 cp -r src $TEMP_DIR/
 cp -r config $TEMP_DIR/
 cp -r database $TEMP_DIR/
+cp -r scripts $TEMP_DIR/ 2>/dev/null || true
 cp server.js $TEMP_DIR/
 cp package.json $TEMP_DIR/
-cp .env.example $TEMP_DIR/
 cp deploy.sh $TEMP_DIR/
 cp README.md $TEMP_DIR/
+
+# 确保 .env.example 被复制（显式处理隐藏文件）
+if [ -f ".env.example" ]; then
+    cp .env.example $TEMP_DIR/
+    echo "✓ .env.example 已复制"
+else
+    echo "⚠️  警告: .env.example 文件不存在"
+fi
 
 # 设置执行权限
 chmod +x $TEMP_DIR/*.sh
@@ -35,6 +55,15 @@ chmod +x $TEMP_DIR/*.sh
 # 打包
 echo "正在压缩..."
 tar -czf $PACKAGE_NAME $TEMP_DIR
+
+# 验证打包内容
+echo ""
+echo "🔍 验证打包内容..."
+if tar -tzf $PACKAGE_NAME | grep -q ".env.example"; then
+    echo "✓ .env.example 已包含在压缩包中"
+else
+    echo "⚠️  警告: .env.example 未包含在压缩包中"
+fi
 
 # 清理临时目录
 rm -rf $TEMP_DIR
