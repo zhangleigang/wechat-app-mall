@@ -36,29 +36,31 @@
 }
 
 .header-upload-btn {
-  background: rgba(255, 255, 255, 0.2);
-  border: 2px solid rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.95);
+  border: none;
   border-radius: var(--radius-round);
-  padding: var(--space-sm) var(--space-lg);
+  padding: 10px 20px;
   display: flex;
   align-items: center;
-  gap: var(--space-xs);
+  gap: 6px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: all var(--transition-base);
 }
 
 .header-upload-btn:active {
   transform: scale(0.95);
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .btn-icon {
-  font-size: 16px;
+  font-size: 18px;
 }
 
 .btn-text {
-  font-size: var(--font-sm);
+  font-size: 15px;
   font-weight: var(--font-bold);
-  color: var(--text-white);
+  color: #6366f1;
 }
 
 
@@ -119,7 +121,7 @@
 
 /* ==================== 简历卡片容器 ==================== */
 .resume-cards-container {
-  padding: var(--space-lg);
+  padding: var(--space-md) var(--space-lg);
   animation: fadeIn 0.5s ease-in;
 }
 
@@ -127,11 +129,11 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: var(--space-md);
+  margin-bottom: var(--space-sm);
 }
 
 .cards-title {
-  font-size: var(--font-md);
+  font-size: 15px;
   font-weight: var(--font-bold);
   color: var(--text-primary);
 }
@@ -170,7 +172,7 @@
 .resume-cards-scroll {
   width: 100%;
   white-space: nowrap;
-  margin-bottom: var(--space-md);
+  margin-bottom: var(--space-sm);
 }
 
 .resume-cards-list {
@@ -186,12 +188,14 @@
   background: var(--bg-page);
   border: 2px solid var(--border-light);
   border-radius: var(--radius-lg);
-  padding: var(--space-lg);
-  min-width: 200px;
-  max-width: 240px;
+  padding: 10px 12px;
+  min-width: 220px;
+  max-width: 260px;
+  height: 68px;
   white-space: normal;
   transition: all var(--transition-base);
   animation: slideInRight 0.3s ease-out;
+  overflow: hidden;
 }
 
 .resume-card:active {
@@ -239,13 +243,16 @@
 }
 
 .card-filename {
-  font-size: var(--font-sm);
-  font-weight: var(--font-bold);
+  font-size: 13px;
+  line-height: 1.4;
+  font-weight: var(--font-medium);
   color: var(--text-primary);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
-  display: block;
+  word-break: break-all;
 }
 
 .resume-card.active .card-filename {
@@ -275,17 +282,18 @@
 /* 上传提示 */
 .upload-hint {
   text-align: center;
-  padding-top: var(--space-sm);
+  padding-top: 4px;
+  padding-bottom: 4px;
 }
 
 .hint-text {
-  font-size: var(--font-xs);
+  font-size: 11px;
   color: var(--text-tertiary);
 }
 
 /* ==================== 预设问题区域 ==================== */
 .preset-questions-section {
-  padding: var(--space-lg);
+  padding: var(--space-md) var(--space-lg);
   background: var(--bg-card);
   border-bottom: 1px solid var(--border-light);
   animation: fadeIn 0.5s ease-in;
@@ -358,6 +366,28 @@
 .messages-wrapper {
   padding: var(--space-lg) var(--space-md);
   min-height: 100%;
+}
+
+/* ==================== 空状态提示 ==================== */
+.empty-chat-hint {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 40px;
+  text-align: center;
+}
+
+.empty-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  opacity: 0.6;
+}
+
+.empty-text {
+  font-size: 14px;
+  color: var(--text-tertiary);
+  line-height: 1.6;
 }
 
 /* ==================== 消息项 ==================== */
@@ -587,6 +617,7 @@
   background: var(--bg-card);
   border-top: 1px solid var(--border-light);
   padding: var(--space-md) var(--space-lg);
+  box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
 }
 
 /* ==================== 功能按钮栏 ==================== */
@@ -625,22 +656,25 @@
 /* ==================== 输入容器 ==================== */
 .input-container {
   display: flex;
-  gap: var(--space-md);
+  gap: 12px;
   align-items: flex-end;
+  width: 100%;
 }
 
 .input-wrapper {
   flex: 1;
   position: relative;
-  background: var(--bg-page);
-  border-radius: var(--radius-xl);
-  border: 2px solid var(--border-light);
+  background: #f5f5f7;
+  border-radius: 24px;
+  border: none;
   transition: all var(--transition-base);
+  overflow: hidden;
+  min-width: 0;
 }
 
 .input-wrapper:focus-within {
-  border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px var(--primary-lighter);
+  background: #ffffff;
+  box-shadow: 0 2px 12px rgba(99, 102, 241, 0.15);
 }
 
 /* ==================== 输入框 ==================== */
@@ -648,18 +682,21 @@
   width: 100%;
   min-height: 44px;
   max-height: 120px;
-  padding: var(--space-md) var(--space-lg);
-  font-size: var(--font-md);
-  line-height: var(--line-height-normal);
+  padding: 12px 16px;
+  font-size: 15px;
+  line-height: 1.5;
   background: transparent;
   border: none;
-  border-radius: var(--radius-xl);
+  border-radius: 24px;
   resize: none;
   color: var(--text-primary);
+  box-sizing: border-box;
+  word-break: break-all;
 }
 
 .message-input::placeholder {
-  color: var(--text-tertiary);
+  color: #9ca3af;
+  font-size: 13px;
 }
 
 /* ==================== 字数统计 ==================== */
@@ -685,41 +722,42 @@
 .send-button {
   width: 48px;
   height: 48px;
-  border-radius: var(--radius-circle);
+  border-radius: 24px;
   border: none;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all var(--transition-base);
-  box-shadow: var(--shadow-md);
   padding: 0;
 }
 
 .send-button.active {
-  background: var(--primary-gradient);
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
 }
 
 .send-button.active:active {
-  transform: scale(0.9);
-  box-shadow: var(--shadow-sm);
+  transform: scale(0.92);
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.4);
 }
 
 .send-button.disabled {
-  background: var(--bg-disabled);
+  background: #e5e7eb;
   cursor: not-allowed;
+  box-shadow: none;
 }
 
 .send-icon {
-  font-size: 20px;
+  font-size: 22px;
 }
 
 .send-button.active .send-icon {
-  color: var(--text-white);
+  color: #ffffff;
 }
 
 .send-button.disabled .send-icon {
-  color: var(--text-disabled);
+  color: #9ca3af;
 }
 
 .send-icon.loading {

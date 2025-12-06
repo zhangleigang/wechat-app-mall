@@ -8,10 +8,6 @@
           AI智能分析简历，提供优化建议
         </text>
       </view>
-      <button class="header-upload-btn" bindtap="uploadResume">
-        <text class="btn-icon">📤</text>
-        <text class="btn-text">上传</text>
-      </button>
     </view>
   </view>
   
@@ -57,18 +53,10 @@
               <text class="badge-text">当前</text>
             </view>
             
-            <!-- 文件图标 -->
-            <view class="card-icon">📄</view>
-            
             <!-- 文件信息 -->
             <view class="card-info">
               <text class="card-filename">{{item.filename}}</text>
               <text class="card-time">{{item.uploadTime}}</text>
-            </view>
-            
-            <!-- 删除提示（长按显示） -->
-            <view class="card-delete-hint">
-              <text class="delete-hint-text">长按删除</text>
             </view>
           </view>
         </view>
@@ -108,6 +96,12 @@
     show-scrollbar="false"
   >
     <view class="messages-wrapper">
+      <!-- 空状态提示 -->
+      <view wx:if="{{messages.length === 0 && activeResumeId}}" class="empty-chat-hint">
+        <text class="empty-icon">💬</text>
+        <text class="empty-text">选择上方预设问题，或输入您的问题开始分析</text>
+      </view>
+      
       <block wx:for="{{messages}}" wx:key="index">
         <view class="message-item {{item.role === 'user' ? 'user-message' : 'ai-message'}}">
           <!-- 用户消息 -->
@@ -127,7 +121,13 @@
               <text class="avatar-text">AI</text>
             </view>
             <view class="message-bubble ai-bubble-content">
-              <text class="message-text">{{item.content}}</text>
+              <!-- 使用 mp-html 渲染 Markdown -->
+              <mp-html 
+                class="markdown-content"
+                content="{{item.htmlContent || item.content}}" 
+                selectable="{{true}}"
+                markdown="{{true}}"
+              />
               <text class="message-time">{{item.time}}</text>
               
               <!-- 操作按钮 -->
@@ -189,7 +189,7 @@
       <view class="input-wrapper">
         <textarea 
           class="message-input" 
-          placeholder="请输入问题，如：针对数据分析岗位优化建议..." 
+          placeholder="输入问题开始分析..." 
           value="{{inputVal}}" 
           bindinput="handleInput"
           bindconfirm="send"

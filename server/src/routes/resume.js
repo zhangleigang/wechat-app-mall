@@ -28,7 +28,7 @@ router.post('/upload', upload.single('file'), handleUploadError, asyncHandler(as
     const conn = await pool.getConnection();
 
     try {
-        const { openid } = req.body;
+        const { openid, originalName } = req.body;
         const file = req.file;
 
         // 验证参数
@@ -43,6 +43,9 @@ router.post('/upload', upload.single('file'), handleUploadError, asyncHandler(as
         if (!file) {
             throw new BusinessError(ERROR_CODES.BAD_REQUEST, '未上传文件');
         }
+
+        // 使用传递的原始文件名，如果没有则使用multer解析的文件名
+        const displayFilename = originalName || file.originalname;
 
         // 1. 验证用户会员状态
         const [memberRows] = await conn.query(
@@ -113,7 +116,7 @@ router.post('/upload', upload.single('file'), handleUploadError, asyncHandler(as
             const [result] = await conn.query(
                 `INSERT INTO resumes (openid, filename, file_path, parsed_text, file_size, upload_time) 
                  VALUES (?, ?, ?, ?, ?, NOW())`,
-                [openid, file.originalname, relativePath, parsedText, file.size]
+                [openid, displayFilename, relativePath, parsedText, file.size]
             );
 
             await conn.commit();
@@ -124,7 +127,7 @@ router.post('/upload', upload.single('file'), handleUploadError, asyncHandler(as
                 message: '上传成功',
                 data: {
                     id: result.insertId,
-                    filename: file.originalname,
+                    filename: displayFilename,
                     uploadTime: new Date().toISOString(),
                     parsedText: parsedText
                 }

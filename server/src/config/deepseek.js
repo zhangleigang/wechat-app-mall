@@ -13,11 +13,12 @@ module.exports = {
     temperature: 0.7,
 
     // 请求超时配置（毫秒）
-    timeout: 30000,
+    // 增加到 60 秒，因为 DeepSeek API 响应较慢（通常需要 20-30 秒）
+    timeout: 60000,
 
     // 重试配置
     retry: {
-        maxRetries: 1,
-        retryDelay: 1000
+        maxRetries: 2,  // 增加重试次数
+        retryDelay: 2000  // 增加重试延迟
     }
 };

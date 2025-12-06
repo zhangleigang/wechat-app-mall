@@ -2,6 +2,7 @@ const AI = require('../../../utils/ai.js')
 const SimpleAuth = require('../../../utils/simpleAuth.js')
 const MemberAPI = require('../../../utils/member-api.js')
 const ResumeAPI = require('../../../utils/resume-api.js')
+const { markdownToHtml } = require('../../../utils/markdown.js')
 
 Page({
   data: {
@@ -56,8 +57,14 @@ Page({
       wx.hideLoading()
 
       if (result.success) {
+        // 格式化简历列表的时间显示
+        const formattedResumes = (result.resumes || []).map(resume => ({
+          ...resume,
+          uploadTime: this.formatUploadTime(resume.uploadTime)
+        }))
+
         this.setData({
-          resumeList: result.resumes || []
+          resumeList: formattedResumes
         })
 
         // 如果列表不为空，自动选中第一个简历
@@ -150,9 +157,15 @@ Page({
       success: async (res) => {
         const file = res.tempFiles[0]
 
+        // 获取原始文件名（优先使用name，如果没有则从path提取）
+        let fileName = file.name
+        if (!fileName || fileName.startsWith('wxfile://') || fileName.startsWith('tmp_')) {
+          // 如果name是临时路径，尝试从path中提取
+          fileName = file.path.split('/').pop()
+        }
+
         // 文件格式验证
         const allowedTypes = ['.pdf', '.doc', '.docx', '.md']
-        const fileName = file.name || file.path
         const fileExt = fileName.substring(fileName.lastIndexOf('.')).toLowerCase()
 
         if (!allowedTypes.includes(fileExt)) {
@@ -178,7 +191,7 @@ Page({
 
         try {
           const openid = wx.getStorageSync('openid')
-          const result = await ResumeAPI.uploadResume(file.path, openid)
+          const result = await ResumeAPI.uploadResume(file.path, openid, fileName)
 
           wx.hideLoading()
 
@@ -511,6 +524,7 @@ Page({
         const aiMessage = {
           role: 'assistant',
           content: result.answer || '（暂无回复）',
+          htmlContent: markdownToHtml(result.answer || '（暂无回复）'), // 转换 Markdown 为 HTML
           time: this.formatTime(new Date()),
           timestamp: Date.now()
         }
@@ -638,6 +652,42 @@ Page({
         })
       }
     })
+  },
+
+  /**
+   * 格式化上传时间（简洁显示）
+   */
+  formatUploadTime(timeStr) {
+    if (!timeStr) return ''
+
+    try {
+      const date = new Date(timeStr)
+      const now = new Date()
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate())
+      const uploadDate = new Date(date.getFullYear(), date.getMonth(), date.getDate())
+
+      // 计算天数差
+      const daysDiff = Math.floor((today - uploadDate) / (24 * 60 * 60 * 1000))
+
+      if (daysDiff === 0) {
+        // 今天：显示时间
+        return date.toLocaleTimeString('zh-CN', {
+          hour: '2-digit',
+          minute: '2-digit'
+        })
+      } else if (daysDiff === 1) {
+        // 昨天
+        return '昨天'
+      } else if (daysDiff < 7) {
+        // 一周内：显示天数
+        return `${daysDiff}天前`
+      } else {
+        // 超过一周：显示日期
+        return `${date.getMonth() + 1}-${date.getDate()}`
+      }
+    } catch (e) {
+      return timeStr
+    }
   },
 
   /**

@@ -118,9 +118,10 @@ function request(url, method = 'GET', data = null, isFormData = false) {
  * 上传简历文件
  * @param {string} filePath - 本地文件路径
  * @param {string} openid - 用户OpenID
+ * @param {string} originalName - 原始文件名（可选）
  * @returns {Promise<Object>}
  */
-async function uploadResume(filePath, openid) {
+async function uploadResume(filePath, openid, originalName = null) {
     try {
         const token = wx.getStorageSync('token')
 
@@ -130,7 +131,8 @@ async function uploadResume(filePath, openid) {
                 filePath: filePath,
                 name: 'file',
                 formData: {
-                    openid: openid
+                    openid: openid,
+                    originalName: originalName || '' // 传递原始文件名
                 },
                 header: {
                     'Authorization': token ? `Bearer ${token}` : ''
