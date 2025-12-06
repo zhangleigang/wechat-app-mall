@@ -121,13 +121,12 @@
               <text class="avatar-text">AI</text>
             </view>
             <view class="message-bubble ai-bubble-content">
-              <!-- 使用 mp-html 渲染 Markdown -->
-              <mp-html 
-                class="markdown-content"
-                content="{{item.htmlContent || item.content}}" 
-                selectable="{{true}}"
-                markdown="{{true}}"
-              />
+              <!-- 使用 towxml 渲染 Markdown -->
+            <towxml 
+              class="markdown-content"
+              nodes="{{item.htmlContent}}"
+              selectable="{{true}}"
+            />
               <text class="message-time">{{item.time}}</text>
               
               <!-- 操作按钮 -->

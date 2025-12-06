@@ -5,7 +5,6 @@
     "backgroundColor": "#f8fafc",
     "enablePullDownRefresh": false,
     "usingComponents": {
-        "mermaid-chart": "/components/mermaid-chart/mermaid-chart",
-        "mp-html": "mp-html"
+        "mermaid-chart": "/components/mermaid-chart/mermaid-chart"
     }
 }

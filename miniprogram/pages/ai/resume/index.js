@@ -2,7 +2,7 @@ const AI = require('../../../utils/ai.js')
 const SimpleAuth = require('../../../utils/simpleAuth.js')
 const MemberAPI = require('../../../utils/member-api.js')
 const ResumeAPI = require('../../../utils/resume-api.js')
-const { markdownToHtml } = require('../../../utils/markdown.js')
+const towxml = require('../../../components/towxml-dist/index.js')
 
 Page({
   data: {
@@ -524,7 +524,7 @@ Page({
         const aiMessage = {
           role: 'assistant',
           content: result.answer || '（暂无回复）',
-          htmlContent: markdownToHtml(result.answer || '（暂无回复）'), // 转换 Markdown 为 HTML
+          htmlContent: towxml(result.answer || '（暂无回复）', 'markdown'), // 使用towxml转换 Markdown
           time: this.formatTime(new Date()),
           timestamp: Date.now()
         }

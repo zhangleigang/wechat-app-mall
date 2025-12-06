@@ -69,7 +69,7 @@
   },
   "usingComponents": {
     "fuwuxieyi": "/components/fuwuxieyi/index",
-    "mp-html": "mp-html",
+    "towxml": "/components/towxml-dist/towxml",
     "van-notice-bar": "@vant/weapp/notice-bar/index",
     "van-search": "@vant/weapp/search/index",
     "van-divider": "@vant/weapp/divider/index",

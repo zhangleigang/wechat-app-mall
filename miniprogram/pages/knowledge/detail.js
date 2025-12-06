@@ -1,4 +1,4 @@
-const { markdownToHtml } = require('../../utils/markdown.js')
+const towxml = require('../../components/towxml-dist/index.js')
 
 Page({
   data: {
@@ -45,8 +45,8 @@ Page({
       console.log('从 URL 参数加载题目');
     }
 
-    // 将 Markdown 转换为 HTML
-    const answerHtml = markdownToHtml(answer);
+    // 使用Towxml处理所有Markdown内容
+    const answerHtml = towxml(answer, 'markdown');
 
     // 保存当前项目信息
     const currentItem = {

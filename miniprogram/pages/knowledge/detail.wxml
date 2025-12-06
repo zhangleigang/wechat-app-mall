@@ -22,7 +22,7 @@
       <text class="answer-title">答案解析</text>
     </view>
     <view class="answer-content">
-      <mp-html content="{{answerHtml}}" />
+      <towxml nodes="{{answerHtml}}" selectable="{{true}}" />
     </view>
   </view>
 </view>

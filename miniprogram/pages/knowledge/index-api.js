@@ -5,7 +5,6 @@
 
 const CONFIG = require('../../config.js');
 const knowledgeApi = require('../../utils/knowledge-api.js');
-const { markdownToHtml } = require('../../utils/markdown.js');
 
 // 降级方案：本地数据（已禁用以减小包体积）
 // let localKnowledge = null;
@@ -141,7 +140,6 @@ Page({
                         id: `${topic.id}-${index}`,
                         question: question,
                         answer: answer,
-                        answerHtml: markdownToHtml(answer),
                         expanded: false
                     });
                 });
