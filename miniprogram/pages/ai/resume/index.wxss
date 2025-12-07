@@ -121,7 +121,7 @@
 
 /* ==================== 简历卡片容器 ==================== */
 .resume-cards-container {
-  padding: var(--space-md) var(--space-lg);
+  padding: var(--space-xs) var(--space-lg);
   animation: fadeIn 0.5s ease-in;
 }
 
@@ -129,7 +129,7 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: var(--space-sm);
+  margin-bottom: 2px;
 }
 
 .cards-title {
@@ -172,7 +172,7 @@
 .resume-cards-scroll {
   width: 100%;
   white-space: nowrap;
-  margin-bottom: var(--space-sm);
+  margin-bottom: 2px;
 }
 
 .resume-cards-list {
@@ -189,9 +189,9 @@
   border: 2px solid var(--border-light);
   border-radius: var(--radius-lg);
   padding: 10px 12px;
-  min-width: 220px;
+  min-width: 150px;
   max-width: 260px;
-  height: 68px;
+  height: 40px;
   white-space: normal;
   transition: all var(--transition-base);
   animation: slideInRight 0.3s ease-out;
@@ -364,8 +364,9 @@
 }
 
 .messages-wrapper {
-  padding: var(--space-lg) var(--space-md);
+  padding: var(--space-lg);
   min-height: 100%;
+  box-sizing: border-box;
 }
 
 /* ==================== 空状态提示 ==================== */
@@ -399,24 +400,35 @@
 .user-message {
   display: flex;
   justify-content: flex-end;
+  position: relative;
 }
 
 .ai-message {
   display: flex;
-  justify-content: flex-start;
+  flex-direction: column;
+  width: 100%;
+  position: relative;
+  margin-bottom: var(--space-lg);
 }
 
 /* ==================== 消息气泡 ==================== */
-.user-bubble,
-.ai-bubble {
+.user-bubble {
   display: flex;
-  align-items: flex-end;
+  align-items: flex-start;
   gap: var(--space-sm);
-  max-width: 85%;
+  max-width: 98%;
+  flex: 1;
+  flex-direction: row-reverse;
 }
 
-.user-bubble {
-  flex-direction: row-reverse;
+.ai-bubble {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: var(--space-xs); /* 头像和文字之间的间距 */
+  flex: 1;
+  padding-left: 0; /* 移除不必要的内边距 */
+  position: static; /* 恢复为静态定位 */
 }
 
 /* ==================== 头像 ==================== */
@@ -429,6 +441,15 @@
   justify-content: center;
   flex-shrink: 0;
   box-shadow: var(--shadow-sm);
+}
+
+.ai-message .message-avatar {
+  position: static; /* 恢复为静态定位，让头像参与Flex布局 */
+  margin-right: 0; /* 移除右侧边距 */
+  z-index: auto; /* 恢复默认层级 */
+  flex-shrink: 0; /* 确保头像不会被压缩 */
+  margin-bottom: 2px; /* 减小头像与文字之间的间距 */
+  align-self: flex-start; /* 确保头像左对齐 */
 }
 
 .user-avatar {
@@ -448,10 +469,16 @@
 /* ==================== 消息气泡内容 ==================== */
 .message-bubble {
   border-radius: var(--radius-lg);
-  padding: var(--space-md) var(--space-lg);
+  padding: var(--space-sm) var(--space-md);
   position: relative;
   box-shadow: var(--shadow-sm);
-  max-width: 100%;
+  flex: 1;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.ai-bubble .message-bubble {
+  padding: var(--space-sm) var(--space-md); /* 统一内边距，确保文本能充分利用宽度 */
 }
 
 .user-bubble-content {
@@ -475,18 +502,23 @@
   background: var(--bg-card);
   color: var(--text-primary);
   border: 1px solid var(--border-light);
+  flex: 1;
+  width: 100%; /* 确保文字占据整行宽度 */
+  min-width: 0; /* 确保内容能正确收缩 */
+  margin-left: 0; /* 确保气泡与头像对齐，显示在头像下方 */
+  box-sizing: border-box;
+  padding: 8px var(--space-md); /* 减小上内边距 */
 }
 
 .ai-bubble-content::after {
-  content: '';
-  position: absolute;
-  left: -8px;
-  bottom: 12px;
-  width: 0;
-  height: 0;
-  border-right: 8px solid var(--bg-card);
-  border-top: 8px solid transparent;
-  border-bottom: 8px solid transparent;
+  display: none; /* 移除指向头像的三角形 */
+}
+
+/* 确保Towxml内容占据整行 */
+.markdown-content {
+  width: 100%; /* 确保Towxml渲染的内容能占据整行 */
+  min-width: 0; /* 确保内容能正确收缩 */
+  box-sizing: border-box;
 }
 
 /* ==================== 消息文本 ==================== */
@@ -566,12 +598,18 @@
 .typing-bubble {
   background: var(--bg-hover) !important;
   border-color: var(--border-color) !important;
+  box-sizing: border-box !important;
+  margin-right: 0 !important;
+  padding: var(--space-sm) var(--space-md) !important;
+  width: 100%;
+  min-width: 0 !important;
 }
 
 .typing-indicator {
   display: flex;
   align-items: center;
   gap: var(--space-sm);
+  margin-left: 16px; /* 确保文字与头像不重叠 */
 }
 
 .typing-text {

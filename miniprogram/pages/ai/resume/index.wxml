@@ -61,10 +61,6 @@
           </view>
         </view>
       </scroll-view>
-      
-      <view class="upload-hint">
-        <text class="hint-text">💡 支持 PDF、Word、Markdown 格式，最多3个</text>
-      </view>
     </view>
   </view>
   

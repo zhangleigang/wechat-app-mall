@@ -48,7 +48,7 @@
 
 /* 答案区域 */
 .answer-section {
-  margin: var(--space-lg);
+  margin: var(--space-sm) var(--space-sm) var(--space-lg) var(--space-sm);
   background: var(--bg-card);
   border-radius: var(--radius-lg);
   overflow: hidden;
