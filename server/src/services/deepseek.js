@@ -34,6 +34,30 @@ async function chat(messages, options = {}) {
 }
 
 /**
+ * 调用 DeepSeek API 进行流式对话
+ * @param {Array} messages - 对话消息数组
+ * @param {Function} onChunk - 接收到数据块时的回调函数
+ * @param {Object} options - 可选配置
+ * @returns {Promise<string>} 完整的AI回复内容
+ */
+async function chatStream(messages, onChunk, options = {}) {
+    const config = {
+        model: options.model || deepseekConfig.model,
+        messages: messages,
+        max_tokens: options.maxTokens || deepseekConfig.maxTokens,
+        temperature: options.temperature || deepseekConfig.temperature,
+        stream: true
+    };
+
+    try {
+        return await makeStreamRequest(config, onChunk);
+    } catch (error) {
+        console.error('DeepSeek API 流式调用失败:', error.message);
+        throw error;
+    }
+}
+
+/**
  * 发送 HTTP 请求到 DeepSeek API（带重试逻辑）
  * @param {Object} data - 请求数据
  * @param {number} retryCount - 当前重试次数
@@ -65,6 +89,108 @@ async function makeRequest(data, retryCount = 0) {
             // 等待后重试
             await sleep(deepseekConfig.retry.retryDelay);
             return makeRequest(data, retryCount + 1);
+        }
+
+        // 格式化错误信息
+        throw formatError(error);
+    }
+}
+
+/**
+ * 发送流式 HTTP 请求到 DeepSeek API
+ * @param {Object} data - 请求数据
+ * @param {Function} onChunk - 接收到数据块时的回调函数
+ * @param {number} retryCount - 当前重试次数
+ * @returns {Promise<string>} 完整的响应内容
+ */
+async function makeStreamRequest(data, onChunk, retryCount = 0) {
+    try {
+        const response = await axios.post(
+            deepseekConfig.apiUrl,
+            data,
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${deepseekConfig.apiKey}`
+                },
+                timeout: deepseekConfig.timeout,
+                responseType: 'stream'
+            }
+        );
+
+        return new Promise((resolve, reject) => {
+            let fullContent = '';
+            let buffer = '';
+
+            response.data.on('data', (chunk) => {
+                try {
+                    buffer += chunk.toString();
+                    const lines = buffer.split('\n');
+
+                    // 保留最后一个可能不完整的行
+                    buffer = lines.pop() || '';
+
+                    for (const line of lines) {
+                        const trimmedLine = line.trim();
+
+                        // 跳过空行和注释
+                        if (!trimmedLine || trimmedLine.startsWith(':')) {
+                            continue;
+                        }
+
+                        // 处理 SSE 数据格式
+                        if (trimmedLine.startsWith('data: ')) {
+                            const data = trimmedLine.substring(6);
+
+                            // 检查是否是结束信号
+                            if (data === '[DONE]') {
+                                continue;
+                            }
+
+                            try {
+                                const parsed = JSON.parse(data);
+
+                                if (parsed.choices && parsed.choices.length > 0) {
+                                    const delta = parsed.choices[0].delta;
+
+                                    if (delta && delta.content) {
+                                        fullContent += delta.content;
+
+                                        // 调用回调函数，传递增量内容
+                                        if (onChunk) {
+                                            onChunk(delta.content);
+                                        }
+                                    }
+                                }
+                            } catch (parseError) {
+                                console.error('解析流式数据失败:', parseError.message);
+                            }
+                        }
+                    }
+                } catch (error) {
+                    console.error('处理流式数据块失败:', error.message);
+                }
+            });
+
+            response.data.on('end', () => {
+                resolve(fullContent);
+            });
+
+            response.data.on('error', (error) => {
+                reject(formatError(error));
+            });
+        });
+    } catch (error) {
+        // 判断是否需要重试
+        const shouldRetry = retryCount < deepseekConfig.retry.maxRetries &&
+            isRetryableError(error);
+
+        if (shouldRetry) {
+            console.log(`DeepSeek API 流式请求失败，${deepseekConfig.retry.retryDelay}ms 后重试 (${retryCount + 1}/${deepseekConfig.retry.maxRetries})`);
+
+            // 等待后重试
+            await sleep(deepseekConfig.retry.retryDelay);
+            return makeStreamRequest(data, onChunk, retryCount + 1);
         }
 
         // 格式化错误信息
@@ -205,6 +331,7 @@ function buildResumeContext(resumeText, question, conversationHistory = []) {
 
 module.exports = {
     chat,
+    chatStream,
     buildResumeContext,
     buildDocumentContext
 };

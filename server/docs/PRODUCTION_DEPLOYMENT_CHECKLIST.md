@@ -2,11 +2,12 @@
 
 ## 概述
 
-本文档提供简历管理功能的生产环境部署步骤和验证清单。
+本文档提供 AI 面试助手后端服务的生产环境部署步骤和验证清单。
 
 **部署时间**: 预计 15-20 分钟  
-**服务器**: https://api.feelnow.cn:8443  
-**数据库**: ai_interview_helper
+**服务器**: https://api.feelnow.cn  
+**数据库**: ai_interview_helper  
+**当前版本**: v1.2.0
 
 ---
 
@@ -110,34 +111,30 @@ grep DEEPSEEK_API_KEY .env
 mysql -u root -p -e "USE ai_interview_helper; SHOW TABLES;"
 ```
 
-#### 4.2 执行简历表创建脚本
+#### 4.2 执行数据库初始化脚本
 
 ```bash
+# 完整初始化（首次部署）
+mysql -u root -p ai_interview_helper < database/init.sql
+
+# 或者单独初始化各个模块
 mysql -u root -p ai_interview_helper < database/init-resumes.sql
+mysql -u root -p ai_interview_helper < database/init-favorites.sql
 ```
 
 #### 4.3 验证表结构
 
 ```bash
-mysql -u root -p -e "USE ai_interview_helper; DESCRIBE resumes;"
+mysql -u root -p -e "USE ai_interview_helper; SHOW TABLES;"
 ```
 
-**预期输出**:
-```
-+-------------+--------------+------+-----+-------------------+
-| Field       | Type         | Null | Key | Default           |
-+-------------+--------------+------+-----+-------------------+
-| id          | int          | NO   | PRI | NULL              |
-| openid      | varchar(100) | NO   | MUL | NULL              |
-| filename    | varchar(255) | NO   |     | NULL              |
-| file_path   | varchar(500) | NO   |     | NULL              |
-| parsed_text | text         | YES  |     | NULL              |
-| file_size   | int          | YES  |     | NULL              |
-| upload_time | datetime     | YES  |     | CURRENT_TIMESTAMP |
-| created_at  | datetime     | YES  |     | CURRENT_TIMESTAMP |
-| updated_at  | datetime     | YES  |     | CURRENT_TIMESTAMP |
-+-------------+--------------+------+-----+-------------------+
-```
+**预期输出应包含**:
+- members（会员表）
+- orders（订单表）
+- resumes（简历表）
+- favorites（收藏表）
+- tags（标签表）
+- favorite_tags（收藏标签关联表）
 
 ---
 
@@ -188,35 +185,32 @@ pm2 logs ai-interview-helper --lines 50
 
 ### 6. 验证后端功能
 
-#### 6.1 健康检查
+#### 6.1 服务状态检查
 
 ```bash
-curl http://localhost:3000/health
+# 检查 PM2 状态
+pm2 status ai-interview-helper
+
+# 查看最近日志
+pm2 logs ai-interview-helper --lines 50
 ```
 
-**预期输出**:
-```json
-{"status":"ok","timestamp":1733380800000}
-```
+**预期**: 服务状态为 `online`，日志无错误
 
-#### 6.2 测试简历列表接口
+#### 6.2 测试核心接口
 
 ```bash
+# 测试知识库接口
+curl "http://localhost:3000/api/knowledge/categories"
+
+# 测试简历列表接口
 curl "http://localhost:3000/api/resume/list?openid=test_openid"
+
+# 测试收藏统计接口
+curl "http://localhost:3000/api/favorites/stats?openid=test_openid"
 ```
 
-**预期输出**:
-```json
-{
-  "code": 0,
-  "message": "success",
-  "data": {
-    "resumes": [],
-    "total": 0,
-    "limit": 3
-  }
-}
-```
+**预期**: 所有接口返回 `"code":0`
 
 #### 6.3 检查文件上传目录权限
 
@@ -255,50 +249,40 @@ rm uploads/resumes/test.txt
 
 ### 8. 功能验证
 
-#### 8.1 简历上传测试
-
-1. 打开小程序（体验版或正式版）
-2. 进入"简历解读"页面
-3. 点击上传按钮
-4. 选择一个 PDF 或 Word 文件
-5. 验证上传成功
+#### 8.1 知识库功能测试
 
 **检查点**:
-- [ ] 文件上传成功
-- [ ] 简历列表显示新上传的文件
-- [ ] 文件名和上传时间正确
+- [ ] 知识库分类列表正常
+- [ ] 题目列表显示正确
+- [ ] 题目详情可以查看
+- [ ] 搜索功能正常
 
-#### 8.2 简历列表测试
-
-1. 查看简历列表
-2. 点击不同的简历卡片
+#### 8.2 简历管理功能测试
 
 **检查点**:
-- [ ] 列表显示正确
-- [ ] 选中状态高亮显示
-- [ ] 可以切换不同简历
+- [ ] 简历上传成功
+- [ ] 简历列表显示正确
+- [ ] 简历切换功能正常
+- [ ] AI 问答功能正常
+- [ ] 简历删除功能正常
 
-#### 8.3 AI 问答测试
-
-1. 选择一个简历
-2. 点击预设问题或输入自定义问题
-3. 等待 AI 回复
+#### 8.3 收藏管理功能测试
 
 **检查点**:
-- [ ] 问题发送成功
-- [ ] AI 回复正常显示
-- [ ] 回复内容相关且专业
+- [ ] 收藏创建成功
+- [ ] 收藏列表显示正确
+- [ ] 标签筛选功能正常
+- [ ] AI 生成答案功能正常
+- [ ] 收藏编辑和删除正常
+- [ ] 会员配额限制正常
 
-#### 8.4 简历删除测试
-
-1. 长按某个简历卡片
-2. 点击删除按钮
-3. 确认删除
+#### 8.4 会员功能测试
 
 **检查点**:
-- [ ] 删除成功
-- [ ] 列表更新正确
-- [ ] 服务器文件已删除
+- [ ] 会员状态查询正常
+- [ ] 会员开通功能正常
+- [ ] 订单记录正确
+- [ ] 会员权限验证正常
 
 ---
 

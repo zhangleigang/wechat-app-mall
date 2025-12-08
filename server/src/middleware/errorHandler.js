@@ -16,6 +16,7 @@ const ERROR_CODES = {
     UNAUTHORIZED: 401,
     FORBIDDEN: 403,
     NOT_FOUND: 404,
+    DUPLICATE: 409,
 
     // 业务错误 (1000-1999)
     FILE_PARSE_ERROR: 1001,      // 文件解析失败
@@ -36,6 +37,7 @@ const ERROR_MESSAGES = {
     [ERROR_CODES.UNAUTHORIZED]: '未授权访问',
     [ERROR_CODES.FORBIDDEN]: '无权限访问',
     [ERROR_CODES.NOT_FOUND]: '资源不存在',
+    [ERROR_CODES.DUPLICATE]: '资源已存在',
     [ERROR_CODES.FILE_PARSE_ERROR]: '文件解析失败',
     [ERROR_CODES.DATABASE_ERROR]: '数据存储失败',
     [ERROR_CODES.FILE_STORAGE_ERROR]: '文件保存失败',

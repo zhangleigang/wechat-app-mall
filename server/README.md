@@ -61,14 +61,8 @@ WECHAT_SECRET=your_wechat_secret
 ### 3. 初始化数据库
 
 ```bash
-mysql -u root -p
-```
-
-```sql
-CREATE DATABASE ai_interview_helper CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-USE ai_interview_helper;
-SOURCE database/init.sql;
-EXIT;
+# 执行初始化脚本（会自动创建数据库）
+mysql -u root -p < database/init.sql
 ```
 
 ### 4. 启动服务
@@ -88,8 +82,9 @@ pm2 save
 
 ### 基础信息
 - **Base URL**: `https://api.feelnow.cn/api`
-- **认证方式**: Bearer Token (JWT)
+- **认证方式**: OpenID (Query Parameter)
 - **响应格式**: JSON
+- **当前版本**: v1.2.0
 
 ### 接口列表
 
@@ -105,6 +100,21 @@ pm2 save
 | | GET | `/knowledge/questions` | 题目列表 |
 | | GET | `/knowledge/questions/:id` | 题目详情 |
 | **订单** | GET | `/orders` | 用户订单列表 |
+| **简历** | POST | `/resume/upload` | 上传简历 |
+| | GET | `/resume/list` | 简历列表 |
+| | DELETE | `/resume/:id` | 删除简历 |
+| | POST | `/resume/chat` | AI问答 |
+| | POST | `/resume/chat-stream` | AI问答（流式） |
+| **收藏** | POST | `/favorites` | 创建收藏 |
+| | GET | `/favorites` | 收藏列表 |
+| | GET | `/favorites/:id` | 收藏详情 |
+| | PUT | `/favorites/:id` | 更新收藏 |
+| | DELETE | `/favorites/:id` | 删除收藏 |
+| | GET | `/favorites/tags` | 标签列表 |
+| | POST | `/favorites/:id/tags` | 添加标签 |
+| | DELETE | `/favorites/:id/tags/:tagId` | 移除标签 |
+| | POST | `/favorites/generate-answer` | AI生成答案（SSE流式） |
+| | GET | `/favorites/stats` | 收藏统计 |
 | **上传** | POST | `/upload/avatar` | 上传头像 |
 | **管理** | GET | `/admin/orders` | 订单管理 |
 | | GET | `/admin/members` | 会员管理 |
@@ -131,6 +141,30 @@ pm2 save
 - `duration` - 时长（天）
 - `created_at` - 创建时间
 
+**favorites** - 收藏记录
+- `id` (主键) - 收藏ID
+- `openid` - 用户OpenID
+- `question` - 问题内容
+- `answer` - 答案内容（Markdown）
+- `source_type` - 来源类型（knowledge/resume/custom）
+- `source_id` - 来源ID
+- `source_category` - 来源分类
+- `created_at` - 创建时间
+- `updated_at` - 更新时间
+
+**tags** - 标签（v1.2.0）
+- `id` (主键) - 标签ID
+- `name` - 标签名称
+- `openid` - 创建者OpenID
+- `use_count` - 使用次数
+- `created_at` - 创建时间
+
+**favorite_tags** - 收藏标签关联（v1.2.0）
+- `id` (主键) - 关联ID
+- `favorite_id` - 收藏ID
+- `tag_id` - 标签ID
+- `created_at` - 创建时间
+
 ## 🔐 环境变量说明
 
 | 变量 | 必需 | 默认值 | 说明 |
@@ -144,6 +178,7 @@ pm2 save
 | `JWT_SECRET` | 是 | - | JWT密钥 |
 | `WECHAT_APPID` | 是 | - | 微信AppID |
 | `WECHAT_SECRET` | 是 | - | 微信Secret |
+| `DEEPSEEK_API_KEY` | 是 | - | DeepSeek API密钥 |
 
 ## 📊 常用命令
 
@@ -194,16 +229,17 @@ curl https://api.feelnow.cn/health
 ### 测试API
 
 ```bash
-# 测试登录
-curl -X POST https://api.feelnow.cn/api/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{"code":"test_code"}'
-
 # 测试知识库
-curl https://api.feelnow.cn/api/knowledge/categories
+curl -k "https://api.feelnow.cn/api/knowledge/categories"
+
+# 测试收藏统计
+curl -k "https://api.feelnow.cn/api/favorites/stats?openid=test_user"
+
+# 测试简历列表
+curl -k "https://api.feelnow.cn/api/resume/list?openid=test_user"
 
 # 测试静态文件
-curl -I https://api.feelnow.cn/static/images/payment-qrcode.png
+curl -I -k "https://api.feelnow.cn/static/images/payment-qrcode.png"
 ```
 
 ## 🔧 维护任务
@@ -280,11 +316,12 @@ connectionLimit: 10  // 根据实际负载调整
 
 详细文档请查看 `docs/` 目录：
 
-- [部署指南](docs/DEPLOYMENT_GUIDE.md) - 完整部署流程
+- **[文档索引](docs/README.md)** - 所有文档的入口（⭐ 推荐从这里开始）
+- [部署总结](docs/DEPLOYMENT_SUMMARY.md) - 版本历史和快速部署
 - [快速部署](docs/QUICK_DEPLOY.md) - 快速部署命令
-- [简历功能部署](docs/RESUME_FEATURE_DEPLOY.md) - 简历管理功能部署
-- [简历部署检查清单](docs/RESUME_DEPLOY_CHECKLIST.md) - 部署检查清单
+- [生产环境部署清单](docs/PRODUCTION_DEPLOYMENT_CHECKLIST.md) - 完整检查清单
 - [简历 API 文档](docs/RESUME_API.md) - 简历管理 API 接口
+- [收藏 API 文档](docs/FAVORITES_API.md) - 收藏管理 API 接口
 - [静态文件指南](docs/STATIC_FILES_GUIDE.md) - 静态文件配置
 
 ## 🔗 相关链接
@@ -294,4 +331,4 @@ connectionLimit: 10  // 根据实际负载调整
 
 ---
 
-**版本**: 1.1.0 | **最后更新**: 2025-12-05
+**版本**: v1.2.0 | **最后更新**: 2025-12-08

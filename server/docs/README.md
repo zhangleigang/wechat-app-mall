@@ -1,110 +1,153 @@
-# 📚 AI面试助手后端服务 - 文档中心
+# 📚 服务端文档
 
-> 所有详细文档集中在这里，保持服务器文件整洁
-
----
+AI面试助手后端服务的完整文档。
 
 ## 📖 文档索引
 
-### 🚀 部署相关
+### API 文档
 
-| 文档 | 说明 | 适用场景 |
-|------|------|----------|
-| [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md) | 完整部署指南 | 首次部署或完整了解部署流程 |
-| [QUICK_DEPLOY.md](QUICK_DEPLOY.md) | 快速部署命令 | 熟悉流程后的快速部署 |
-| [RESUME_FEATURE_DEPLOY.md](RESUME_FEATURE_DEPLOY.md) | 简历功能部署指南 | 部署简历管理功能 |
-| [RESUME_DEPLOY_CHECKLIST.md](RESUME_DEPLOY_CHECKLIST.md) | 简历功能部署检查清单 | 部署时逐项检查 |
+- **[收藏管理 API](FAVORITES_API.md)** - 收藏功能的完整API文档（✅ v1.2.0 已部署）
+  - 收藏CRUD操作
+  - 标签管理
+  - AI生成答案（SSE流式）
+  - 会员配额管理
+  
+- **[简历管理 API](RESUME_API.md)** - 简历功能的完整API文档（✅ v1.1.0 已部署）
+  - 简历上传和解析
+  - 简历列表管理
+  - AI智能问答
 
-### 📡 API 文档
+### 部署文档
 
-| 文档 | 说明 | 内容 |
-|------|------|------|
-| [RESUME_API.md](RESUME_API.md) | 简历管理 API | 上传、列表、删除、AI问答接口 |
+- **[部署总结](DEPLOYMENT_SUMMARY.md)** - 版本历史和快速部署指南（⭐ 推荐）
 
-### 🔧 配置指南
+- **[快速部署指南](QUICK_DEPLOY.md)** - 快速部署命令和步骤
 
-| 文档 | 说明 | 适用场景 |
-|------|------|----------|
-| [STATIC_FILES_GUIDE.md](STATIC_FILES_GUIDE.md) | 静态文件配置 | 配置收款码等静态资源 |
+- **[生产环境部署清单](PRODUCTION_DEPLOYMENT_CHECKLIST.md)** - 完整的部署检查清单
 
----
+### 功能指南
 
-## 🎯 快速导航
+- **[静态文件配置](STATIC_FILES_GUIDE.md)** - 静态文件服务配置说明
 
-### 我想...
+## 🚀 快速开始
 
-**部署新服务器**
-1. 阅读 [DEPLOYMENT_GUIDE.md](DEPLOYMENT_GUIDE.md)
-2. 按照步骤操作
-3. 使用 [QUICK_DEPLOY.md](QUICK_DEPLOY.md) 作为命令参考
+### 本地开发
 
-**部署简历功能**
-1. 阅读 [RESUME_FEATURE_DEPLOY.md](RESUME_FEATURE_DEPLOY.md)
-2. 使用 [RESUME_DEPLOY_CHECKLIST.md](RESUME_DEPLOY_CHECKLIST.md) 逐项检查
-3. 参考 [RESUME_API.md](RESUME_API.md) 了解接口
+```bash
+# 1. 安装依赖
+npm install
 
-**配置静态文件**
-1. 阅读 [STATIC_FILES_GUIDE.md](STATIC_FILES_GUIDE.md)
-2. 按照步骤配置收款码
+# 2. 配置环境变量
+cp .env.example .env
+vi .env
 
-**了解 API 接口**
-1. 查看 [RESUME_API.md](RESUME_API.md)
-2. 参考请求/响应示例
-3. 查看错误码说明
+# 3. 初始化数据库
+mysql -u root -p < database/init.sql
 
----
+# 4. 启动服务
+npm start
+```
 
-## 📝 文档规范
+### 生产部署
 
-### 文档分类
+```bash
+# 1. 打包
+bash pack.sh
 
-- **部署指南**: `*_DEPLOY*.md` - 部署相关的详细步骤
-- **API 文档**: `*_API.md` - API 接口说明和示例
-- **配置指南**: `*_GUIDE.md` - 配置和设置说明
-- **检查清单**: `*_CHECKLIST.md` - 可打印的检查清单
+# 2. 上传到服务器
+scp server-*.tar.gz root@your-server:/root/
 
-### 文档位置
+# 3. 部署
+ssh root@your-server
+tar -xzf server-*.tar.gz
+cd server
+vi .env
+pm2 restart ai-interview-helper
+```
 
-✅ **应该在 docs/ 目录**:
-- 所有详细的部署指南
-- 所有 API 文档
-- 所有功能说明文档
-- 所有检查清单
+详细步骤请参考 [快速部署指南](QUICK_DEPLOY.md)。
 
-❌ **不应该在 docs/ 目录**:
-- 可执行脚本（应在 server/ 根目录）
-- 配置文件（应在 config/ 目录）
-- 数据库脚本（应在 database/ 目录）
+## 📊 数据库
 
-### 创建新文档
+### 主要表结构
 
-创建新文档时，请遵循以下规则：
+- `members` - 用户和会员信息
+- `orders` - 订单记录
+- `resumes` - 简历信息
+- `favorites` - 收藏记录
+- `tags` - 标签
+- `favorite_tags` - 收藏标签关联
 
-1. **命名规范**: 使用大写字母和下划线，如 `NEW_FEATURE_GUIDE.md`
-2. **放置位置**: 所有文档放在 `docs/` 目录
-3. **更新索引**: 在本文件中添加新文档的链接
-4. **保持简洁**: server 根目录只保留 README.md
+### 初始化脚本
 
----
+```bash
+# 完整初始化（包含所有表）
+mysql -u root -p ai_interview_helper < database/init.sql
 
-## 🔗 相关资源
+# 单独初始化简历表
+mysql -u root -p ai_interview_helper < database/init-resumes.sql
 
-- **服务器代码**: `../server/`
-- **前端代码**: `../../miniprogram/`
-- **项目文档**: `../../docs/`
-- **Steering 规范**: `../../.kiro/steering/deployment.md`
+# 单独初始化收藏表
+mysql -u root -p ai_interview_helper < database/init-favorites.sql
+```
 
----
+## 🔧 常用命令
+
+### PM2 管理
+
+```bash
+pm2 list                          # 查看服务列表
+pm2 logs ai-interview-helper      # 查看日志
+pm2 restart ai-interview-helper   # 重启服务
+pm2 stop ai-interview-helper      # 停止服务
+pm2 monit                         # 实时监控
+```
+
+### 数据库操作
+
+```bash
+# 连接数据库
+mysql -u root -p ai_interview_helper
+
+# 备份数据库
+mysqldump -u root -p ai_interview_helper > backup_$(date +%Y%m%d).sql
+
+# 恢复数据库
+mysql -u root -p ai_interview_helper < backup.sql
+```
+
+## 🐛 故障排查
+
+### 服务无法启动
+
+```bash
+# 检查端口占用
+netstat -tlnp | grep :3000
+
+# 检查数据库连接
+mysql -u root -p -e "SELECT 1"
+
+# 查看详细日志
+pm2 logs ai-interview-helper --lines 200
+```
+
+### 数据库连接失败
+
+```bash
+# 检查 .env 配置
+cat .env | grep DB_
+
+# 测试数据库连接
+mysql -h localhost -u root -p ai_interview_helper -e "SELECT 1"
+```
 
 ## 📞 技术支持
 
-如果文档有问题或需要补充：
-
-1. 检查是否有最新版本
-2. 查看 Git 提交历史
-3. 联系开发团队
+如有问题，请查看：
+- 错误日志: `pm2 logs ai-interview-helper --err`
+- 数据库状态: `mysql -u root -p -e "USE ai_interview_helper; SHOW TABLES;"`
+- 服务状态: `pm2 status`
 
 ---
 
-**最后更新**: 2025-12-05  
-**文档版本**: 1.0.0
+**版本**: 1.2.0 | **最后更新**: 2025-12-08
