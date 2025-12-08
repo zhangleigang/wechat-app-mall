@@ -594,6 +594,16 @@
   color: var(--text-secondary);
 }
 
+.favorite-action {
+  padding: 0;
+  background: transparent;
+}
+
+.favorite-action:active {
+  transform: none;
+  background: transparent;
+}
+
 /* ==================== 打字指示器 ==================== */
 .typing-bubble {
   background: var(--bg-hover) !important;

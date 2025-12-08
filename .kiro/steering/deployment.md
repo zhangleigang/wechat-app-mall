@@ -33,11 +33,12 @@ server/
 ├── setup-static-files.sh  # 设置脚本
 ├── README.md              # 简要说明
 ├── docs/                  # 📚 所有文档集中在这里
-│   ├── DEPLOYMENT_GUIDE.md           # 通用部署指南
+│   ├── README.md                     # 文档索引
+│   ├── DEPLOYMENT_SUMMARY.md         # 部署总结（v1.2.0）
 │   ├── QUICK_DEPLOY.md               # 快速部署
-│   ├── RESUME_FEATURE_DEPLOY.md      # 简历功能部署
-│   ├── RESUME_DEPLOY_CHECKLIST.md    # 简历部署检查清单
+│   ├── PRODUCTION_DEPLOYMENT_CHECKLIST.md  # 生产环境检查清单
 │   ├── RESUME_API.md                 # 简历 API 文档
+│   ├── FAVORITES_API.md              # 收藏 API 文档
 │   ├── STATIC_FILES_GUIDE.md         # 静态文件指南
 │   └── [其他文档]
 ├── config/                # 配置文件

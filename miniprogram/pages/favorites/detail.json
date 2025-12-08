@@ -1,0 +1,16 @@
+{
+    "navigationBarTitleText": "收藏详情",
+    "navigationBarBackgroundColor": "#6366f1",
+    "navigationBarTextStyle": "white",
+    "enablePullDownRefresh": false,
+    "usingComponents": {
+        "towxml": "/components/towxml-dist/towxml",
+        "van-icon": "@vant/weapp/icon/index",
+        "van-tag": "@vant/weapp/tag/index",
+        "van-button": "@vant/weapp/button/index",
+        "van-dialog": "@vant/weapp/dialog/index",
+        "van-field": "@vant/weapp/field/index",
+        "van-loading": "@vant/weapp/loading/index",
+        "van-toast": "@vant/weapp/toast/index"
+    }
+}

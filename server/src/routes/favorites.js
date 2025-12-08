@@ -795,13 +795,13 @@ async function generateAnswer(req, res) {
         // 监听客户端断开连接
         req.on('close', () => {
             connectionClosed = true;
-            logger.logInfo('generateAnswer', '客户端断开连接', { openid });
+            logger.info('客户端断开连接', { openid, function: 'generateAnswer' });
         });
 
         // 监听连接错误
         req.on('error', (error) => {
             connectionClosed = true;
-            logger.logError('generateAnswer', error, { openid, event: 'connection_error' });
+            logger.error('连接错误', { openid, event: 'connection_error', function: 'generateAnswer', error: error.message });
         });
 
         // 发送初始连接成功消息
@@ -833,7 +833,7 @@ async function generateAnswer(req, res) {
                 (chunk) => {
                     // 检查连接是否已关闭
                     if (connectionClosed) {
-                        logger.logInfo('generateAnswer', '连接已关闭，停止发送数据', { openid, chunkCount });
+                        logger.info('连接已关闭，停止发送数据', { openid, chunkCount, function: 'generateAnswer' });
                         return;
                     }
 
@@ -844,10 +844,12 @@ async function generateAnswer(req, res) {
                         res.write(`data: ${JSON.stringify({ content: chunk })}\n\n`);
                     } catch (writeError) {
                         connectionClosed = true;
-                        logger.logError('generateAnswer', writeError, {
+                        logger.error('写入数据块失败', {
                             openid,
                             event: 'write_error',
-                            chunkCount
+                            chunkCount,
+                            function: 'generateAnswer',
+                            error: writeError.message
                         });
                     }
                 }
@@ -864,16 +866,18 @@ async function generateAnswer(req, res) {
                 })}\n\n`);
                 res.end();
 
-                logger.logInfo('generateAnswer', '答案生成成功', {
+                logger.info('答案生成成功', {
                     openid,
                     questionLength: question.length,
                     answerLength: fullAnswer.length,
-                    chunkCount: chunkCount
+                    chunkCount: chunkCount,
+                    function: 'generateAnswer'
                 });
             } else {
-                logger.logInfo('generateAnswer', '答案生成完成但连接已关闭', {
+                logger.info('答案生成完成但连接已关闭', {
                     openid,
-                    answerLength: fullAnswer.length
+                    answerLength: fullAnswer.length,
+                    function: 'generateAnswer'
                 });
             }
         } catch (error) {
@@ -891,15 +895,19 @@ async function generateAnswer(req, res) {
                 })}\n\n`);
                 res.end();
 
-                logger.logError('generateAnswer', error, {
+                logger.error('生成答案失败', {
                     openid,
                     question: question.substring(0, 50),
-                    errorCode: errorCode
+                    errorCode: errorCode,
+                    function: 'generateAnswer',
+                    error: error.message
                 });
             } else {
-                logger.logError('generateAnswer', error, {
+                logger.error('生成答案失败（连接已断开）', {
                     openid,
-                    event: 'error_after_disconnect'
+                    event: 'error_after_disconnect',
+                    function: 'generateAnswer',
+                    error: error.message
                 });
             }
         }
@@ -928,8 +936,10 @@ async function generateAnswer(req, res) {
                 })}\n\n`);
                 res.end();
             } catch (writeError) {
-                logger.logError('generateAnswer', writeError, {
-                    event: 'final_error_write_failed'
+                logger.error('写入最终错误响应失败', {
+                    event: 'final_error_write_failed',
+                    function: 'generateAnswer',
+                    error: writeError.message
                 });
             }
         }
@@ -1053,7 +1063,7 @@ async function checkFavoriteQuota(conn, openid) {
         };
     } catch (error) {
         // 如果检查失败，为了不影响用户体验，允许创建（但记录错误）
-        logger.logError('checkFavoriteQuota', error, { openid });
+        logger.error('配额检查失败', { openid, function: 'checkFavoriteQuota', error: error.message });
         return {
             allowed: true,
             isValid: false,

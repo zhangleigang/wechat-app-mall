@@ -5,13 +5,18 @@
       <view class="question-icon">❓</view>
       <text class="question-title">{{question}}</text>
     </view>
-    <view class="favorite-btn" bind:tap="toggleFavorite">
-      <van-icon 
-        name="{{isFavorite ? 'star' : 'star-o'}}" 
-        size="24px" 
-        color="{{isFavorite ? '#ff6b00' : '#999'}}"
+    <view class="favorite-btn">
+      <favorite-button
+        question-id="{{currentItem.id}}"
+        question="{{question}}"
+        answer="{{answer}}"
+        source-type="knowledge"
+        source-category="{{currentItem.categoryName}}"
+        is-favorited="{{isFavorite}}"
+        favorite-id="{{favoriteId}}"
+        size="large"
+        bind:favoritechange="onFavoriteChange"
       />
-      <text class="favorite-text">{{isFavorite ? '已收藏' : '收藏'}}</text>
     </view>
   </view>
   

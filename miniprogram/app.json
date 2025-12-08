@@ -4,6 +4,7 @@
     "pages/knowledge/detail",
     "pages/ai/resume/index",
     "pages/favorites/index",
+    "pages/favorites/detail",
     "pages/my/index",
     "pages/my/setting",
     "pages/my/feedback",
@@ -69,6 +70,8 @@
   },
   "usingComponents": {
     "fuwuxieyi": "/components/fuwuxieyi/index",
+    "favorite-button": "/components/favorite-button/index",
+    "add-question-modal": "/components/add-question-modal/index",
     "towxml": "/components/towxml-dist/towxml",
     "van-notice-bar": "@vant/weapp/notice-bar/index",
     "van-search": "@vant/weapp/search/index",
@@ -111,7 +114,8 @@
     "van-area": "@vant/weapp/area/index",
     "van-action-sheet": "@vant/weapp/action-sheet/index",
     "van-checkbox": "@vant/weapp/checkbox/index",
-    "van-checkbox-group": "@vant/weapp/checkbox-group/index"
+    "van-checkbox-group": "@vant/weapp/checkbox-group/index",
+    "van-loading": "@vant/weapp/loading/index"
   },
   "sitemapLocation": "sitemap.json"
 }

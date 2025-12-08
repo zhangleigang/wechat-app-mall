@@ -1,0 +1,213 @@
+<view class="detail-container">
+  <!-- 加载中 - 骨架屏 -->
+  <view class="skeleton-detail-container" wx:if="{{loading}}">
+    <view class="skeleton-question-section">
+      <view class="skeleton-icon"></view>
+      <view class="skeleton-question-text"></view>
+    </view>
+    <view class="skeleton-tags-section">
+      <view class="skeleton-tag"></view>
+      <view class="skeleton-tag"></view>
+      <view class="skeleton-tag"></view>
+    </view>
+    <view class="skeleton-answer-section">
+      <view class="skeleton-answer-line" wx:for="{{[1,2,3,4,5,6,7,8]}}" wx:key="*this"></view>
+    </view>
+  </view>
+
+  <!-- 详情内容 -->
+  <view class="detail-content" wx:if="{{!loading && favorite}}">
+    <!-- 问题标题 -->
+    <view class="question-section">
+      <view class="question-icon">❓</view>
+      
+      <!-- 非编辑模式：显示问题文本 -->
+      <view wx:if="{{!isEditing}}" class="question-content">
+        <text class="question-text">{{favorite.question}}</text>
+        <!-- 只有自定义问题才显示编辑按钮 -->
+        <van-button 
+          wx:if="{{favorite.sourceType === 'custom'}}"
+          type="primary" 
+          size="mini"
+          icon="edit"
+          bindtap="startEdit"
+          custom-class="edit-question-btn"
+        >
+          编辑
+        </van-button>
+      </view>
+
+      <!-- 编辑模式：显示输入框 -->
+      <view wx:if="{{isEditing}}" class="question-edit-mode">
+        <van-field
+          value="{{editedQuestion}}"
+          type="textarea"
+          placeholder="请输入问题（至少5个字符）"
+          autosize
+          maxlength="500"
+          show-word-limit
+          bind:input="onQuestionInput"
+          custom-class="question-edit-input"
+        />
+        <view class="question-edit-actions">
+          <van-button 
+            size="small"
+            bindtap="cancelEdit"
+            custom-class="edit-action-btn"
+          >
+            取消
+          </van-button>
+          <van-button 
+            type="primary"
+            size="small"
+            bindtap="saveEdit"
+            custom-class="edit-action-btn"
+          >
+            保存
+          </van-button>
+        </view>
+      </view>
+    </view>
+
+    <!-- 标签区域 -->
+    <view class="tags-section">
+      <view class="section-header">
+        <view class="section-header-left">
+          <van-icon name="label-o" size="18px" />
+          <text>标签</text>
+        </view>
+        <van-button 
+          type="primary" 
+          size="mini"
+          icon="plus"
+          bindtap="showAddTag"
+          custom-class="add-tag-btn"
+        >
+          添加
+        </van-button>
+      </view>
+
+      <!-- 标签列表 -->
+      <view class="tags-list" wx:if="{{favorite.tags && favorite.tags.length > 0}}">
+        <view 
+          wx:for="{{favorite.tags.slice(0, maxTags)}}"
+          wx:key="id"
+          class="tag-item-wrapper"
+        >
+          <van-tag 
+            type="primary"
+            size="medium"
+            closeable
+            bind:close="removeTag"
+            data-tag-id="{{item.id}}"
+            data-tag-name="{{item.name}}"
+            custom-class="tag-item"
+          >
+            {{item.name}}
+          </van-tag>
+        </view>
+        <view wx:if="{{favorite.tags.length > maxTags}}" class="tag-more">
+          +{{favorite.tags.length - maxTags}} 更多
+        </view>
+      </view>
+
+      <!-- 无标签提示 -->
+      <view class="no-tags" wx:if="{{!favorite.tags || favorite.tags.length === 0}}">
+        <text class="no-tags-text">暂无标签，点击右上角添加</text>
+      </view>
+
+      <!-- 添加标签输入框 -->
+      <view class="tag-input-container" wx:if="{{showTagInput}}">
+        <van-field
+          value="{{newTagName}}"
+          placeholder="输入标签名称（最多10字）"
+          maxlength="10"
+          bind:input="onTagNameInput"
+          custom-class="tag-input"
+        />
+        <view class="tag-input-actions">
+          <van-button 
+            size="small"
+            bindtap="hideAddTag"
+            custom-class="tag-action-btn"
+          >
+            取消
+          </van-button>
+          <van-button 
+            type="primary"
+            size="small"
+            bindtap="addTag"
+            custom-class="tag-action-btn"
+          >
+            确定
+          </van-button>
+        </view>
+      </view>
+    </view>
+
+    <!-- 答案内容 -->
+    <view class="answer-section">
+      <view class="section-title">
+        <van-icon name="notes-o" size="18px" />
+        <text>答案</text>
+      </view>
+      <view class="answer-content">
+        <towxml nodes="{{answerHtml}}" selectable="{{true}}" />
+      </view>
+    </view>
+
+    <!-- 元信息 -->
+    <view class="meta-section">
+      <view class="meta-item">
+        <van-icon name="bookmark-o" size="16px" />
+        <text class="meta-label">来源：</text>
+        <text class="meta-value">{{favorite.sourceType === 'knowledge' ? '知识库' : favorite.sourceType === 'resume' ? '简历解读' : '自定义'}}</text>
+        <text wx:if="{{favorite.sourceCategory}}" class="meta-category">
+          · {{favorite.sourceCategory}}
+        </text>
+      </view>
+      <view class="meta-item">
+        <van-icon name="clock-o" size="16px" />
+        <text class="meta-label">收藏时间：</text>
+        <text class="meta-value">{{favorite.formattedTime}}</text>
+      </view>
+    </view>
+
+    <!-- 操作按钮 -->
+    <view class="action-section">
+      <van-button 
+        type="danger" 
+        size="large"
+        icon="delete-o"
+        bindtap="deleteFavorite"
+        custom-class="action-btn delete-btn"
+      >
+        删除
+      </van-button>
+      <van-button 
+        type="default" 
+        size="large"
+        icon="share-o"
+        custom-class="action-btn"
+        open-type="share"
+      >
+        分享
+      </van-button>
+    </view>
+  </view>
+
+  <!-- 撤销删除浮层 -->
+  <view class="undo-toast" wx:if="{{showDeleteToast}}">
+    <view class="undo-content">
+      <text class="undo-text">已删除</text>
+      <van-button 
+        type="primary" 
+        size="small"
+        bindtap="undoDelete"
+        custom-class="undo-btn"
+      >
+        撤销
+      </van-button>
+    </view>
+  </view>
+</view>

@@ -28,7 +28,11 @@ const LOG_LEVELS = {
  * 格式化日志消息
  */
 function formatLogMessage(level, message, metadata = {}) {
-    const timestamp = new Date().toISOString();
+    // 使用北京时间（UTC+8）
+    const now = new Date();
+    const beijingTime = new Date(now.getTime() + (8 * 60 * 60 * 1000));
+    const timestamp = beijingTime.toISOString().replace('T', ' ').replace('Z', '');
+
     const logEntry = {
         timestamp,
         level,

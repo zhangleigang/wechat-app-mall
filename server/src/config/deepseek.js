@@ -9,7 +9,7 @@ module.exports = {
     apiUrl: 'https://api.deepseek.com/v1/chat/completions',
     apiKey: process.env.DEEPSEEK_API_KEY || '',
     model: 'deepseek-chat',
-    maxTokens: 2000,
+    maxTokens: null,  // 不限制 tokens，让 API 自动决定
     temperature: 0.7,
 
     // 请求超时配置（毫秒）

@@ -2,6 +2,7 @@ const AI = require('../../../utils/ai.js')
 const SimpleAuth = require('../../../utils/simpleAuth.js')
 const MemberAPI = require('../../../utils/member-api.js')
 const ResumeAPI = require('../../../utils/resume-api.js')
+const favoritesApi = require('../../../utils/favorites-api.js')
 const towxml = require('../../../components/towxml-dist/index.js')
 
 Page({
@@ -526,7 +527,11 @@ Page({
           content: result.answer || '（暂无回复）',
           htmlContent: towxml(result.answer || '（暂无回复）', 'markdown'), // 使用towxml转换 Markdown
           time: this.formatTime(new Date()),
-          timestamp: Date.now()
+          timestamp: Date.now(),
+          // 收藏相关字段
+          question: text,
+          isFavorited: false,
+          favoriteId: 0
         }
 
         this.setData({
@@ -564,6 +569,22 @@ Page({
       })
 
       this.setData({ sending: false })
+    }
+  },
+
+  /**
+   * 处理收藏状态变化
+   */
+  onFavoriteChange(e) {
+    const { favorited, favoriteId } = e.detail
+    const index = e.currentTarget.dataset.index
+
+    // 更新消息的收藏状态
+    const messages = this.data.messages
+    if (messages[index]) {
+      messages[index].isFavorited = favorited
+      messages[index].favoriteId = favoriteId
+      this.setData({ messages })
     }
   },
 
@@ -737,7 +758,7 @@ Page({
   /**
    * 加载对话历史
    */
-  loadConversation() {
+  async loadConversation() {
     try {
       const conversation = wx.getStorageSync('resume_conversation')
       if (conversation && conversation.messages) {
@@ -750,11 +771,59 @@ Page({
               messages: conversation.messages
             })
             this.scrollToBottom()
+
+            // 检查每条消息的收藏状态
+            await this.checkMessagesFavoriteStatus()
           }
         }
       }
     } catch (error) {
       console.error('加载对话失败:', error)
+    }
+  },
+
+  /**
+   * 检查消息的收藏状态
+   */
+  async checkMessagesFavoriteStatus() {
+    try {
+      const openid = wx.getStorageSync('openid')
+      if (!openid) return
+
+      // 获取收藏列表
+      const result = await favoritesApi.getFavorites({
+        openid,
+        page: 1,
+        pageSize: 100
+      })
+
+      if (result.code === 0 && result.data && result.data.list) {
+        const favorites = result.data.list
+        const messages = this.data.messages
+
+        // 更新每条AI消息的收藏状态
+        let updated = false
+        messages.forEach(msg => {
+          if (msg.role === 'assistant' && msg.question) {
+            const favorite = favorites.find(fav =>
+              fav.sourceType === 'resume' &&
+              fav.question === msg.question &&
+              fav.answer === msg.content
+            )
+            if (favorite) {
+              msg.isFavorited = true
+              msg.favoriteId = favorite.id
+              updated = true
+            }
+          }
+        })
+
+        if (updated) {
+          this.setData({ messages })
+        }
+      }
+    } catch (error) {
+      console.error('检查收藏状态失败:', error)
     }
   },
 

@@ -1,0 +1,6 @@
+<!-- components/favorite-button/index.wxml -->
+<view class="favorite-button {{size}}" bindtap="toggleFavorite">
+  <view class="favorite-icon {{favorited ? 'favorited' : ''}} {{animating ? 'animating' : ''}} {{loading ? 'loading' : ''}}">
+    <text class="icon">{{favorited ? '★' : '☆'}}</text>
+  </view>
+</view>

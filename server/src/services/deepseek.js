@@ -15,9 +15,14 @@ async function chat(messages, options = {}) {
     const config = {
         model: options.model || deepseekConfig.model,
         messages: messages,
-        max_tokens: options.maxTokens || deepseekConfig.maxTokens,
         temperature: options.temperature || deepseekConfig.temperature
     };
+
+    // 只在指定了 maxTokens 时才添加
+    const maxTokens = options.maxTokens || deepseekConfig.maxTokens;
+    if (maxTokens) {
+        config.max_tokens = maxTokens;
+    }
 
     try {
         const response = await makeRequest(config);
@@ -44,10 +49,15 @@ async function chatStream(messages, onChunk, options = {}) {
     const config = {
         model: options.model || deepseekConfig.model,
         messages: messages,
-        max_tokens: options.maxTokens || deepseekConfig.maxTokens,
         temperature: options.temperature || deepseekConfig.temperature,
         stream: true
     };
+
+    // 只在指定了 maxTokens 时才添加
+    const maxTokens = options.maxTokens || deepseekConfig.maxTokens;
+    if (maxTokens) {
+        config.max_tokens = maxTokens;
+    }
 
     try {
         return await makeStreamRequest(config, onChunk);
@@ -133,8 +143,8 @@ async function makeStreamRequest(data, onChunk, retryCount = 0) {
                     for (const line of lines) {
                         const trimmedLine = line.trim();
 
-                        // 跳过空行和注释
-                        if (!trimmedLine || trimmedLine.startsWith(':')) {
+                        // 跳过空行
+                        if (!trimmedLine) {
                             continue;
                         }
 
@@ -164,6 +174,7 @@ async function makeStreamRequest(data, onChunk, retryCount = 0) {
                                 }
                             } catch (parseError) {
                                 console.error('解析流式数据失败:', parseError.message);
+                                console.error('原始数据:', data.substring(0, 200));
                             }
                         }
                     }

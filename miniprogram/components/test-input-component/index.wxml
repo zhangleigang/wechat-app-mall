@@ -1,0 +1,44 @@
+<view class="test-container">
+  <view class="test-header">
+    <text class="test-title">简化版输入测试</text>
+  </view>
+  
+  <view class="test-content">
+    <view class="section">
+      <view class="section-title">
+        <text class="title-text">问题</text>
+        <text class="title-required">*</text>
+      </view>
+      
+      <van-field
+        value="{{question}}"
+        type="textarea"
+        placeholder="请输入您的问题"
+        autosize
+        maxlength="500"
+        show-word-limit
+        border="{{false}}"
+        custom-class="question-input"
+        bind:input="onQuestionInput"
+        bind:blur="onQuestionBlur"
+        bind:focus="onQuestionFocus"
+      />
+      
+      <view wx:if="{{questionError}}" class="error-text">
+        {{questionError}}
+      </view>
+    </view>
+  </view>
+  
+  <view class="test-footer">
+    <van-button
+      type="primary"
+      block
+      round
+      bind:click="onSubmit"
+      disabled="{{!question || question.length < 5}}"
+    >
+      提交
+    </van-button>
+  </view>
+</view>

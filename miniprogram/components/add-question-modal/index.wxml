@@ -1,0 +1,180 @@
+<van-popup
+  show="{{show}}"
+  position="bottom"
+  round
+  closeable
+  close-icon="close"
+  bind:close="close"
+  custom-style="height: 75%; max-height: 90vh; width: 100%; left: 0;"
+>
+  <view class="modal-container">
+    <!-- 标题 -->
+    <view class="modal-header">
+      <text class="modal-title">添加自定义问题</text>
+      <text class="modal-subtitle">输入问题，AI将为您生成专业答案</text>
+    </view>
+
+    <!-- 内容区域 -->
+    <scroll-view class="modal-content" scroll-y enhanced>
+      <!-- 问题输入 -->
+      <view class="section">
+        <view class="section-title">
+          <text class="title-text">问题</text>
+          <text class="title-required">*</text>
+        </view>
+        
+        <van-field
+          value="{{question}}"
+          type="textarea"
+          placeholder="请输入您的问题（至少5个字符）"
+          autosize
+          maxlength="500"
+          show-word-limit
+          border="{{false}}"
+          custom-class="question-input"
+          bind:input="onQuestionInput"
+          bind:blur="onQuestionBlur"
+          bind:focus="onQuestionFocus"
+        />
+        
+        <view wx:if="{{questionError}}" class="error-text">
+          {{questionError}}
+        </view>
+      </view>
+
+      <!-- 生成答案按钮 -->
+      <view class="section" wx:if="{{!answer && !isGenerating}}">
+        <van-button
+          type="primary"
+          block
+          round
+          icon="guide-o"
+          bind:click="generateAnswer"
+          custom-class="primary-button"
+          disabled="{{!question || question.length < 5}}"
+        >
+          生成AI答案
+        </van-button>
+      </view>
+
+      <!-- 生成中状态 -->
+      <view class="section" wx:if="{{isGenerating}}">
+        <view class="generating-container">
+          <view class="generating-header">
+            <text class="generating-text">💡 AI正在生成答案...</text>
+            <van-button
+              type="default"
+              size="small"
+              bind:click="cancelGenerate"
+            >
+              取消
+            </van-button>
+          </view>
+          
+          <van-progress
+            percentage="{{generateProgress}}"
+            stroke-width="8"
+            color="linear-gradient(to right, #667eea, #764ba2)"
+            custom-class="progress-bar"
+          />
+        </view>
+      </view>
+
+      <!-- 答案预览 -->
+      <view class="section" wx:if="{{answer}}">
+        <view class="section-title">
+          <text class="title-text">答案预览</text>
+          <text class="title-badge" wx:if="{{isGenerating}}">生成中...</text>
+          <text class="title-badge success" wx:else>✓ 已完成</text>
+        </view>
+        
+        <view class="answer-preview">
+          <text class="answer-text">{{answer}}</text>
+        </view>
+
+        <!-- 重新生成按钮 -->
+        <van-button
+          wx:if="{{!isGenerating}}"
+          type="default"
+          size="small"
+          icon="replay"
+          bind:click="generateAnswer"
+          custom-class="regenerate-btn"
+        >
+          重新生成
+        </van-button>
+      </view>
+
+      <!-- 标签管理 -->
+      <view class="section" wx:if="{{answer && !isGenerating}}">
+        <view class="section-title">
+          <text class="title-text">标签</text>
+          <text class="title-tip">（可选，最多10个字符）</text>
+        </view>
+
+        <!-- 标签列表 -->
+        <view class="tags-list" wx:if="{{tags.length > 0}}">
+          <view
+            wx:for="{{tags}}"
+            wx:key="index"
+            class="tag-item"
+          >
+            <van-tag
+              type="primary"
+              closeable
+              size="medium"
+              bind:close="removeTag"
+              data-index="{{index}}"
+            >
+              {{item}}
+            </van-tag>
+          </view>
+        </view>
+
+        <!-- 添加标签 -->
+        <view class="tag-input-container">
+          <van-field
+            value="{{tagInput}}"
+            placeholder="输入标签名称"
+            maxlength="10"
+            border="{{false}}"
+            custom-class="tag-input"
+            bind:input="onTagInput"
+          />
+          <van-button
+            type="primary"
+            size="small"
+            icon="plus"
+            bind:click="addTag"
+          >
+            添加
+          </van-button>
+        </view>
+
+        <view wx:if="{{tagError}}" class="error-text">
+          {{tagError}}
+        </view>
+      </view>
+    </scroll-view>
+
+    <!-- 底部操作栏 -->
+    <view class="modal-footer">
+      <view class="footer-btn-container">
+        <button
+          class="footer-btn default"
+          bind:tap="close"
+        >
+          取消
+        </button>
+        
+        <button
+          class="footer-btn primary"
+          bind:tap="saveToFavorites"
+          disabled="{{!answer || isGenerating || isSaving}}"
+        >
+          {{isSaving ? '保存中...' : '保存到收藏'}}
+        </button>
+      </view>
+    </view>
+  </view>
+</van-popup>

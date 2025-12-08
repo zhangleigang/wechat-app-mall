@@ -135,6 +135,18 @@
                   <text class="action-icon">👍</text>
                   <text class="action-text">有用</text>
                 </view>
+                <view class="action-btn favorite-action">
+                  <favorite-button
+                    question="{{item.question}}"
+                    answer="{{item.content}}"
+                    source-type="resume"
+                    is-favorited="{{item.isFavorited}}"
+                    favorite-id="{{item.favoriteId}}"
+                    size="small"
+                    bind:favoritechange="onFavoriteChange"
+                    data-index="{{index}}"
+                  />
+                </view>
               </view>
             </view>
           </view>

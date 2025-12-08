@@ -29,26 +29,24 @@
 - 认证：Bearer Token
 - 格式：JSON
 
-**知识库API** - Node.js/Express后端服务（端口3000/8443）
+**统一后端服务** - Node.js/Express后端服务（端口3000，HTTPS 443）
 - Express.js 4.x
+- MySQL 8.0+数据库
 - 启用CORS跨域
 - Gzip压缩
 - JWT + OpenID认证
 - 微信登录（code2Session）
-- 静态文件服务（收款码图片）
-- PM2进程管理（生产环境）
-- Nginx反向代理（HTTP 8080 → 3000，HTTPS 8443 → 3000）
-- 生产地址：https://api.feelnow.cn:8443
-
-**会员服务API** - Node.js/Express后端服务（端口3001）
-- Express.js 4.x
-- MySQL 8.0+数据库
-- 基于OpenID的会员管理
-- 会员状态查询、开通、续费
+- 会员管理（状态查询、开通、续费）
+- 知识库API
+- 简历管理（上传、解析、AI问答）
+- 收藏管理（CRUD、标签、AI生成答案）
 - 订单记录和管理
+- 静态文件服务（收款码、头像等）
 - 管理员接口（订单列表、会员列表、导出）
+- DeepSeek AI集成
 - PM2进程管理（生产环境）
-- 生产地址：http://47.95.196.190:3001
+- Nginx反向代理（HTTPS 443 → 3000）
+- 生产地址：https://api.feelnow.cn
 
 ## 开发工具
 
@@ -64,32 +62,16 @@
 npm install                    # 安装依赖
 # 微信开发者工具 -> 工具 -> 构建 npm
 
-# 知识库API后端（本地开发）
-cd knowledge-api
+# 统一后端服务（本地开发）
+cd server
 npm install
 npm start                      # 启动开发服务器（http://localhost:3000）
-npm run dev                    # 开发模式（nodemon自动重启）
 
-# 知识库API生产环境部署
-pm2 start server.js --name knowledge-api
-pm2 logs knowledge-api
-pm2 restart knowledge-api
-
-# 会员服务后端（本地开发）
-cd member-service
-npm install
-npm start                      # 启动开发服务器（http://localhost:3001）
-
-# 会员服务生产环境部署
-cd member-service
-bash pack.sh                   # 打包
-scp member-service-*.tar.gz root@47.95.196.190:/root/
-# 在服务器上：
-tar -xzf member-service-*.tar.gz
-cd member-service-temp
-./check-env.sh                 # 检查环境
-vi .env                        # 配置数据库
-./deploy.sh                    # 自动部署
+# 生产环境部署
+cd server
+pm2 start server.js --name ai-interview-helper
+pm2 logs ai-interview-helper
+pm2 restart ai-interview-helper
 ```
 
 ## 配置文件
@@ -100,13 +82,12 @@ vi .env                        # 配置数据库
 - `project.config.json` - 微信开发者工具项目配置
 - `package.json` - npm依赖配置
 
-**知识库API后端**：
-- `.env` - 环境变量（微信AppID、Secret、JWT密钥）
-- `package.json` - 依赖配置
-
-**会员服务后端**：
-- `.env` - 环境变量（数据库配置）
-- `init.sql` - 数据库初始化脚本
+**统一后端服务**：
+- `.env` - 环境变量（数据库配置、微信AppID、Secret、JWT密钥、DeepSeek API密钥）
+- `database/init.sql` - 完整数据库初始化脚本（包含所有表、视图、触发器）
+- `database/maintenance.sql` - 数据库维护脚本
+- `database/README.md` - 数据库文档
+- `database/QUICK_START.md` - 快速启动指南
 - `package.json` - 依赖配置
 
 ## 代码组织
@@ -115,9 +96,9 @@ vi .env                        # 配置数据库
 1. 应用层 - `app.js`、`app.json`、`app.wxss`
 2. 页面层 - `/pages`（每个页面4个文件：.js、.json、.wxml、.wxss）
 3. 组件层 - `/components` + Vant UI组件
-4. 工具层 - `/utils`（ai.js、auth.js、member-api.js、knowledge-api.js、tools.js）
+4. 工具层 - `/utils`（ai.js、auth.js、member-api.js、knowledge-api.js、favorites-api.js、resume-api.js、tools.js）
 5. 配置层 - `config.js`
-6. 后端服务层 - knowledge-api（知识库+认证）、member-service（会员管理）
+6. 后端服务层 - 统一后端服务（认证、会员、知识库、简历、收藏、订单管理）
 
 ## 包体积管理
 
@@ -153,15 +134,21 @@ vi .env                        # 配置数据库
 **前端存储**（wx.setStorageSync）：
 - 用户信息：`userId`、`token`、`openid`（退出登录时清除）
 - 会员信息缓存：`memberInfo`、`memberInfoTime`（10分钟有效期）
+- 简历列表缓存：`resumeList`、`resumeListTime`（5分钟有效期）
+- 标签列表缓存：`tagsList`、`tagsListTime`（5分钟有效期）
 - 会话数据：7天过期
 - 存储限制：总计10MB
 
 **后端存储**：
-- 知识库数据：JSON文件（knowledge-api/data/knowledge.json）
-- 用户认证：JSON文件（knowledge-api/data/users.json，OpenID映射）
-- 会员数据：MySQL数据库（member-service，members表，主键OpenID）
-- 订单数据：MySQL数据库（member-service，orders表，关联OpenID）
+- 知识库数据：JSON文件（server/src/data/knowledge.json）
+- 会员数据：MySQL数据库（members表，主键OpenID）
+- 订单数据：MySQL数据库（orders表，关联OpenID）
+- 简历数据：MySQL数据库（resumes表，关联OpenID）+ 文件系统（server/uploads/resumes/）
+- 收藏数据：MySQL数据库（favorites、tags、favorite_tags表，关联OpenID）
+- 静态文件：文件系统（server/src/static/）
 
 **缓存策略**：
 - 会员状态：前端缓存10分钟，减少API调用
+- 简历列表：前端缓存5分钟
+- 标签列表：前端缓存5分钟
 - 知识库数据：后端内存缓存，启动时加载

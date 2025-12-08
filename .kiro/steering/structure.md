@@ -3,18 +3,30 @@
 ## 目录组织
 
 ```
-wechat-app-mall/
-├── pages/              # 页面模块（每个页面4个文件：.js、.json、.wxml、.wxss）
-├── components/         # 可复用的自定义组件
-├── utils/              # 业务逻辑和服务接口
-├── images/             # 静态图片资源
-├── miniprogram_npm/    # 编译后的npm依赖
-├── knowledge-api/      # 知识库Node.js后端（端口3000/8443）
-├── member-service/     # 会员服务后端（端口3001）
-├── app.js              # 应用入口和生命周期
-├── app.json            # 全局配置
-├── app.wxss            # 全局样式
-└── config.js           # 应用配置
+ai-interview-helper/
+├── miniprogram/        # 小程序前端
+│   ├── pages/          # 页面模块（每个页面4个文件：.js、.json、.wxml、.wxss）
+│   ├── components/     # 可复用的自定义组件
+│   ├── utils/          # 业务逻辑和服务接口
+│   ├── images/         # 静态图片资源
+│   ├── miniprogram_npm/# 编译后的npm依赖
+│   ├── app.js          # 应用入口和生命周期
+│   ├── app.json        # 全局配置
+│   ├── app.wxss        # 全局样式
+│   └── config.js       # 应用配置
+└── server/             # 统一后端服务（端口3000，HTTPS 443）
+    ├── src/            # 源代码
+    │   ├── routes/     # 路由（认证、会员、知识库、简历、收藏）
+    │   ├── services/   # 服务（DeepSeek AI）
+    │   ├── middleware/ # 中间件（认证、错误处理）
+    │   ├── utils/      # 工具函数
+    │   ├── data/       # 知识库数据
+    │   └── static/     # 静态文件
+    ├── database/       # 数据库脚本
+    ├── uploads/        # 上传文件（简历）
+    ├── docs/           # 文档
+    ├── server.js       # 主服务文件
+    └── .env            # 环境变量
 ```
 
 ## 核心目录
@@ -31,6 +43,10 @@ wechat-app-mall/
 **知识库** (`pages/knowledge/`)
 - `index.js` - 分类浏览和搜索
 - `detail.js` - 问答展示，支持Markdown渲染
+
+**收藏管理** (`pages/favorites/`)
+- `index.js` - 收藏列表，标签筛选，分页加载
+- `detail.js` - 收藏详情，标签管理，编辑删除
 
 **会员中心** (`pages/member/`)
 - `payment/` - 收款码支付页面
@@ -53,6 +69,8 @@ wechat-app-mall/
 - `bind-mobile/` - 手机号绑定组件
 - `payment/` - 支付流程封装
 - `fuwuxieyi/` - 服务协议展示
+- `favorite-button/` - 收藏按钮组件
+- `add-question-modal/` - 添加自定义问题弹窗
 - `goods-pop/` - 商品弹窗（遗留电商功能）
 
 ### `/utils` - 工具模块
@@ -64,6 +82,8 @@ wechat-app-mall/
 - `member-api.js` - 会员服务API客户端（状态查询、开通、续费）
 - `knowledge.js` - 知识库数据结构（已废弃，使用API）
 - `knowledge-api.js` - 知识库API客户端
+- `favorites-api.js` - 收藏管理API客户端（新增）
+- `resume-api.js` - 简历管理API客户端
 - `tools.js` - 通用工具函数（日期格式化、防抖、节流）
 - `markdown.js` - Markdown渲染辅助函数
 
@@ -75,21 +95,31 @@ wechat-app-mall/
 - `home/` - 首页资源
 - `order/` - 订单相关图标（遗留）
 
-### `/knowledge-api` - 知识库后端服务
+### `/server` - 统一后端服务
 
-Node.js/Express后端（端口3000，HTTPS 8443）：
-- `server.js` - 主服务文件
+Node.js/Express统一后端（端口3000，HTTPS 443）：
+
+**核心路由**：
 - `routes/auth.js` - 认证路由（微信登录、JWT）
+- `routes/member.js` - 会员管理（状态查询、开通、续费、订单）
+- `routes/knowledge.js` - 知识库API
+- `routes/resume.js` - 简历管理（上传、列表、删除、AI问答）
+- `routes/favorites.js` - 收藏管理（CRUD、标签、AI生成答案）
+
+**核心服务**：
+- `services/deepseek.js` - DeepSeek AI集成
+
+**中间件**：
 - `middleware/auth.js` - JWT认证中间件
-- `utils/` - 后端工具函数（JWT、用户存储、知识库）
-- `data/` - 知识库JSON数据和用户数据
-- 生产地址：https://api.feelnow.cn:8443
+- `middleware/errorHandler.js` - 统一错误处理
 
-### `/member-service` - 会员服务后端
+**数据库脚本**：
+- `database/init.sql` - 完整初始化脚本（包含所有表）
+- `database/maintenance.sql` - 维护脚本
+- `database/README.md` - 数据库文档
+- `database/QUICK_START.md` - 快速启动指南
 
-Node.js/Express后端（端口3001）：
-- `server.js` - 主服务文件（会员管理、订单管理）
-- `init.sql` - 数据库初始化脚本
+**生产地址**：https://api.feelnow.cn
 - `deploy.sh` - 自动化部署脚本
 - `check-env.sh` - 环境检查脚本
 - `pack.sh` - 打包脚本
