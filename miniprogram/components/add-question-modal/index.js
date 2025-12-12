@@ -46,7 +46,7 @@ Component({
 
         // 流式请求控制
         generateTask: null,
-        
+
         // 内部状态：记录当前弹窗显示状态
         _lastShowState: false
     },
@@ -126,9 +126,9 @@ Component({
             if (e && e.detail) {
                 inputValue = e.detail.value !== undefined ? e.detail.value : e.detail;
             }
-            
+
             const question = typeof inputValue === 'string' ? inputValue : '';
-            
+
             this.setData({
                 question: question,
                 questionError: '' // 输入时清除错误

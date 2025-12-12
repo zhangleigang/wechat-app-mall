@@ -373,6 +373,12 @@ async function updateFavorite(req, res) {
                         );
                     }
                 }
+
+                // 清理无用标签（use_count = 0 的标签）
+                await conn.query(
+                    'DELETE FROM tags WHERE openid = ? AND use_count = 0',
+                    [openid]
+                );
             }
 
             await conn.commit();
@@ -454,7 +460,7 @@ async function deleteFavorite(req, res) {
                 );
             }
 
-            // 3. 删除标签关联（由于外键级联，这一步可能不需要，但为了明确性保留）
+            // 3. 删除标签关联
             await conn.query(
                 'DELETE FROM favorite_tags WHERE favorite_id = ?',
                 [favoriteId]
@@ -464,6 +470,12 @@ async function deleteFavorite(req, res) {
             await conn.query(
                 'DELETE FROM favorites WHERE id = ?',
                 [favoriteId]
+            );
+
+            // 5. 清理无用标签（use_count = 0 的标签）
+            await conn.query(
+                'DELETE FROM tags WHERE openid = ? AND use_count = 0',
+                [openid]
             );
 
             await conn.commit();
@@ -523,13 +535,13 @@ async function getFavoriteById(conn, favoriteId, openid) {
 
     const favorite = rows[0];
 
-    // 加载标签
+    // 加载标签（确保标签属于同一用户）
     const [tagRows] = await conn.query(
         `SELECT t.id, t.name 
          FROM tags t
          INNER JOIN favorite_tags ft ON t.id = ft.tag_id
-         WHERE ft.favorite_id = ?`,
-        [favoriteId]
+         WHERE ft.favorite_id = ? A
+        [favoriteId,
     );
 
     favorite.tags = tagRows;
@@ -550,12 +562,19 @@ async function getTags(req, res) {
             openid: { required: true, type: 'string' }
         });
 
-        // 查询用户的所有标签，按使用次数降序排序
+        // 查询用户的标签，只返回有收藏的标签（use_count > 0）
         const [tags] = await conn.query(
-            `SELECT id, name, use_count, created_at 
-             FROM tags 
-             WHERE openid = ? 
-             ORDER BY use_count DESC, name ASC`,
+            `SELECT 
+                t.id, 
+                t.name, 
+                t.created_at,
+                COUNT(ft.favorite_id) as use_count
+             FROM tags t
+             INNER JOIN favorite_tags ft ON t.id = ft.tag_id
+             WHERE t.openid = ? 
+             GROUP BY t.id, t.name, t.created_at
+             HAVING use_count > 0
+             ORDER BY use_count DESC, t.name ASC`,
             [openid]
         );
 
@@ -586,14 +605,7 @@ async function addTag(req, res) {
 
         // 验证参数
         validateParams(req.body, {
-            openid: { required: true, type: 'string' },
-            tagName: {
-                required: true,
-                type: 'string',
-                minLength: 1,
-                maxLength: 10,
-                message: '标签名称长度必须在1-10个字符之间'
-            }
+            openid: { required: true, type: 'string' }
         });
 
         validateParams(req.params, {
@@ -604,8 +616,22 @@ async function addTag(req, res) {
             }
         });
 
-        const favoriteId = parseInt(id);
+        // 验证标签名称（先trim再验证）
+        if (!tagName || typeof tagName !== 'string') {
+            throw new BusinessError(ERROR_CODES.BAD_REQUEST, '标签名称不能为空');
+        }
+
         const trimmedTagName = tagName.trim();
+
+        if (!trimmedTagName) {
+            throw new BusinessError(ERROR_CODES.BAD_REQUEST, '标签名称不能为空');
+        }
+
+        if (trimmedTagName.length > 10) {
+            throw new BusinessError(ERROR_CODES.BAD_REQUEST, '标签名称不能超过10个字符');
+        }
+
+        const favoriteId = parseInt(id);
 
         await conn.beginTransaction();
 
@@ -743,6 +769,12 @@ async function removeTag(req, res) {
                 [tagIdNum]
             );
 
+            // 5. 清理无用标签（use_count = 0 的标签）
+            await conn.query(
+                'DELETE FROM tags WHERE openid = ? AND use_count = 0',
+                [openid]
+            );
+
             await conn.commit();
 
             // 5. 返回更新后的收藏信息
@@ -770,8 +802,6 @@ async function removeTag(req, res) {
 
 
 async function generateAnswer(req, res) {
-    let connectionClosed = false;
-
     try {
         const { question, openid } = req.body;
 
@@ -786,29 +816,7 @@ async function generateAnswer(req, res) {
             }
         });
 
-        // 设置 SSE 响应头
-        res.setHeader('Content-Type', 'text/event-stream');
-        res.setHeader('Cache-Control', 'no-cache');
-        res.setHeader('Connection', 'keep-alive');
-        res.setHeader('X-Accel-Buffering', 'no'); // 禁用 Nginx 缓冲
-
-        // 监听客户端断开连接
-        req.on('close', () => {
-            connectionClosed = true;
-            logger.info('客户端断开连接', { openid, function: 'generateAnswer' });
-        });
-
-        // 监听连接错误
-        req.on('error', (error) => {
-            connectionClosed = true;
-            logger.error('连接错误', { openid, event: 'connection_error', function: 'generateAnswer', error: error.message });
-        });
-
-        // 发送初始连接成功消息
-        if (!connectionClosed) {
-            res.write('event: connected\n');
-            res.write('data: {"status":"connected"}\n\n');
-        }
+        logger.info('开始生成答案', { openid, questionLength: question.length, function: 'generateAnswer' });
 
         // 构建消息上下文
         const deepseek = require('../services/deepseek');
@@ -823,126 +831,47 @@ async function generateAnswer(req, res) {
             }
         ];
 
-        let fullAnswer = '';
-        let chunkCount = 0;
+        // 调用 AI API（非流式，等待完整答案）
+        const fullAnswer = await deepseek.chat(messages);
 
-        // 调用流式 API
-        try {
-            fullAnswer = await deepseek.chatStream(
-                messages,
-                (chunk) => {
-                    // 检查连接是否已关闭
-                    if (connectionClosed) {
-                        logger.info('连接已关闭，停止发送数据', { openid, chunkCount, function: 'generateAnswer' });
-                        return;
-                    }
+        logger.info('答案生成成功', {
+            openid,
+            questionLength: question.length,
+            answerLength: fullAnswer.length,
+            function: 'generateAnswer'
+        });
 
-                    try {
-                        // 发送数据块
-                        chunkCount++;
-                        res.write('event: chunk\n');
-                        res.write(`data: ${JSON.stringify({ content: chunk })}\n\n`);
-                    } catch (writeError) {
-                        connectionClosed = true;
-                        logger.error('写入数据块失败', {
-                            openid,
-                            event: 'write_error',
-                            chunkCount,
-                            function: 'generateAnswer',
-                            error: writeError.message
-                        });
-                    }
-                }
-            );
-
-            // 检查连接状态后再发送完成信号
-            if (!connectionClosed) {
-                // 发送完成信号
-                res.write('event: done\n');
-                res.write(`data: ${JSON.stringify({
-                    content: fullAnswer,
-                    status: 'completed',
-                    chunkCount: chunkCount
-                })}\n\n`);
-                res.end();
-
-                logger.info('答案生成成功', {
-                    openid,
-                    questionLength: question.length,
-                    answerLength: fullAnswer.length,
-                    chunkCount: chunkCount,
-                    function: 'generateAnswer'
-                });
-            } else {
-                logger.info('答案生成完成但连接已关闭', {
-                    openid,
-                    answerLength: fullAnswer.length,
-                    function: 'generateAnswer'
-                });
+        // 返回完整答案
+        res.json({
+            code: 0,
+            message: 'success',
+            data: {
+                answer: fullAnswer,
+                questionLength: question.length,
+                answerLength: fullAnswer.length
             }
-        } catch (error) {
-            // 检查连接状态
-            if (!connectionClosed) {
-                // 发送错误事件
-                const errorMessage = error.message || 'AI生成答案失败';
-                const errorCode = getErrorCode(error);
+        });
 
-                res.write('event: error\n');
-                res.write(`data: ${JSON.stringify({
-                    error: errorMessage,
-                    code: errorCode,
-                    retryable: isRetryableStreamError(error)
-                })}\n\n`);
-                res.end();
-
-                logger.error('生成答案失败', {
-                    openid,
-                    question: question.substring(0, 50),
-                    errorCode: errorCode,
-                    function: 'generateAnswer',
-                    error: error.message
-                });
-            } else {
-                logger.error('生成答案失败（连接已断开）', {
-                    openid,
-                    event: 'error_after_disconnect',
-                    function: 'generateAnswer',
-                    error: error.message
-                });
-            }
-        }
     } catch (error) {
-        // 参数验证错误或其他错误
-        if (!res.headersSent) {
-            if (error instanceof BusinessError) {
-                res.status(400).json({
-                    code: error.code,
-                    message: error.message
-                });
-            } else {
-                res.status(500).json({
-                    code: ERROR_CODES.INTERNAL_ERROR,
-                    message: '服务器内部错误'
-                });
-            }
-        } else if (!connectionClosed) {
-            // 如果已经开始发送 SSE 且连接未关闭，发送错误事件
-            try {
-                res.write('event: error\n');
-                res.write(`data: ${JSON.stringify({
-                    error: error.message || '服务器错误',
-                    code: 'SERVER_ERROR',
-                    retryable: false
-                })}\n\n`);
-                res.end();
-            } catch (writeError) {
-                logger.error('写入最终错误响应失败', {
-                    event: 'final_error_write_failed',
-                    function: 'generateAnswer',
-                    error: writeError.message
-                });
-            }
+        if (error instanceof BusinessError) {
+            throw error;
         }
+
+        const errorMessage = error.message || 'AI生成答案失败';
+        const errorCode = getErrorCode(error);
+
+        logger.error('生成答案失败', {
+            openid: req.body.openid,
+            question: req.body.question?.substring(0, 50),
+            errorCode: errorCode,
+            function: 'generateAnswer',
+            error: error.message
+        });
+
+        throw new BusinessError(ERROR_CODES.INTERNAL_ERROR, errorMessage, {
+            code: errorCode,
+            retryable: isRetryableStreamError(error)
+        });
     }
 }
 

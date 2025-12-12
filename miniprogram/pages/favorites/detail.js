@@ -30,6 +30,9 @@ Page({
         undoSeconds: 5,
         deletedFavorite: null,  // 保存已删除的收藏，用于撤销
 
+        // 更多操作
+        showMoreActions: false,
+
         // 状态
         loading: true,
         isLogined: false,
@@ -120,7 +123,7 @@ Page({
                 const answerHtml = towxml(favorite.answer || '', 'markdown');
 
                 // 格式化时间显示
-                const formattedTime = this.formatTime(favorite.createdAt);
+                const formattedTime = this.formatTime(favorite.created_at || favorite.createdAt);
 
                 this.setData({
                     favorite: {
@@ -180,7 +183,7 @@ Page({
     showAddTag() {
         this.setData({
             showTagInput: true,
-            newTagName: ''
+            newTagName: ''  // 清空输入框，准备新的输入
         });
     },
 
@@ -195,11 +198,12 @@ Page({
     },
 
     /**
-     * 标签名称输入
+     * 标签名称输入（原生input事件）
      */
     onTagNameInput(e) {
+        const newValue = e.detail.value || '';
         this.setData({
-            newTagName: e.detail.value
+            newTagName: newValue
         });
     },
 
@@ -273,6 +277,16 @@ Page({
 
                 // 成功触觉反馈
                 haptic.success();
+
+                // 通知收藏列表页面刷新标签列表
+                const pages = getCurrentPages();
+                if (pages.length > 1) {
+                    const prevPage = pages[pages.length - 2];
+                    if (prevPage.route === 'pages/favorites/index' && prevPage.loadTags) {
+                        // 强制刷新标签列表，跳过缓存
+                        prevPage.loadTags(true);
+                    }
+                }
             } else {
                 throw new Error(result.message || '添加失败');
             }
@@ -342,6 +356,16 @@ Page({
 
                 // 成功触觉反馈
                 haptic.success();
+
+                // 通知收藏列表页面刷新标签列表
+                const pages = getCurrentPages();
+                if (pages.length > 1) {
+                    const prevPage = pages[pages.length - 2];
+                    if (prevPage.route === 'pages/favorites/index' && prevPage.loadTags) {
+                        // 强制刷新标签列表，跳过缓存
+                        prevPage.loadTags(true);
+                    }
+                }
             } else {
                 throw new Error(result.message || '删除失败');
             }
@@ -479,9 +503,44 @@ Page({
     },
 
     /**
+     * 显示更多操作菜单
+     */
+    toggleMoreActions() {
+        this.setData({
+            showMoreActions: !this.data.showMoreActions
+        });
+    },
+
+    /**
+     * 隐藏更多操作菜单
+     */
+    hideMoreActions() {
+        this.setData({
+            showMoreActions: false
+        });
+    },
+
+    /**
+     * 分享收藏
+     */
+    shareFavorite() {
+        // 隐藏菜单
+        this.hideMoreActions();
+
+        // 触发分享（小程序中需要用户主动触发分享）
+        wx.showToast({
+            title: '请点击右上角分享',
+            icon: 'none'
+        });
+    },
+
+    /**
      * 删除收藏
      */
     async deleteFavorite() {
+        // 隐藏更多操作菜单
+        this.hideMoreActions();
+
         const { favorite, openid } = this.data;
 
         try {
@@ -544,6 +603,8 @@ Page({
                                 hasMore: true
                             });
                             prevPage.loadFavorites();
+                            // 强制刷新标签列表，跳过缓存
+                            prevPage.loadTags(true);
                         }
                     }
 
@@ -617,6 +678,16 @@ Page({
                     favoriteId: result.favoriteId
                 });
                 await this.loadDetail();
+
+                // 通知列表页面刷新标签
+                const pages = getCurrentPages();
+                if (pages.length > 1) {
+                    const prevPage = pages[pages.length - 2];
+                    if (prevPage.route === 'pages/favorites/index' && prevPage.loadTags) {
+                        // 强制刷新标签列表，跳过缓存
+                        prevPage.loadTags(true);
+                    }
+                }
 
                 // 成功触觉反馈
                 haptic.success();

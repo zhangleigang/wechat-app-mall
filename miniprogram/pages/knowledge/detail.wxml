@@ -4,8 +4,6 @@
     <view class="question-header">
       <view class="question-icon">❓</view>
       <text class="question-title">{{question}}</text>
-    </view>
-    <view class="favorite-btn">
       <favorite-button
         question-id="{{currentItem.id}}"
         question="{{question}}"
@@ -14,7 +12,7 @@
         source-category="{{currentItem.categoryName}}"
         is-favorited="{{isFavorite}}"
         favorite-id="{{favoriteId}}"
-        size="large"
+        size="small"
         bind:favoritechange="onFavoriteChange"
       />
     </view>

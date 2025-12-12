@@ -24,17 +24,23 @@
       <!-- 非编辑模式：显示问题文本 -->
       <view wx:if="{{!isEditing}}" class="question-content">
         <text class="question-text">{{favorite.question}}</text>
-        <!-- 只有自定义问题才显示编辑按钮 -->
-        <van-button 
-          wx:if="{{favorite.sourceType === 'custom'}}"
-          type="primary" 
-          size="mini"
-          icon="edit"
-          bindtap="startEdit"
-          custom-class="edit-question-btn"
-        >
-          编辑
-        </van-button>
+        <view class="question-actions">
+          <!-- 只有自定义问题才显示编辑按钮 -->
+          <van-button 
+            wx:if="{{favorite.sourceType === 'custom'}}"
+            type="primary" 
+            size="mini"
+            icon="edit"
+            bindtap="startEdit"
+            custom-class="edit-question-btn"
+          >
+            编辑
+          </van-button>
+          <!-- 更多操作按钮 -->
+          <view class="more-actions" bindtap="toggleMoreActions">
+            <van-icon name="ellipsis" size="20px" color="#666" />
+          </view>
+        </view>
       </view>
 
       <!-- 编辑模式：显示输入框 -->
@@ -90,21 +96,19 @@
       <!-- 标签列表 -->
       <view class="tags-list" wx:if="{{favorite.tags && favorite.tags.length > 0}}">
         <view 
-          wx:for="{{favorite.tags.slice(0, maxTags)}}"
+          wx:for="{{favorite.tags}}"
           wx:key="id"
           class="tag-item-wrapper"
+          wx:if="{{index < maxTags}}"
         >
-          <van-tag 
-            type="primary"
-            size="medium"
-            closeable
-            bind:close="removeTag"
-            data-tag-id="{{item.id}}"
+          <view 
+            class="simple-tag"
+            bindtap="removeTag" 
+            data-tag-id="{{item.id}}" 
             data-tag-name="{{item.name}}"
-            custom-class="tag-item"
           >
-            {{item.name}}
-          </van-tag>
+            {{item.name}} ×
+          </view>
         </view>
         <view wx:if="{{favorite.tags.length > maxTags}}" class="tag-more">
           +{{favorite.tags.length - maxTags}} 更多
@@ -118,13 +122,16 @@
 
       <!-- 添加标签输入框 -->
       <view class="tag-input-container" wx:if="{{showTagInput}}">
-        <van-field
-          value="{{newTagName}}"
-          placeholder="输入标签名称（最多10字）"
-          maxlength="10"
-          bind:input="onTagNameInput"
-          custom-class="tag-input"
-        />
+        <view class="native-input-wrapper">
+          <input
+            class="native-tag-input"
+            value="{{newTagName}}"
+            placeholder="输入标签名称（最多10字）"
+            maxlength="10"
+            bindinput="onTagNameInput"
+            focus="{{showTagInput}}"
+          />
+        </view>
         <view class="tag-input-actions">
           <van-button 
             size="small"
@@ -159,40 +166,27 @@
     <!-- 元信息 -->
     <view class="meta-section">
       <view class="meta-item">
-        <van-icon name="bookmark-o" size="16px" />
-        <text class="meta-label">来源：</text>
-        <text class="meta-value">{{favorite.sourceType === 'knowledge' ? '知识库' : favorite.sourceType === 'resume' ? '简历解读' : '自定义'}}</text>
-        <text wx:if="{{favorite.sourceCategory}}" class="meta-category">
-          · {{favorite.sourceCategory}}
-        </text>
-      </view>
-      <view class="meta-item">
         <van-icon name="clock-o" size="16px" />
         <text class="meta-label">收藏时间：</text>
         <text class="meta-value">{{favorite.formattedTime}}</text>
       </view>
     </view>
 
-    <!-- 操作按钮 -->
-    <view class="action-section">
-      <van-button 
-        type="danger" 
-        size="large"
-        icon="delete-o"
-        bindtap="deleteFavorite"
-        custom-class="action-btn delete-btn"
-      >
-        删除
-      </van-button>
-      <van-button 
-        type="default" 
-        size="large"
-        icon="share-o"
-        custom-class="action-btn"
-        open-type="share"
-      >
-        分享
-      </van-button>
+
+  </view>
+
+  <!-- 更多操作弹出菜单 -->
+  <view class="more-actions-overlay" wx:if="{{showMoreActions}}" bindtap="hideMoreActions">
+    <view class="more-actions-menu" catchtap="">
+      <view class="action-menu-item" bindtap="shareFavorite">
+        <van-icon name="share-o" size="18px" color="#5352ed" />
+        <text class="action-menu-text">分享</text>
+      </view>
+      <view class="action-menu-divider"></view>
+      <view class="action-menu-item" bindtap="deleteFavorite">
+        <van-icon name="delete-o" size="18px" color="#ff4757" />
+        <text class="action-menu-text delete-menu-text">删除</text>
+      </view>
     </view>
   </view>
 

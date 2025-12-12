@@ -50,7 +50,24 @@ Page({
     onShow() {
         // 每次显示页面时都重新加载，确保数据是最新的（实时UI更新）
         // 这样当用户从会员套餐页面返回时，配额信息会立即更新
+
+        // 确保弹窗是关闭状态
+        if (this.data.showAddModal) {
+            this.setData({
+                showAddModal: false
+            });
+        }
+
         this.checkLoginAndLoad();
+    },
+
+    onHide() {
+        // 页面隐藏时，确保关闭弹窗，避免残留请求
+        if (this.data.showAddModal) {
+            this.setData({
+                showAddModal: false
+            });
+        }
     },
 
     /**
@@ -368,8 +385,6 @@ Page({
      * 显示添加问题弹窗
      */
     async showAddQuestionModal() {
-        console.log('=== 父组件 showAddQuestionModal 触发 ===');
-        
         // 轻微触觉反馈 - 按钮点击
         haptic.light();
 
@@ -391,11 +406,8 @@ Page({
             return;
         }
 
-        console.log('父组件准备显示弹窗，设置 showAddModal 为 true');
         this.setData({
             showAddModal: true
-        }, () => {
-            console.log('父组件 showAddModal 设置完成，当前值:', this.data.showAddModal);
         });
     },
 
@@ -403,12 +415,8 @@ Page({
      * 关闭添加问题弹窗
      */
     closeAddQuestionModal() {
-        console.log('=== 父组件 closeAddQuestionModal 触发 ===');
-        console.log('父组件准备关闭弹窗，设置 showAddModal 为 false');
         this.setData({
             showAddModal: false
-        }, () => {
-            console.log('父组件 showAddModal 设置完成，当前值:', this.data.showAddModal);
         });
     },
 

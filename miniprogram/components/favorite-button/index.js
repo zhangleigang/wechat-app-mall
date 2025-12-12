@@ -167,7 +167,8 @@ Component({
             // 显示成功提示
             wx.showToast({
                 title: '收藏成功',
-                icon: 'success'
+                icon: 'success',
+                duration: 1500
             })
 
             // 成功触觉反馈
@@ -228,7 +229,8 @@ Component({
             // 显示成功提示
             wx.showToast({
                 title: '已取消收藏',
-                icon: 'success'
+                icon: 'success',
+                duration: 1500
             })
 
             // 轻微触觉反馈

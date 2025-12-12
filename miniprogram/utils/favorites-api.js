@@ -431,7 +431,15 @@ async function getTags(openid, forceRefresh = false) {
         const result = handleResponse(res);
 
         if (result.success) {
-            const tags = result.data || [];
+            let tags = result.data || [];
+            
+            // 修复：将后端返回的 use_count 转换为前端需要的 useCount
+            tags = tags.map(tag => ({
+                ...tag,
+                useCount: tag.use_count || 0,
+                // 移除下划线格式的字段，避免混淆
+                use_count: undefined
+            }));
 
             // 缓存结果
             setCache(`${CACHE_CONFIG.TAGS_CACHE_KEY}_${openid}`, tags);
@@ -555,160 +563,65 @@ async function getStats(openid) {
 }
 
 /**
- * 生成AI答案（流式输出）
- * 使用Server-Sent Events (SSE)接收流式数据
+ * 生成AI答案（非流式，一次性返回完整答案）
  * @param {string} question - 问题内容
  * @param {string} openid - 用户OpenID
- * @param {Function} onChunk - 接收数据块的回调函数 (chunk) => void
+ * @param {Function} onChunk - 接收数据块的回调函数（兼容旧接口，不再使用）
  * @param {Function} onComplete - 完成时的回调函数 (fullAnswer) => void
  * @param {Function} onError - 错误时的回调函数 (error) => void
  * @returns {Object} - 返回包含abort方法的对象，用于取消请求
  */
 function generateAnswer(question, openid, onChunk, onComplete, onError) {
-    const token = wx.getStorageSync('token');
     let requestTask = null;
-    let buffer = '';
-    let fullAnswer = '';
     let isAborted = false;
 
     try {
+        console.log('🚀 开始生成答案（非流式）');
+
         // 创建请求任务
-        requestTask = wx.request({
-            url: `${CONFIG.apiBaseUrl}/favorites/generate-answer`,
-            method: 'POST',
-            data: {
-                question,
-                openid
-            },
-            header: {
-                'Content-Type': 'application/json',
-                'Authorization': token ? `Bearer ${token}` : ''
-            },
-            enableChunked: true, // 启用分块传输
-            success: (res) => {
+        requestTask = request('/favorites/generate-answer', 'POST', {
+            question,
+            openid
+        });
+
+        requestTask
+            .then(response => {
                 if (isAborted) return;
 
-                if (res.statusCode !== 200) {
-                    const errorMsg = res.data?.message || '请求失败';
-                    onError && onError(new Error(errorMsg));
+                console.log('✅ 答案生成成功');
+
+                const result = handleResponse(response);
+
+                if (result.success) {
+                    const answer = result.data.answer || '';
+                    console.log('📄 答案长度:', answer.length);
+
+                    // 调用完成回调
+                    onComplete && onComplete(answer);
+                } else {
+                    throw new Error(result.message || '生成失败');
                 }
-            },
-            fail: (err) => {
+            })
+            .catch(error => {
                 if (isAborted) return;
-                onError && onError(new Error(err.errMsg || '网络连接失败'));
-            }
-        });
 
-        // 监听数据接收
-        requestTask.onHeadersReceived((result) => {
-            if (isAborted) return;
-
-            // 验证是否是SSE响应
-            const contentType = result.header['Content-Type'] || result.header['content-type'];
-            if (!contentType || !contentType.includes('text/event-stream')) {
-                onError && onError(new Error('服务器响应格式错误'));
-                requestTask.abort();
-            }
-        });
-
-        // 监听分块数据
-        requestTask.onChunkReceived((result) => {
-            if (isAborted) return;
-
-            try {
-                // 将ArrayBuffer转换为字符串
-                const chunk = arrayBufferToString(result.data);
-                buffer += chunk;
-
-                // 解析SSE事件
-                const events = parseSSEEvents(buffer);
-
-                events.forEach(event => {
-                    if (event.event === 'connected') {
-                        // 连接成功
-                        console.log('SSE连接成功');
-                    } else if (event.event === 'chunk') {
-                        // 接收数据块
-                        const data = JSON.parse(event.data);
-                        if (data.content) {
-                            fullAnswer += data.content;
-                            onChunk && onChunk(data.content);
-                        }
-                    } else if (event.event === 'done') {
-                        // 完成
-                        const data = JSON.parse(event.data);
-                        onComplete && onComplete(data.content || fullAnswer);
-                    } else if (event.event === 'error') {
-                        // 错误
-                        const data = JSON.parse(event.data);
-                        onError && onError(new Error(data.error || '生成失败'), data.retryable);
-                    }
-                });
-
-                // 清除已处理的buffer
-                buffer = '';
-            } catch (err) {
-                console.error('解析SSE数据失败:', err);
-                onError && onError(new Error('数据解析失败'));
-            }
-        });
+                console.error('❌ 生成答案失败:', error);
+                onError && onError(error, false);
+            });
 
     } catch (err) {
-        onError && onError(err);
+        console.error('❌ 请求创建失败:', err);
+        onError && onError(err, false);
     }
 
     // 返回控制对象
     return {
         abort: () => {
             isAborted = true;
-            if (requestTask) {
-                requestTask.abort();
-            }
+            // 注意：普通的 request 函数返回 Promise，无法直接 abort
+            // 但我们可以通过 isAborted 标志来忽略回调
         }
     };
-}
-
-/**
- * 将ArrayBuffer转换为字符串
- * @param {ArrayBuffer} buffer - ArrayBuffer数据
- * @returns {string}
- */
-function arrayBufferToString(buffer) {
-    const uint8Array = new Uint8Array(buffer);
-    let result = '';
-    for (let i = 0; i < uint8Array.length; i++) {
-        result += String.fromCharCode(uint8Array[i]);
-    }
-    return result;
-}
-
-/**
- * 解析SSE事件
- * @param {string} text - SSE文本数据
- * @returns {Array<Object>} - 解析后的事件数组
- */
-function parseSSEEvents(text) {
-    const events = [];
-    const lines = text.split('\n');
-    let currentEvent = { event: 'message', data: '' };
-
-    for (let i = 0; i < lines.length; i++) {
-        const line = lines[i].trim();
-
-        if (line === '') {
-            // 空行表示事件结束
-            if (currentEvent.data) {
-                events.push(currentEvent);
-                currentEvent = { event: 'message', data: '' };
-            }
-        } else if (line.startsWith('event:')) {
-            currentEvent.event = line.substring(6).trim();
-        } else if (line.startsWith('data:')) {
-            currentEvent.data = line.substring(5).trim();
-        }
-    }
-
-    return events;
 }
 
 module.exports = {

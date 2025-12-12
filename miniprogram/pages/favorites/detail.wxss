@@ -276,25 +276,76 @@
   font-weight: 500;
 }
 
-/* 操作按钮区域 */
-.action-section {
+/* 问题区域操作按钮 */
+.question-actions {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.more-actions {
+  padding: 8rpx;
+  border-radius: 50%;
+  background: #f8f9fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.more-actions:active {
+  background: #e9ecef;
+  transform: scale(0.95);
+}
+
+/* 更多操作弹出菜单 */
+.more-actions-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.more-actions-menu {
   background: white;
   border-radius: 16rpx;
-  padding: 24rpx 30rpx;
-  box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.08);
+  padding: 20rpx 0;
+  margin: 0 40rpx;
+  box-shadow: 0 8rpx 32rpx rgba(0, 0, 0, 0.15);
+  min-width: 280rpx;
+}
+
+.action-menu-item {
   display: flex;
-  gap: 20rpx;
+  align-items: center;
+  gap: 16rpx;
+  padding: 24rpx 32rpx;
+  transition: background 0.2s ease;
 }
 
-.action-btn {
-  flex: 1;
-  border-radius: 12rpx !important;
-  font-size: 28rpx !important;
+.action-menu-item:active {
+  background: #f8f9fa;
 }
 
-.delete-btn {
-  background: linear-gradient(135deg, #ff6b6b 0%, #ee0a24 100%) !important;
-  border: none !important;
+.action-menu-text {
+  font-size: 28rpx;
+  color: #333;
+}
+
+.delete-menu-text {
+  color: #ff4757;
+}
+
+.action-menu-divider {
+  height: 2rpx;
+  background: #f0f0f0;
+  margin: 0 32rpx;
 }
 
 /* 撤销删除浮层 */
@@ -423,4 +474,60 @@
   100% {
     background-position: -200% 0;
   }
+}
+/* 临时原生input样式 */
+.tag-input-native {
+  width: 100%;
+  padding: 20rpx;
+  border: 2rpx solid #e5e7eb;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+  background: white;
+  box-sizing: border-box;
+}
+
+.tag-input-native:focus {
+  border-color: #3b82f6;
+  outline: none;
+}
+/* 临时简单标签样式 */
+.simple-tag {
+  display: inline-block;
+  background: #3b82f6;
+  color: white;
+  padding: 8rpx 16rpx;
+  border-radius: 16rpx;
+  font-size: 24rpx;
+  margin-right: 12rpx;
+  margin-bottom: 12rpx;
+}
+
+.simple-tag:active {
+  background: #2563eb;
+}
+
+/* 原生输入框样式 */
+.native-input-wrapper {
+  margin-bottom: 16rpx;
+  position: relative;
+}
+
+.native-tag-input {
+  width: 100%;
+  padding: 24rpx 20rpx;
+  border: 2rpx solid #e5e7eb;
+  border-radius: 12rpx;
+  font-size: 28rpx;
+  background: white;
+  box-sizing: border-box;
+  color: #374151;
+  line-height: 1.4;
+  min-height: 80rpx;
+  transition: all 0.2s ease;
+}
+
+.native-tag-input:focus {
+  border-color: #3b82f6;
+  background: white;
+  box-shadow: 0 0 0 4rpx rgba(59, 130, 246, 0.1);
 }

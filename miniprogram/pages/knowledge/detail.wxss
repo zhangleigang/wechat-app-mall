@@ -30,21 +30,7 @@
   line-height: var(--line-height-relaxed);
 }
 
-.favorite-btn {
-  display: flex;
-  align-items: center;
-  gap: 8rpx;
-  padding: 16rpx 32rpx;
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 50rpx;
-  backdrop-filter: blur(10px);
-}
 
-.favorite-text {
-  font-size: 28rpx;
-  color: var(--text-white);
-  font-weight: 500;
-}
 
 /* 答案区域 */
 .answer-section {
