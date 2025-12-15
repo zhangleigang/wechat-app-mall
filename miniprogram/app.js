@@ -2,7 +2,7 @@ const CONFIG = require('config.js')
 const SimpleAuth = require('utils/simpleAuth')
 App({
   onLaunch: function () {
-    console.log('小程序启动')
+    // 小程序启动
 
     // 自动登录
     this.autoLogin()
@@ -83,12 +83,12 @@ App({
     try {
       const isLogined = await SimpleAuth.checkHasLogined()
       if (isLogined) {
-        console.log('自动登录成功')
+        // 自动登录成功
         if (this.loginOK) {
           this.loginOK()
         }
       } else {
-        console.log('自动登录失败')
+        // 自动登录失败
         if (this.loginFail) {
           this.loginFail()
         }
