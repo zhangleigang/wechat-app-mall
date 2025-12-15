@@ -132,27 +132,35 @@ Page({
       const openid = wx.getStorageSync('openid');
       if (!openid) return;
 
-      // 获取收藏列表，检查是否已收藏
+      // 使用搜索API检查特定问题是否已收藏
       const result = await favoritesApi.getFavorites({
         openid,
         page: 1,
-        pageSize: 100
+        pageSize: 1,
+        sourceType: 'knowledge',
+        sourceId: id
       });
 
-      if (result.code === 0 && result.data && result.data.list) {
-        const favorite = result.data.list.find(item =>
-          item.sourceType === 'knowledge' && item.sourceId === id
-        );
-
-        if (favorite) {
-          this.setData({
-            isFavorite: true,
-            favoriteId: favorite.id
-          });
-        }
+      if (result.code === 0 && result.data && result.data.list && result.data.list.length > 0) {
+        const favorite = result.data.list[0];
+        this.setData({
+          isFavorite: true,
+          favoriteId: favorite.id
+        });
+      } else {
+        // 确保重置状态
+        this.setData({
+          isFavorite: false,
+          favoriteId: 0
+        });
       }
     } catch (error) {
       console.error('检查收藏状态失败:', error);
+      // 出错时重置状态
+      this.setData({
+        isFavorite: false,
+        favoriteId: 0
+      });
     }
   },
 
@@ -166,6 +174,14 @@ Page({
   },
 
 
+
+  // 页面显示时重新检查收藏状态
+  onShow() {
+    // 如果有当前项目ID，重新检查收藏状态
+    if (this.data.currentItem && this.data.currentItem.id) {
+      this.checkFavorite(this.data.currentItem.id);
+    }
+  },
 
   onShareAppMessage() {
     return {

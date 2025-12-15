@@ -258,7 +258,7 @@
 .answer-preview {
   background: #fafafa;
   border-radius: 12rpx;
-  padding: 30rpx;
+  padding: 5rpx;
   max-height: 400rpx;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;

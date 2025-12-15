@@ -89,7 +89,7 @@
         </view>
         
         <view class="answer-preview">
-          <text class="answer-text">{{answer}}</text>
+          <towxml nodes="{{answerHtml}}" />
         </view>
 
         <!-- 重新生成按钮 -->

@@ -3,6 +3,7 @@
  * 支持输入问题、AI生成答案（流式）、添加标签、保存到收藏
  */
 
+const towxml = require('../../components/towxml-dist/index.js');
 const favoritesApi = require('../../utils/favorites-api');
 const errorHandler = require('../../utils/error-handler');
 const haptic = require('../../utils/haptic');
@@ -33,8 +34,13 @@ Component({
 
         // AI答案生成
         answer: '',
+        answerHtml: null, // towxml渲染后的对象
         isGenerating: false,
         generateProgress: 0,
+
+        // 进度控制
+        progressTimer: null, // 模拟进度定时器
+        hasReceivedData: false, // 是否已收到数据
 
         // 标签管理
         tags: [],
@@ -72,8 +78,11 @@ Component({
                         question: '',
                         questionError: '',
                         answer: '',
+                        answerHtml: null,
                         isGenerating: false,
                         generateProgress: 0,
+                        progressTimer: null,
+                        hasReceivedData: false,
                         tags: [],
                         tagInput: '',
                         tagError: '',
@@ -100,13 +109,21 @@ Component({
                 this.data.generateTask.abort();
             }
 
+            // 清除定时器
+            if (this.data.progressTimer) {
+                clearInterval(this.data.progressTimer);
+            }
+
             // 重置所有状态
             this.setData({
                 question: '',
                 questionError: '',
                 answer: '',
+                answerHtml: null,
                 isGenerating: false,
                 generateProgress: 0,
+                progressTimer: null,
+                hasReceivedData: false,
                 tags: [],
                 tagInput: '',
                 tagError: '',
@@ -150,6 +167,51 @@ Component({
          */
         onQuestionBlur() {
             // 失去焦点时不做验证，只在点击生成按钮时验证
+        },
+
+        /**
+         * 开始模拟进度条
+         */
+        startSimulateProgress() {
+            // 清除之前的定时器
+            if (this.data.progressTimer) {
+                clearInterval(this.data.progressTimer);
+            }
+
+            // 初始进度设为10%
+            this.setData({
+                generateProgress: 10,
+                hasReceivedData: false
+            });
+
+            // 模拟进度增长
+            const timer = setInterval(() => {
+                const currentProgress = this.data.generateProgress;
+
+                // 如果已经收到数据，停止模拟进度
+                if (this.data.hasReceivedData) {
+                    clearInterval(timer);
+                    this.setData({ progressTimer: null });
+                    return;
+                }
+
+                // 如果还没收到数据，缓慢增长到60%
+                if (currentProgress < 60) {
+                    // 随机增长1-3%，确保是整数
+                    const increment = Math.floor(Math.random() * 3) + 1; // 1, 2, 或 3
+                    const newProgress = Math.min(60, Math.floor(currentProgress + increment));
+
+                    this.setData({
+                        generateProgress: newProgress
+                    });
+                } else {
+                    // 到达60%后停止增长，等待真实数据
+                    clearInterval(timer);
+                    this.setData({ progressTimer: null });
+                }
+            }, 300); // 每300ms更新一次，让进度更平稳
+
+            this.setData({ progressTimer: timer });
         },
 
         /**
@@ -202,8 +264,12 @@ Component({
             this.setData({
                 isGenerating: true,
                 answer: '',
+                answerHtml: null,
                 generateProgress: 0
             });
+
+            // 开始模拟进度
+            this.startSimulateProgress();
 
             const question = this.data.question.trim();
 
@@ -214,17 +280,33 @@ Component({
                 // onChunk - 接收数据块
                 (chunk) => {
                     const newAnswer = this.data.answer + chunk;
-                    const progress = Math.min(90, this.data.generateProgress + 5);
+
+                    // 标记已收到数据
+                    if (!this.data.hasReceivedData) {
+                        this.setData({ hasReceivedData: true });
+                    }
+
+                    // 根据答案长度计算真实进度 (60% - 95%)，确保是整数
+                    const answerLength = newAnswer.length;
+                    const estimatedProgress = Math.min(95, Math.floor(60 + (answerLength / 20))); // 每20个字符增加1%，向下取整
+
+                    // 实时渲染 Markdown
+                    const answerHtml = towxml(newAnswer, 'markdown');
 
                     this.setData({
                         answer: newAnswer,
-                        generateProgress: progress
+                        answerHtml: answerHtml,
+                        generateProgress: estimatedProgress
                     });
                 },
                 // onComplete - 完成
                 (fullAnswer) => {
+                    // 最终渲染 Markdown
+                    const answerHtml = towxml(fullAnswer, 'markdown');
+
                     this.setData({
                         answer: fullAnswer,
+                        answerHtml: answerHtml,
                         isGenerating: false,
                         generateProgress: 100,
                         generateTask: null
@@ -240,9 +322,16 @@ Component({
                 },
                 // onError - 错误
                 (error, retryable) => {
+                    // 清除进度定时器
+                    if (this.data.progressTimer) {
+                        clearInterval(this.data.progressTimer);
+                    }
+
                     this.setData({
                         isGenerating: false,
-                        generateTask: null
+                        generateTask: null,
+                        progressTimer: null,
+                        hasReceivedData: false
                     });
 
                     // 使用统一错误处理
@@ -270,13 +359,22 @@ Component({
          * 取消生成
          */
         cancelGenerate() {
+            // 取消网络请求
             if (this.data.generateTask) {
                 this.data.generateTask.abort();
             }
 
+            // 清除进度定时器
+            if (this.data.progressTimer) {
+                clearInterval(this.data.progressTimer);
+            }
+
             this.setData({
                 isGenerating: false,
-                generateTask: null
+                generateTask: null,
+                progressTimer: null,
+                hasReceivedData: false,
+                generateProgress: 0
             });
 
             wx.showToast({

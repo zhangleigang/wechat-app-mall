@@ -6,19 +6,23 @@
   justify-content: center;
   cursor: pointer;
   margin-left: 16rpx;
+  flex-shrink: 0;
 }
 
 .favorite-icon {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 12rpx;
+  width: 60rpx;
+  height: 60rpx;
+  padding: 0;
   border-radius: 50%;
   background: rgba(255, 255, 255, 0.25);
   backdrop-filter: blur(10rpx);
   border: 2rpx solid rgba(255, 255, 255, 0.3);
   box-shadow: 0 4rpx 12rpx rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
+  overflow: hidden;
 }
 
 .favorite-icon:active {
@@ -31,6 +35,10 @@
   color: rgba(255, 255, 255, 0.9);
   transition: all 0.3s ease;
   text-shadow: 0 2rpx 4rpx rgba(0, 0, 0, 0.2);
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* 已收藏状态 */
@@ -83,7 +91,8 @@
 
 /* 尺寸变体 */
 .favorite-button.small .favorite-icon {
-  padding: 10rpx;
+  width: 50rpx;
+  height: 50rpx;
 }
 
 .favorite-button.small .favorite-icon .icon {
@@ -91,7 +100,8 @@
 }
 
 .favorite-button.medium .favorite-icon {
-  padding: 12rpx;
+  width: 60rpx;
+  height: 60rpx;
 }
 
 .favorite-button.medium .favorite-icon .icon {
@@ -99,7 +109,8 @@
 }
 
 .favorite-button.large .favorite-icon {
-  padding: 14rpx;
+  width: 70rpx;
+  height: 70rpx;
 }
 
 .favorite-button.large .favorite-icon .icon {
