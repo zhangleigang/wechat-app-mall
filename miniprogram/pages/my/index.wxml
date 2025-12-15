@@ -24,15 +24,16 @@
         <button class="avatar-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
           <image 
             class="user-avatar" 
-            src="{{ userInfo.avatarUrl || '/images/default.png' }}" 
+            src="{{ (userInfo && userInfo.avatarUrl) ? userInfo.avatarUrl : '/images/default.png' }}" 
             mode="aspectFill"
+            binderror="onAvatarError"
           />
           <view class="avatar-edit-tip">点击更换</view>
         </button>
         
         <view class="user-info">
           <view class="user-nick" bindtap="editNickname">
-            <text class="nick-text">{{ nick || '用户' }}</text>
+            <text class="nick-text">{{ nick || (userInfo && userInfo.nickName) || '用户' }}</text>
             <text class="edit-icon">✏️</text>
           </view>
           
@@ -90,11 +91,20 @@
         <text class="menu-arrow">→</text>
       </view>
       
-      <view class="menu-item-card" bindtap="goOrderManage">
+      <!-- 管理员功能 - 仅管理员可见 -->
+      <view wx:if="{{isAdmin}}" class="menu-item-card" bindtap="goOrderManage">
         <view class="menu-item-left">
           <text class="menu-icon">📋</text>
           <text class="menu-title">订单管理</text>
           <text class="menu-badge" wx:if="{{pendingOrderCount > 0}}">{{pendingOrderCount}}</text>
+        </view>
+        <text class="menu-arrow">→</text>
+      </view>
+      
+      <view wx:if="{{isAdmin}}" class="menu-item-card" bindtap="goFeedbackManage">
+        <view class="menu-item-left">
+          <text class="menu-icon">💬</text>
+          <text class="menu-title">反馈管理</text>
         </view>
         <text class="menu-arrow">→</text>
       </view>

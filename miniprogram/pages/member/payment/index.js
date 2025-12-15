@@ -313,22 +313,7 @@ Page({
         this.quickSave()
     },
 
-    // 长按二维码（保留兼容）
-    handleLongPress() {
-        wx.showModal({
-            title: '如何支付？',
-            content: '由于微信限制，小程序内无法直接识别二维码\n\n请点击下方"保存并查看支付步骤"按钮，我们将为您提供详细的支付指引',
-            confirmText: '查看步骤',
-            cancelText: '知道了',
-            success: (res) => {
-                if (res.confirm) {
-                    this.saveAndGuide()
-                }
-            }
-        })
-    },
-
-    // 长按提示
+    // 长按二维码
     handleLongPress() {
         wx.showModal({
             title: '温馨提示',
@@ -400,9 +385,18 @@ Page({
 
     // 我已支付
     async handlePaid() {
-        if (this.data.checking) return
+        console.log('=== 我已支付按钮被点击 ===')
+        console.log('checking状态:', this.data.checking)
+        console.log('packageInfo:', this.data.packageInfo)
+        console.log('orderInfo:', this.data.orderInfo)
+
+        if (this.data.checking) {
+            console.log('正在处理中，忽略点击')
+            return
+        }
 
         if (!this.data.packageInfo || !this.data.orderInfo) {
+            console.log('数据错误，缺少必要信息')
             wx.showToast({
                 title: '数据错误，请重试',
                 icon: 'none'
@@ -410,17 +404,25 @@ Page({
             return
         }
 
+        console.log('准备显示确认对话框')
         wx.showModal({
-            title: '支付确认',
-            content: `请确认您已完成 ¥${this.data.packageInfo.price} 的转账支付\n\n订单号：${this.data.orderInfo.orderNumber}\n\n虚假确认将导致账号被永久封禁`,
+            title: '确认支付完成',
+            content: `请确认您已完成 ¥${this.data.packageInfo.price} 的转账支付\n\n订单号：${this.data.orderInfo.orderNumber}\n\n💡 温馨提示：请确保支付成功后再点击确认，以便我们及时为您开通会员服务`,
             confirmText: '确认',
-            confirmColor: '#ff6b00',
+            confirmColor: '#07c160',
             cancelText: '取消',
             success: async (res) => {
+                console.log('用户选择结果:', res)
                 if (res.confirm) {
+                    console.log('用户确认支付，开始激活会员')
                     this.setData({ checking: true })
                     await this.confirmPayment()
+                } else {
+                    console.log('用户取消确认')
                 }
+            },
+            fail: (err) => {
+                console.error('显示对话框失败:', err)
             }
         })
     },

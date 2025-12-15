@@ -5,6 +5,43 @@
 const express = require('express');
 const router = express.Router();
 
+// Import shared order status utilities (Requirements: 1.5)
+const {
+    ORDER_STATUS,
+    isValidOrderStatus,
+    validateAndSanitizeStatus,
+    getStatusDisplayText
+} = require('../utils/orderStatus');
+
+/**
+ * Create order with proper status validation
+ * @param {object} connection - Database connection
+ * @param {object} orderData - Order data
+ * @returns {string} - Order number
+ */
+async function createOrderWithValidation(connection, orderData) {
+    const { openid, nickName, packageId, amount, duration } = orderData;
+
+    // Generate unique order number
+    const orderNumber = `ORDER_${Date.now()}_${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+
+    // Always set status to pending for new orders (Requirements: 1.1, 3.1)
+    const orderStatus = ORDER_STATUS.PENDING;
+
+    // Validate status before insertion
+    if (!isValidOrderStatus(orderStatus)) {
+        throw new Error(`Invalid order status: ${orderStatus}`);
+    }
+
+    // Insert order with explicit status
+    await connection.query(
+        'INSERT INTO orders (order_number, openid, nick_name, package_id, amount, duration, status) VALUES (?, ?, ?, ?, ?, ?, ?)',
+        [orderNumber, openid, nickName, packageId, amount, duration, orderStatus]
+    );
+
+    return orderNumber;
+}
+
 /**
  * 查询会员状态
  * GET /api/member/status?openid=xxx
@@ -87,11 +124,15 @@ router.post('/activate', async (req, res) => {
 
         await conn.beginTransaction();
 
-        // 1. 创建订单记录
+        // 1. 创建订单记录 (explicitly set status = 0 for pending verification)
+        // Status codes: 0=待核实(pending), 1=已核实(verified), 2=已取消(cancelled)
+        // Requirements: 1.1, 3.1 - New orders must default to pending verification
         const orderNumber = `ORDER_${Date.now()}_${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+        const orderStatus = 0; // Always start with pending verification status
+
         await conn.query(
-            'INSERT INTO orders (order_number, openid, nick_name, package_id, amount, duration) VALUES (?, ?, ?, ?, ?, ?)',
-            [orderNumber, openid, nickName, packageId, amount, duration]
+            'INSERT INTO orders (order_number, openid, nick_name, package_id, amount, duration, status) VALUES (?, ?, ?, ?, ?, ?, ?)',
+            [orderNumber, openid, nickName, packageId, amount, duration, orderStatus]
         );
 
         // 2. 更新会员状态
@@ -219,11 +260,15 @@ router.post('/renew', async (req, res) => {
 
         await conn.beginTransaction();
 
-        // 1. 创建订单记录
+        // 1. 创建订单记录 (explicitly set status = 0 for pending verification)
+        // Status codes: 0=待核实(pending), 1=已核实(verified), 2=已取消(cancelled)
+        // Requirements: 1.1, 3.1 - New orders must default to pending verification
         const orderNumber = `ORDER_${Date.now()}_${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+        const orderStatus = 0; // Always start with pending verification status
+
         await conn.query(
-            'INSERT INTO orders (order_number, openid, nick_name, package_id, amount, duration) VALUES (?, ?, ?, ?, ?, ?)',
-            [orderNumber, openid, nickName, packageId, amount, duration]
+            'INSERT INTO orders (order_number, openid, nick_name, package_id, amount, duration, status) VALUES (?, ?, ?, ?, ?, ?, ?)',
+            [orderNumber, openid, nickName, packageId, amount, duration, orderStatus]
         );
 
         // 2. 更新会员状态

@@ -96,8 +96,9 @@ Page({
 
                 // 延迟跳转
                 setTimeout(() => {
-                    this.navigateToHome()
-                }, 1500)
+                    console.log('准备执行跳转...');
+                    this.navigateToHome();
+                }, 1500);
             } else {
                 throw new Error(result.error || '登录失败')
             }
@@ -140,8 +141,9 @@ Page({
 
                 // 延迟跳转，让用户看到成功提示
                 setTimeout(() => {
-                    this.navigateToHome()
-                }, 1500)
+                    console.log('快速登录成功，准备跳转...');
+                    this.navigateToHome();
+                }, 1500);
             } else {
                 throw new Error(result.error || '登录失败')
             }
@@ -229,16 +231,27 @@ Page({
      * 跳转到首页
      */
     navigateToHome() {
-        // 检查是否有返回页面参数
-        const pages = getCurrentPages()
-        if (pages.length > 1) {
-            // 有上一页，返回上一页
-            wx.navigateBack()
-        } else {
-            // 没有上一页，跳转到首页
-            wx.switchTab({
-                url: '/pages/ai/job/index'
-            })
-        }
+        console.log('准备跳转到首页...');
+
+        // 跳转到 tabBar 的第一个页面（面试知识）
+        wx.switchTab({
+            url: '/pages/knowledge/index',
+            success: () => {
+                console.log('跳转到面试知识页面成功');
+            },
+            fail: (error) => {
+                console.error('switchTab 失败:', error);
+                // 备用方案：使用 reLaunch 跳转到非 tabBar 页面
+                wx.reLaunch({
+                    url: '/pages/knowledge/index',
+                    success: () => {
+                        console.log('reLaunch 跳转成功');
+                    },
+                    fail: (err) => {
+                        console.error('reLaunch 也失败:', err);
+                    }
+                });
+            }
+        });
     }
 })

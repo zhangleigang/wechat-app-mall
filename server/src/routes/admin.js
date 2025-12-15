@@ -5,6 +5,14 @@
 const express = require('express');
 const router = express.Router();
 
+// Import shared order status utilities (Requirements: 1.5)
+const {
+    ORDER_STATUS,
+    STATUS_DISPLAY,
+    isValidOrderStatus,
+    validateAndSanitizeStatus
+} = require('../utils/orderStatus');
+
 /**
  * 查询订单列表
  * GET /api/admin/orders?page=1&limit=20&status=1
@@ -22,9 +30,18 @@ router.get('/orders', async (req, res) => {
         let whereClause = '';
         let params = [];
 
+        // 状态筛选 - 使用状态验证 (Requirements: 1.5)
         if (status !== undefined && status !== '') {
-            whereClause = 'WHERE status = ?';
-            params.push(parseInt(status));
+            try {
+                const validatedStatus = validateAndSanitizeStatus(status);
+                whereClause = 'WHERE status = ?';
+                params.push(validatedStatus);
+            } catch (error) {
+                return res.status(400).json({
+                    code: -1,
+                    msg: `Invalid status parameter: ${error.message}`
+                });
+            }
         }
 
         // 查询统计数据
@@ -34,7 +51,7 @@ router.get('/orders', async (req, res) => {
 
         // 查询列表
         const [rows] = await pool.query(
-            `SELECT id, order_number, openid, nick_name, package_id, amount, duration, created_at FROM orders ${whereClause} ORDER BY created_at DESC LIMIT ? OFFSET ?`,
+            `SELECT id, order_number, openid, nick_name, package_id, amount, duration, status, created_at FROM orders ${whereClause} ORDER BY created_at DESC LIMIT ? OFFSET ?`,
             [...params, limit, offset]
         );
 
@@ -117,14 +134,18 @@ router.get('/orders/export', async (req, res) => {
         }
 
         const [rows] = await pool.query(
-            `SELECT order_number, openid, nick_name, package_id, amount, duration, created_at FROM orders ${whereClause} ORDER BY created_at DESC`,
+            `SELECT order_number, openid, nick_name, package_id, amount, duration, status, created_at FROM orders ${whereClause} ORDER BY created_at DESC`,
             params
         );
 
         // 生成CSV
-        let csv = '订单号,OpenID,用户昵称,套餐ID,金额,天数,创建时间\n';
+        let csv = '订单号,OpenID,用户昵称,套餐ID,金额,天数,状态,创建时间\n';
         rows.forEach(row => {
-            csv += `${row.order_number},${row.openid},${row.nick_name || ''},${row.package_id},${row.amount},${row.duration},${row.created_at}\n`;
+            // Use consistent status mapping (Requirements: 1.5)
+            const statusText = isValidOrderStatus(row.status) ?
+                STATUS_DISPLAY[row.status] :
+                `无效状态(${row.status})`;
+            csv += `${row.order_number},${row.openid},${row.nick_name || ''},${row.package_id},${row.amount},${row.duration},${statusText},${row.created_at}\n`;
         });
 
         res.setHeader('Content-Type', 'text/csv; charset=utf-8');
@@ -133,6 +154,131 @@ router.get('/orders/export', async (req, res) => {
     } catch (error) {
         console.error('导出订单失败:', error);
         res.json({ code: -1, msg: '导出失败' });
+    }
+});
+
+/**
+ * 验证订单（标记为已核实）
+ * POST /api/admin/orders/:id/verify
+ */
+router.post('/orders/:id/verify', async (req, res) => {
+    const pool = req.app.locals.pool;
+    let connection = null;
+
+    try {
+        const orderId = parseInt(req.params.id);
+
+        if (!orderId || orderId <= 0) {
+            return res.json({ code: -1, msg: '订单ID无效' });
+        }
+
+        // 获取数据库连接并开始事务
+        connection = await pool.getConnection();
+        await connection.beginTransaction();
+
+        // 使用 SELECT FOR UPDATE 锁定订单记录，防止并发修改
+        const [orderRows] = await connection.query(
+            'SELECT id, order_number, openid, status, amount, package_id FROM orders WHERE id = ? FOR UPDATE',
+            [orderId]
+        );
+
+        if (orderRows.length === 0) {
+            await connection.rollback();
+            return res.json({ code: -1, msg: '订单不存在' });
+        }
+
+        const order = orderRows[0];
+
+        // 检查订单状态 - 使用状态常量 (Requirements: 1.5)
+        if (!isValidOrderStatus(order.status)) {
+            await connection.rollback();
+            return res.json({
+                code: -1,
+                msg: `订单状态无效: ${order.status}`
+            });
+        }
+
+        if (order.status === ORDER_STATUS.VERIFIED) {
+            await connection.rollback();
+            return res.json({ code: -1, msg: '订单已经是核实状态，无需重复操作' });
+        }
+
+        if (order.status === ORDER_STATUS.CANCELLED) {
+            await connection.rollback();
+            return res.json({ code: -1, msg: '订单已取消，无法核实' });
+        }
+
+        // 更新订单状态为已核实 - 使用状态常量 (Requirements: 1.5)
+        // 检查是否有 updated_at 字段，如果有则更新，如果没有则只更新状态
+        let updateResult;
+        try {
+            // 尝试使用 updated_at 字段
+            [updateResult] = await connection.query(
+                'UPDATE orders SET status = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ? AND status = ?',
+                [ORDER_STATUS.VERIFIED, orderId, ORDER_STATUS.PENDING]
+            );
+        } catch (updateError) {
+            if (updateError.message.includes('updated_at')) {
+                console.warn('orders 表缺少 updated_at 字段，使用备用更新方式');
+                // 如果 updated_at 字段不存在，只更新状态
+                [updateResult] = await connection.query(
+                    'UPDATE orders SET status = ? WHERE id = ? AND status = ?',
+                    [ORDER_STATUS.VERIFIED, orderId, ORDER_STATUS.PENDING]
+                );
+            } else {
+                throw updateError;
+            }
+        }
+
+        // 验证更新是否成功（防止状态在事务期间被其他进程修改）
+        if (updateResult.affectedRows === 0) {
+            await connection.rollback();
+            return res.json({ code: -1, msg: '订单状态已被其他管理员修改，请刷新后重试' });
+        }
+
+        // 提交事务
+        await connection.commit();
+
+        // 记录操作日志
+        console.log(`订单验证成功: 订单ID=${orderId}, 订单号=${order.order_number}, OpenID=${order.openid}, 金额=${order.amount}`);
+
+        res.json({
+            code: 0,
+            msg: '订单已标记为核实',
+            data: {
+                orderId: orderId,
+                orderNumber: order.order_number,
+                previousStatus: ORDER_STATUS.PENDING,
+                newStatus: ORDER_STATUS.VERIFIED
+            }
+        });
+
+    } catch (error) {
+        // 回滚事务
+        if (connection) {
+            try {
+                await connection.rollback();
+            } catch (rollbackError) {
+                console.error('事务回滚失败:', rollbackError);
+            }
+        }
+
+        console.error('验证订单失败:', {
+            orderId: req.params.id,
+            error: error.message,
+            stack: error.stack
+        });
+
+        res.json({
+            code: -1,
+            msg: '操作失败，请稍后重试',
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
+    } finally {
+        // 释放数据库连接
+        if (connection) {
+            connection.release();
+        }
     }
 });
 
@@ -152,8 +298,10 @@ router.get('/stats', async (req, res) => {
             'SELECT COUNT(*) as count FROM members WHERE expire_date > NOW()'
         );
 
-        // 总订单数
+        // 总订单数和按状态分组 - 使用状态常量 (Requirements: 1.5)
         const [totalOrders] = await pool.query('SELECT COUNT(*) as count FROM orders');
+        const [pendingOrders] = await pool.query('SELECT COUNT(*) as count FROM orders WHERE status = ?', [ORDER_STATUS.PENDING]);
+        const [verifiedOrders] = await pool.query('SELECT COUNT(*) as count FROM orders WHERE status = ?', [ORDER_STATUS.VERIFIED]);
 
         // 总收入
         const [totalRevenue] = await pool.query('SELECT SUM(amount) as total FROM orders');
@@ -174,6 +322,8 @@ router.get('/stats', async (req, res) => {
                 totalUsers: totalUsers[0].count,
                 validMembers: validMembers[0].count,
                 totalOrders: totalOrders[0].count,
+                pendingOrders: pendingOrders[0].count,
+                verifiedOrders: verifiedOrders[0].count,
                 totalRevenue: totalRevenue[0].total || 0,
                 todayUsers: todayUsers[0].count,
                 todayOrders: todayOrders[0].count

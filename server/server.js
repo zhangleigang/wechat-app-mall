@@ -34,6 +34,7 @@ const adminRoutes = require('./src/routes/admin');
 const uploadRoutes = require('./src/routes/upload');
 const resumeRoutes = require('./src/routes/resume');
 const favoritesRoutes = require('./src/routes/favorites');
+const feedbackRoutes = require('./src/routes/feedback');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/member', memberRoutes);
@@ -43,6 +44,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/resume', resumeRoutes);
 app.use('/api/favorites', favoritesRoutes);
+app.use('/api/feedback', feedbackRoutes);
 
 // ============ 健康检查 ============
 app.get('/health', (req, res) => {

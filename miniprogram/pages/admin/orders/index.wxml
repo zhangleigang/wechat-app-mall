@@ -15,6 +15,10 @@
         <view class="stat-label">已核实</view>
       </view>
       <view class="stat-item">
+        <view class="stat-value cancelled">{{stats.cancelled || 0}}</view>
+        <view class="stat-label">已取消</view>
+      </view>
+      <view class="stat-item">
         <view class="stat-value amount">¥{{stats.totalAmount}}</view>
         <view class="stat-label">总金额</view>
       </view>
@@ -44,6 +48,13 @@
     >
       已核实
     </view>
+    <view 
+      class="filter-tab {{filterStatus === 'cancelled' ? 'active' : ''}}"
+      data-status="cancelled"
+      bind:tap="filterOrders"
+    >
+      已取消
+    </view>
   </view>
 
   <!-- 订单列表 -->
@@ -66,7 +77,7 @@
             />
           </view>
           <view class="order-status {{item.status}}">
-            {{item.status === 'pending_verify' ? '待核实' : '已核实'}}
+            {{item.status === 'pending_verify' ? '待核实' : (item.status === 'verified' ? '已核实' : '已取消')}}
           </view>
         </view>
 
@@ -100,14 +111,40 @@
           >
             详情
           </van-button>
+          
+          <!-- 只有待核实状态的订单才显示核实按钮 -->
           <van-button 
             wx:if="{{item.status === 'pending_verify'}}"
             size="small" 
             type="primary"
             data-index="{{index}}"
             bind:click="markAsVerified"
+            loading="{{item.verifying}}"
+            disabled="{{item.verifying}}"
           >
-            标记已核实
+            {{item.verifying ? '处理中...' : '标记已核实'}}
+          </van-button>
+          
+          <!-- 已核实订单显示状态提示 -->
+          <van-button 
+            wx:if="{{item.status === 'verified'}}"
+            size="small" 
+            type="default"
+            disabled
+            plain
+          >
+            已核实
+          </van-button>
+          
+          <!-- 已取消订单显示状态提示 -->
+          <van-button 
+            wx:if="{{item.status === 'cancelled'}}"
+            size="small" 
+            type="default"
+            disabled
+            plain
+          >
+            已取消
           </van-button>
         </view>
       </view>
@@ -128,25 +165,13 @@
       block
       icon="down"
       bind:click="exportOrders"
+      loading="{{loading}}"
     >
       导出订单数据
     </van-button>
     
-    <view class="action-row">
-      <van-button 
-        type="default" 
-        size="small"
-        bind:click="clearVerified"
-      >
-        清空已核实
-      </van-button>
-      <van-button 
-        type="danger" 
-        size="small"
-        bind:click="clearAll"
-      >
-        清空全部
-      </van-button>
+    <view class="refresh-hint">
+      <text>下拉刷新数据，上拉加载更多</text>
     </view>
   </view>
 </view>

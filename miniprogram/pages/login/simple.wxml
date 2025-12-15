@@ -1,8 +1,5 @@
 <view class="login-container">
-  <!-- 顶部装饰 -->
-  <view class="login-header">
-    <view class="header-decoration"></view>
-  </view>
+
   
   <!-- Logo和标题 -->
   <view class="login-brand">
@@ -84,12 +81,12 @@
         <view class="checkbox {{agreed ? 'checked' : ''}}">
           <text wx:if="{{agreed}}" class="check-icon">✓</text>
         </view>
-        <text class="agreement-text">
+        <view class="agreement-text">
           我已阅读并同意
           <text class="agreement-link" catchtap="showAgreement" data-type="user">《用户协议》</text>
           和
           <text class="agreement-link" catchtap="showAgreement" data-type="privacy">《隐私政策》</text>
-        </text>
+        </view>
       </view>
     </view>
   </view>

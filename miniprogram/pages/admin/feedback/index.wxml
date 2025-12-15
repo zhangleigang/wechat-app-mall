@@ -1,0 +1,125 @@
+<!-- 简化的反馈管理页面 -->
+<view class="feedback-admin">
+  <!-- 统计卡片 -->
+  <view class="stats-card">
+    <view class="stats-item">
+      <text class="stats-number">{{stats.unread_count || 0}}</text>
+      <text class="stats-label">未读</text>
+    </view>
+    <view class="stats-item">
+      <text class="stats-number">{{stats.read_count || 0}}</text>
+      <text class="stats-label">已读</text>
+    </view>
+    <view class="stats-item">
+      <text class="stats-number">{{stats.resolved_count || 0}}</text>
+      <text class="stats-label">已解决</text>
+    </view>
+    <view class="stats-item">
+      <text class="stats-number">{{stats.bug_count || 0}}</text>
+      <text class="stats-label">Bug</text>
+    </view>
+  </view>
+
+  <!-- 筛选器 -->
+  <view class="filter-bar">
+    <van-dropdown-menu>
+      <van-dropdown-item 
+        value="{{filterStatus}}" 
+        options="{{statusOptions}}"
+        bind:change="onStatusChange"
+      />
+    </van-dropdown-menu>
+  </view>
+
+  <!-- 反馈列表 -->
+  <view class="feedback-list">
+    <view wx:if="{{loading}}" class="loading">
+      <van-loading type="spinner" />
+      <text>加载中...</text>
+    </view>
+    
+    <view wx:elif="{{feedbacks.length === 0}}" class="empty">
+      <van-empty description="暂无反馈" />
+    </view>
+    
+    <view wx:else>
+      <view 
+        wx:for="{{feedbacks}}" 
+        wx:key="id"
+        class="feedback-item {{item.status}}"
+        data-index="{{index}}"
+        bindtap="viewDetail"
+      >
+        <!-- 用户信息 -->
+        <view class="user-info">
+          <image 
+            class="avatar" 
+            src="{{item.avatar_url || '/images/default.png'}}" 
+            mode="aspectFill"
+          />
+          <view class="user-detail">
+            <text class="nickname">{{item.nick_name || item.name || '匿名'}}</text>
+            <text class="time">{{formatTime(item.created_at)}}</text>
+          </view>
+          <view class="status-badge {{item.status}}">
+            {{item.status === 'unread' ? '未读' : item.status === 'read' ? '已读' : '已解决'}}
+          </view>
+        </view>
+
+        <!-- 反馈内容 -->
+        <view class="content">
+          <text class="content-text">{{item.content}}</text>
+        </view>
+
+        <!-- 联系方式 -->
+        <view wx:if="{{item.mobile || item.wechat}}" class="contact-info">
+          <text wx:if="{{item.mobile}}" 
+                class="contact-item" 
+                data-contact="{{item.mobile}}"
+                catchtap="copyContact">
+            📱 {{item.mobile}}
+          </text>
+          <text wx:if="{{item.wechat}}" 
+                class="contact-item"
+                data-contact="{{item.wechat}}"
+                catchtap="copyContact">
+            💬 {{item.wechat}}
+          </text>
+        </view>
+
+        <!-- 快速操作 -->
+        <view class="actions">
+          <van-button 
+            wx:if="{{item.status === 'unread'}}"
+            size="mini" 
+            type="primary"
+            data-index="{{index}}"
+            catchtap="markAsRead"
+          >
+            标记已读
+          </van-button>
+          
+          <van-button 
+            wx:if="{{item.status === 'read'}}"
+            size="mini" 
+            type="success"
+            data-index="{{index}}"
+            catchtap="markAsResolved"
+          >
+            标记已解决
+          </van-button>
+          
+          <van-button 
+            wx:if="{{item.type !== 'bug'}}"
+            size="mini" 
+            plain
+            data-index="{{index}}"
+            catchtap="markAsBug"
+          >
+            标记为Bug
+          </van-button>
+        </view>
+      </view>
+    </view>
+  </view>
+</view>

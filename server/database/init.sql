@@ -68,11 +68,13 @@ CREATE TABLE IF NOT EXISTS orders (
     package_id VARCHAR(50) NOT NULL COMMENT '套餐ID',
     amount DECIMAL(10,2) NOT NULL COMMENT '支付金额',
     duration INT NOT NULL COMMENT '购买天数',
-    status TINYINT DEFAULT 1 COMMENT '订单状态：0取消，1已完成',
+    status TINYINT DEFAULT 0 COMMENT '订单状态：0待核实，1已核实，2已取消',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
     INDEX idx_order_number (order_number),
     INDEX idx_openid (openid),
     INDEX idx_created_at (created_at),
+    INDEX idx_updated_at (updated_at),
     INDEX idx_status (status)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='订单记录表';
 
@@ -264,6 +266,43 @@ HAVING use_count > 0
 ORDER BY use_count DESC, t.name ASC;
 
 -- ============================================
+-- 扩展模块：意见反馈
+-- ============================================
+
+-- 意见反馈表
+CREATE TABLE IF NOT EXISTS feedback (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    openid VARCHAR(100) NOT NULL COMMENT '用户OpenID',
+    
+    -- 联系信息
+    name VARCHAR(100) DEFAULT '匿名' COMMENT '用户姓名',
+    mobile VARCHAR(20) COMMENT '联系电话',
+    wechat VARCHAR(100) COMMENT '微信号',
+    
+    -- 反馈内容
+    content TEXT NOT NULL COMMENT '反馈内容',
+    type VARCHAR(20) DEFAULT 'feedback' COMMENT '反馈类型：feedback-一般反馈，bug-问题报告',
+    source VARCHAR(20) DEFAULT 'miniprogram' COMMENT '来源：miniprogram-小程序',
+    
+    -- 处理状态（简化为三个状态）
+    status VARCHAR(20) DEFAULT 'unread' COMMENT '状态：unread-未读，read-已读，resolved-已解决',
+    admin_note TEXT COMMENT '管理员备注（可选）',
+    
+    -- 时间戳
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间',
+    
+    -- 索引
+    INDEX idx_openid (openid),
+    INDEX idx_status (status),
+    INDEX idx_created_at (created_at),
+    INDEX idx_type (type),
+    
+    -- 外键约束
+    FOREIGN KEY (openid) REFERENCES members(openid) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='意见反馈表';
+
+-- ============================================
 -- 触发器定义
 -- ============================================
 
@@ -298,6 +337,7 @@ SELECT '========================================' as '';
 SELECT 'Core tables: members, orders' as module_1;
 SELECT 'Resume tables: resumes' as module_2;
 SELECT 'Favorites tables: favorites, tags, favorite_tags' as module_3;
+SELECT 'Feedback tables: feedback' as module_4;
 SELECT '========================================' as '';
 SELECT 'Total tables created: 6' as summary;
 SELECT 'Total views created: 9' as summary;

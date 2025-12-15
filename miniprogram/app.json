@@ -14,6 +14,7 @@
     "pages/member/payment/index",
     "pages/member/payment-result/index",
     "pages/admin/orders/index",
+    "pages/admin/feedback/index",
     "pages/admin/test-member",
     "pages/ai/job/index",
     "pages/ai/mood/index"
