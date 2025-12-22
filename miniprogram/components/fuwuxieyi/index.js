@@ -8,7 +8,7 @@ Component({
    * 组件的对外属性，是属性名到属性设置的映射表
    */
   properties: {
-    k: String,    
+    k: String,
   },
 
   /**
@@ -44,7 +44,7 @@ Component({
    * 组件的方法列表
    */
   methods: {
-    aggree(){
+    aggree() {
       if (this.data.k) {
         wx.setStorageSync('agreeYxtk_' + this.data.k, true)
       }
@@ -52,12 +52,12 @@ Component({
         s: false
       })
     },
-    notagree(){
+    notagree() {
       wx.navigateTo({
         url: '/pages/notagree/index'
       })
     },
-    goYstk(e){
+    goYstk(e) {
       const k = e.currentTarget.dataset.k
       wx.navigateTo({
         url: '/pages/about/index?key=' + k,
@@ -68,11 +68,14 @@ Component({
         delta: 1
       })
     },
-    //回主页
+    //回主页 - 已隐藏管理员功能
     toIndex: function () {
-      wx.navigateTo({
-        url: '/pages/admin/home/index/index'
+      wx.switchTab({
+        url: '/pages/knowledge/index'
       })
+      // wx.navigateTo({
+      //   url: '/pages/admin/home/index/index'
+      // })
     },
   }
 })

@@ -1,31 +1,67 @@
 <view class="detail-page">
-  <!-- 问题标题 -->
-  <view class="question-section">
-    <view class="question-header">
-      <view class="question-icon">❓</view>
-      <text class="question-title">{{question}}</text>
-      <favorite-button
-        question-id="{{currentItem.id}}"
-        question="{{question}}"
-        answer="{{answer}}"
-        source-type="knowledge"
-        source-category="{{currentItem.categoryName}}"
-        is-favorited="{{isFavorite}}"
-        favorite-id="{{favoriteId}}"
-        size="small"
-        bind:favoritechange="onFavoriteChange"
-      />
-    </view>
+  <!-- 加载状态 -->
+  <view wx:if="{{loading}}" class="loading-section">
+    <van-loading type="spinner" size="24px" text-size="14px">加载中...</van-loading>
   </view>
-  
-  <!-- 答案内容 -->
-  <view class="answer-section">
-    <view class="answer-header">
-      <text class="answer-icon">💡</text>
-      <text class="answer-title">答案解析</text>
+
+  <!-- 主要内容 -->
+  <view wx:else>
+    <!-- 问题标题 -->
+    <view class="question-section">
+      <view class="question-header">
+        <view class="question-icon">❓</view>
+        <text class="question-title">{{question}}</text>
+        <favorite-button
+          wx:if="{{currentItem.id}}"
+          question-id="{{currentItem.id}}"
+          question="{{question}}"
+          answer="{{answer}}"
+          source-type="knowledge"
+          source-category="{{currentItem.categoryName}}"
+          is-favorited="{{isFavorite}}"
+          favorite-id="{{favoriteId}}"
+          size="small"
+          bind:favoritechange="onFavoriteChange"
+        />
+      </view>
     </view>
-    <view class="answer-content">
-      <towxml nodes="{{answerHtml}}" selectable="{{true}}" />
+    
+    <!-- 答案内容区域 -->
+    <view class="answer-section">
+      <view class="answer-header">
+        <text class="answer-icon">💡</text>
+        <text class="answer-title">答案解析</text>
+      </view>
+      
+      <!-- 会员用户：显示完整答案 -->
+      <view wx:if="{{showAnswer}}" class="answer-content">
+        <towxml nodes="{{answerHtml}}" selectable="{{true}}" />
+      </view>
+      
+      <!-- 非会员用户：显示会员提示 -->
+      <view wx:elif="{{showMemberPrompt}}" class="member-prompt" bindtap="onMemberPromptTap">
+        <view class="prompt-icon">🔒</view>
+        <view class="prompt-title">解锁完整答案</view>
+        <view class="prompt-content">
+          <text wx:if="{{memberPromptReason === 'network_error'}}">网络连接失败，点击重试验证会员状态</text>
+          <text wx:elif="{{memberPromptReason === 'error'}}">会员状态验证失败，点击重试</text>
+          <text wx:else>开通会员即可查看完整答案解析</text>
+        </view>
+        <view class="prompt-benefits">
+          <view class="benefit-item">✓ 查看200+题目完整答案</view>
+          <view class="benefit-item">✓ 无限次使用AI功能</view>
+          <view class="benefit-item">✓ 专属技术支持</view>
+        </view>
+        <view class="prompt-action">
+          <text wx:if="{{memberPromptReason === 'network_error' || memberPromptReason === 'error'}}">点击重试</text>
+          <text wx:else>点击开通会员</text>
+        </view>
+      </view>
+      
+      <!-- 加载答案状态 -->
+      <view wx:else class="answer-loading">
+        <van-loading type="spinner" size="20px" text-size="12px">验证会员状态...</van-loading>
+      </view>
     </view>
   </view>
 </view>

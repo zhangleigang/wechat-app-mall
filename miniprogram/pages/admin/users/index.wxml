@@ -1,0 +1,187 @@
+<view class="admin-container">
+  <!-- 头部统计 -->
+  <view class="stats-section">
+    <view class="stats-card">
+      <view class="stat-item">
+        <view class="stat-value">{{stats.total}}</view>
+        <view class="stat-label">总用户</view>
+      </view>
+      <view class="stat-item">
+        <view class="stat-value member">{{stats.members}}</view>
+        <view class="stat-label">会员</view>
+      </view>
+      <view class="stat-item">
+        <view class="stat-value non-member">{{stats.nonMembers}}</view>
+        <view class="stat-label">非会员</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 搜索栏 -->
+  <view class="search-section">
+    <view class="search-bar">
+      <van-icon name="search" size="16px" color="#999" />
+      <input 
+        class="search-input"
+        placeholder="搜索用户昵称或OpenID"
+        value="{{searchKeyword}}"
+        bindinput="onSearchInput"
+      />
+      <van-icon 
+        wx:if="{{searchKeyword}}"
+        name="clear" 
+        size="16px" 
+        color="#999"
+        bind:tap="clearSearch"
+      />
+    </view>
+  </view>
+
+  <!-- 筛选标签 -->
+  <view class="filter-section">
+    <view 
+      class="filter-tab {{filterStatus === 'all' ? 'active' : ''}}"
+      data-status="all"
+      bind:tap="filterUsers"
+    >
+      全部
+    </view>
+    <view 
+      class="filter-tab {{filterStatus === 'member' ? 'active' : ''}}"
+      data-status="member"
+      bind:tap="filterUsers"
+    >
+      会员
+    </view>
+    <view 
+      class="filter-tab {{filterStatus === 'non-member' ? 'active' : ''}}"
+      data-status="non-member"
+      bind:tap="filterUsers"
+    >
+      非会员
+    </view>
+  </view>
+
+  <!-- 用户列表 -->
+  <view class="users-section">
+    <block wx:for="{{users}}" wx:key="openid">
+      <view class="user-card">
+        <!-- 用户头部 -->
+        <view class="user-header">
+          <view class="user-info">
+            <image 
+              class="user-avatar" 
+              src="{{item.avatar_url || '/images/default.png'}}"
+              mode="aspectFill"
+            />
+            <view class="user-details">
+              <view class="user-name">{{item.displayName}}</view>
+              <view class="user-openid">
+                <text>{{item.openid}}</text>
+                <van-icon 
+                  name="copy" 
+                  size="14px" 
+                  color="#1989fa"
+                  data-openid="{{item.openid}}"
+                  bind:tap="copyOpenId"
+                />
+              </view>
+            </view>
+          </view>
+          <view class="user-status {{item.memberStatusClass}}">
+            {{item.memberStatus}}
+          </view>
+        </view>
+
+        <!-- 用户信息 -->
+        <view class="user-body">
+          <view class="user-row">
+            <text class="label">注册时间：</text>
+            <text class="value">{{item.createTime}}</text>
+          </view>
+          <view class="user-row" wx:if="{{item.isMember}}">
+            <text class="label">会员到期：</text>
+            <text class="value">{{item.memberExpiry}}</text>
+          </view>
+        </view>
+
+        <!-- 操作按钮 -->
+        <view class="user-actions">
+          <van-button 
+            size="small" 
+            type="default"
+            data-index="{{index}}"
+            bind:click="viewUserDetail"
+          >
+            详情
+          </van-button>
+          
+          <!-- 非会员显示开通按钮 -->
+          <van-button 
+            wx:if="{{!item.isMember}}"
+            size="small" 
+            type="primary"
+            data-index="{{index}}"
+            bind:click="activateMember"
+            loading="{{item.activating}}"
+            disabled="{{item.activating}}"
+          >
+            {{item.activating ? '开通中...' : '开通会员'}}
+          </van-button>
+          
+          <!-- 会员显示状态提示 -->
+          <van-button 
+            wx:if="{{item.isMember}}"
+            size="small" 
+            type="default"
+            disabled
+            plain
+          >
+            已开通
+          </van-button>
+        </view>
+      </view>
+    </block>
+
+    <!-- 空状态 -->
+    <view class="empty-state" wx:if="{{users.length === 0 && !loading}}">
+      <van-icon name="friends-o" size="80px" color="#ccc" />
+      <text class="empty-text">暂无用户记录</text>
+    </view>
+
+    <!-- 加载状态 -->
+    <view class="loading-more" wx:if="{{loading}}">
+      <van-loading size="20px" />
+      <text>加载中...</text>
+    </view>
+  </view>
+
+  <!-- 底部操作 -->
+  <view class="bottom-actions">
+    <van-button 
+      type="primary" 
+      size="large"
+      block
+      icon="friends-o"
+      bind:click="batchActivate"
+      loading="{{loading}}"
+    >
+      批量开通非会员
+    </van-button>
+    
+    <view class="action-row">
+      <van-button 
+        type="default" 
+        size="large"
+        icon="orders-o"
+        bind:click="navigateToOrders"
+      >
+        订单管理
+      </van-button>
+    </view>
+    
+    <view class="refresh-hint">
+      <text>下拉刷新数据，上拉加载更多</text>
+    </view>
+  </view>
+</view>

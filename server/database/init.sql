@@ -266,6 +266,30 @@ HAVING use_count > 0
 ORDER BY use_count DESC, t.name ASC;
 
 -- ============================================
+-- 微信转账支付配置模块
+-- ============================================
+
+-- 微信转账支付配置表
+CREATE TABLE IF NOT EXISTS wechat_payment_config (
+    id INT PRIMARY KEY AUTO_INCREMENT COMMENT '配置ID',
+    wechat_id VARCHAR(50) NOT NULL COMMENT '管理员微信号',
+    member_price DECIMAL(10,2) NOT NULL COMMENT '会员价格(元)',
+    member_duration INT NOT NULL COMMENT '会员时长(天)',
+    is_active BOOLEAN DEFAULT TRUE COMMENT '是否启用',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP COMMENT '创建时间',
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP COMMENT '更新时间'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci COMMENT='微信转账支付配置表';
+
+-- 插入初始配置数据
+INSERT INTO wechat_payment_config (wechat_id, member_price, member_duration, is_active) VALUES
+('your_wechat_id', 99.00, 365, TRUE)
+ON DUPLICATE KEY UPDATE
+    member_price = VALUES(member_price),
+    member_duration = VALUES(member_duration),
+    is_active = VALUES(is_active),
+    updated_at = CURRENT_TIMESTAMP;
+
+-- ============================================
 -- 扩展模块：意见反馈
 -- ============================================
 
@@ -337,9 +361,10 @@ SELECT '========================================' as '';
 SELECT 'Core tables: members, orders' as module_1;
 SELECT 'Resume tables: resumes' as module_2;
 SELECT 'Favorites tables: favorites, tags, favorite_tags' as module_3;
-SELECT 'Feedback tables: feedback' as module_4;
+SELECT 'WeChat payment tables: wechat_payment_config' as module_4;
+SELECT 'Feedback tables: feedback' as module_5;
 SELECT '========================================' as '';
-SELECT 'Total tables created: 6' as summary;
+SELECT 'Total tables created: 7' as summary;
 SELECT 'Total views created: 9' as summary;
 SELECT 'Total triggers created: 2' as summary;
 SELECT '========================================' as '';

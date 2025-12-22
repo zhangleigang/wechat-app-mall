@@ -4,7 +4,5 @@
     "navigationBarTextStyle": "white",
     "backgroundColor": "#f8fafc",
     "enablePullDownRefresh": false,
-    "usingComponents": {
-        "mermaid-chart": "/components/mermaid-chart/mermaid-chart"
-    }
+    "usingComponents": {}
 }

@@ -170,6 +170,17 @@
       导出订单数据
     </van-button>
     
+    <view class="action-row">
+      <van-button 
+        type="default" 
+        size="large"
+        icon="friends-o"
+        bind:click="navigateToUsers"
+      >
+        用户管理
+      </van-button>
+    </view>
+    
     <view class="refresh-hint">
       <text>下拉刷新数据，上拉加载更多</text>
     </view>

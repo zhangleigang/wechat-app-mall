@@ -9,20 +9,13 @@
     "pages/my/setting",
     "pages/my/feedback",
     "pages/login/simple",
-    "pages/member/packages/index",
-    "pages/member/benefits/index",
-    "pages/member/payment/index",
-    "pages/member/payment-result/index",
-    "pages/admin/orders/index",
-    "pages/admin/feedback/index",
     "pages/ai/job/index",
-    "pages/ai/mood/index"
+    "pages/ai/mood/index",
+    "pages/admin/users/index",
+    "pages/admin/orders/index",
+    "pages/admin/feedback/index"
   ],
-  "requiredPrivateInfos": [
-    "getLocation",
-    "chooseAddress",
-    "chooseLocation"
-  ],
+  "requiredPrivateInfos": [],
   "subpackages": [],
   "window": {
     "backgroundTextStyle": "light",
@@ -62,11 +55,6 @@
         "text": "个人中心"
       }
     ]
-  },
-  "permission": {
-    "scope.userLocation": {
-      "desc": "获取离你最近的门店"
-    }
   },
   "usingComponents": {
     "fuwuxieyi": "/components/fuwuxieyi/index",

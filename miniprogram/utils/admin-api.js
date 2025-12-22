@@ -78,6 +78,79 @@ const AdminAPI = {
     },
 
     /**
+     * 获取用户列表 (微信转账功能)
+     * @param {Object} params - 查询参数
+     * @param {number} params.page - 页码，默认1
+     * @param {number} params.limit - 每页数量，默认20
+     * @param {string} params.memberStatus - 会员状态筛选，all/member/non-member
+     * @returns {Promise<Object>} 用户列表数据
+     */
+    async getUsers(params = {}) {
+        const { page = 1, limit = 20, memberStatus = 'all' } = params
+
+        const url = `${CONFIG.apiBaseUrl}/admin/users?page=${page}&limit=${limit}&memberStatus=${memberStatus}`
+
+        return new Promise((resolve, reject) => {
+            wx.request({
+                url: url,
+                method: 'GET',
+                header: {
+                    'Content-Type': 'application/json'
+                },
+                success: (res) => {
+                    if (res.statusCode === 200) {
+                        resolve(res.data)
+                    } else {
+                        reject(new Error(`HTTP ${res.statusCode}`))
+                    }
+                },
+                fail: (err) => {
+                    console.error('获取用户列表失败:', err)
+                    reject(err)
+                }
+            })
+        })
+    },
+
+    /**
+     * 快速开通会员 (微信转账功能)
+     * @param {Object} params - 激活参数
+     * @param {string} params.openid - 用户OpenID
+     * @param {number} params.duration - 会员时长(天)
+     * @returns {Promise<Object>} 操作结果
+     */
+    async activateMember(params) {
+        const { openid, duration } = params
+
+        const url = `${CONFIG.apiBaseUrl}/admin/activate-member`
+
+        return new Promise((resolve, reject) => {
+            wx.request({
+                url: url,
+                method: 'POST',
+                header: {
+                    'Content-Type': 'application/json'
+                },
+                data: {
+                    openid,
+                    duration
+                },
+                success: (res) => {
+                    if (res.statusCode === 200) {
+                        resolve(res.data)
+                    } else {
+                        reject(new Error(`HTTP ${res.statusCode}`))
+                    }
+                },
+                fail: (err) => {
+                    console.error('激活会员失败:', err)
+                    reject(err)
+                }
+            })
+        })
+    },
+
+    /**
      * 获取统计数据
      * @returns {Promise<Object>} 统计数据
      */

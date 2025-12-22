@@ -505,6 +505,13 @@ Page({
         console.log('强制刷新完成')
     },
 
+    // 导航到用户管理页面
+    navigateToUsers() {
+        wx.navigateTo({
+            url: '/pages/admin/users/index'
+        })
+    },
+
     // 检查管理员权限
     checkAdminPermission() {
         const openid = wx.getStorageSync('openid')
@@ -512,7 +519,7 @@ Page({
 
         // 管理员 OpenID 列表
         const adminOpenIds = [
-            'oAHR-1w1Qrz-cL2OiN_hjnqQlXNQ'  // 管理员 openid
+            'onddF1_xp4H5FBBuT2NmNb4m_KbI'  // 管理员 openid
         ]
 
         const isAdmin = adminOpenIds.includes(openid)

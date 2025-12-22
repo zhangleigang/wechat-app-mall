@@ -452,8 +452,24 @@ Page({
      * 跳转到会员套餐页面
      */
     goToMemberPackages() {
-        wx.navigateTo({
-            url: '/pages/member/packages/index',
+        wx.showModal({
+            title: '解锁无限收藏',
+            content: '联系我的微信，开始体验无限收藏功能\n\n微信号：csuzhangleigang',
+            confirmText: '复制微信号',
+            cancelText: '知道了',
+            success: (res) => {
+                if (res.confirm) {
+                    wx.setClipboardData({
+                        data: 'csuzhangleigang',
+                        success: () => {
+                            wx.showToast({
+                                title: '微信号已复制',
+                                icon: 'success'
+                            })
+                        }
+                    })
+                }
+            },
             fail: () => {
                 wx.showToast({
                     title: '页面跳转失败',

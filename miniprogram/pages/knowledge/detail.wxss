@@ -72,3 +72,79 @@
   width: 100%;
   word-break: break-word;
 }
+
+/* 加载状态 */
+.loading-section {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 50vh;
+  padding: var(--space-2xl);
+}
+
+.answer-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: var(--space-2xl);
+  color: var(--text-tertiary);
+}
+
+/* 会员提示区域 */
+.member-prompt {
+  padding: var(--space-2xl);
+  text-align: center;
+  background: linear-gradient(135deg, #f8faff 0%, #f0f4ff 100%);
+  border: 2px dashed var(--primary-lighter);
+  margin: var(--space-lg);
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.member-prompt:active {
+  transform: scale(0.98);
+  background: linear-gradient(135deg, #f0f4ff 0%, #e8f0ff 100%);
+}
+
+.prompt-icon {
+  font-size: 48px;
+  margin-bottom: var(--space-lg);
+  opacity: 0.8;
+}
+
+.prompt-title {
+  font-size: var(--font-xl);
+  font-weight: var(--font-bold);
+  color: var(--primary-color);
+  margin-bottom: var(--space-md);
+}
+
+.prompt-content {
+  font-size: var(--font-md);
+  color: var(--text-secondary);
+  margin-bottom: var(--space-lg);
+  line-height: var(--line-height-relaxed);
+}
+
+.prompt-benefits {
+  margin-bottom: var(--space-lg);
+}
+
+.benefit-item {
+  font-size: var(--font-sm);
+  color: var(--text-tertiary);
+  margin-bottom: var(--space-xs);
+  text-align: left;
+  padding-left: var(--space-md);
+}
+
+.prompt-action {
+  font-size: var(--font-md);
+  font-weight: var(--font-medium);
+  color: var(--primary-color);
+  padding: var(--space-sm) var(--space-lg);
+  background: var(--primary-lighter);
+  border-radius: var(--radius-md);
+  display: inline-block;
+}

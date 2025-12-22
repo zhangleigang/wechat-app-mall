@@ -1,5 +1,0 @@
-<canvas 
-  canvas-id="mermaid-{{canvasId}}"
-  style="width:{{canvasWidth}}px;height:{{canvasHeight}}px;"
-  class="mermaid-canvas"
-></canvas>

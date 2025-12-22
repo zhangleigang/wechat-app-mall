@@ -116,6 +116,62 @@ router.get('/members', async (req, res) => {
 });
 
 /**
+ * 查询用户列表 (微信转账功能)
+ * GET /api/admin/users?page=1&limit=20&memberStatus=all
+ */
+router.get('/users', async (req, res) => {
+    const pool = req.app.locals.pool;
+
+    try {
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 20;
+        const memberStatus = req.query.memberStatus || 'all'; // all, member, non-member
+        const offset = (page - 1) * limit;
+
+        // 构建查询条件
+        let whereClause = '';
+        let params = [];
+
+        if (memberStatus === 'member') {
+            whereClause = 'WHERE expire_date > NOW()';
+        } else if (memberStatus === 'non-member') {
+            whereClause = 'WHERE expire_date IS NULL OR expire_date <= NOW()';
+        }
+
+        // 查询总数
+        const [countResult] = await pool.query(`SELECT COUNT(*) as total FROM members ${whereClause}`, params);
+
+        // 查询列表
+        const [rows] = await pool.query(
+            `SELECT openid, nick_name, avatar_url, expire_date, created_at, updated_at FROM members ${whereClause} ORDER BY created_at DESC LIMIT ? OFFSET ?`,
+            [...params, limit, offset]
+        );
+
+        // 计算会员状态
+        const now = new Date();
+        const list = rows.map(row => ({
+            ...row,
+            isMember: row.expire_date && new Date(row.expire_date) > now,
+            memberExpiry: row.expire_date,
+            createTime: row.created_at
+        }));
+
+        res.json({
+            code: 0,
+            data: {
+                total: countResult[0].total,
+                page,
+                limit,
+                users: list
+            }
+        });
+    } catch (error) {
+        console.error('查询用户列表失败:', error);
+        res.json({ code: -1, msg: '查询失败' });
+    }
+});
+
+/**
  * 导出订单（CSV格式）
  * GET /api/admin/orders/export?start_date=2024-01-01&end_date=2024-12-31
  */
@@ -265,6 +321,111 @@ router.post('/orders/:id/verify', async (req, res) => {
 
         console.error('验证订单失败:', {
             orderId: req.params.id,
+            error: error.message,
+            stack: error.stack
+        });
+
+        res.json({
+            code: -1,
+            msg: '操作失败，请稍后重试',
+            error: process.env.NODE_ENV === 'development' ? error.message : undefined
+        });
+    } finally {
+        // 释放数据库连接
+        if (connection) {
+            connection.release();
+        }
+    }
+});
+
+/**
+ * 快速开通会员 (微信转账功能)
+ * POST /api/admin/activate-member
+ */
+router.post('/activate-member', async (req, res) => {
+    const pool = req.app.locals.pool;
+    let connection = null;
+
+    try {
+        const { openid, duration } = req.body;
+
+        // 参数验证
+        if (!openid) {
+            return res.json({ code: -1, msg: 'OpenID不能为空' });
+        }
+
+        if (!duration || duration <= 0) {
+            return res.json({ code: -1, msg: '会员时长必须大于0天' });
+        }
+
+        // 获取数据库连接并开始事务
+        connection = await pool.getConnection();
+        await connection.beginTransaction();
+
+        // 检查用户是否存在
+        const [userRows] = await connection.query(
+            'SELECT openid, nick_name, expire_date FROM members WHERE openid = ? FOR UPDATE',
+            [openid]
+        );
+
+        if (userRows.length === 0) {
+            await connection.rollback();
+            return res.json({ code: -1, msg: '用户不存在' });
+        }
+
+        const user = userRows[0];
+        const now = new Date();
+
+        // 计算新的过期时间
+        let newExpireDate;
+        if (user.expire_date && new Date(user.expire_date) > now) {
+            // 如果用户还是有效会员，在现有基础上延长
+            newExpireDate = new Date(user.expire_date);
+            newExpireDate.setDate(newExpireDate.getDate() + duration);
+        } else {
+            // 如果用户不是会员或已过期，从现在开始计算
+            newExpireDate = new Date();
+            newExpireDate.setDate(newExpireDate.getDate() + duration);
+        }
+
+        // 更新用户会员状态
+        const [updateResult] = await connection.query(
+            'UPDATE members SET expire_date = ?, updated_at = CURRENT_TIMESTAMP WHERE openid = ?',
+            [newExpireDate, openid]
+        );
+
+        if (updateResult.affectedRows === 0) {
+            await connection.rollback();
+            return res.json({ code: -1, msg: '更新会员状态失败' });
+        }
+
+        // 提交事务
+        await connection.commit();
+
+        // 记录操作日志
+        console.log(`会员激活成功: OpenID=${openid}, 昵称=${user.nick_name}, 延长天数=${duration}, 新过期时间=${newExpireDate.toISOString()}`);
+
+        res.json({
+            code: 0,
+            message: '会员开通成功',
+            data: {
+                memberExpiry: newExpireDate.toISOString().slice(0, 19).replace('T', ' ')
+            }
+        });
+
+    } catch (error) {
+        // 回滚事务
+        if (connection) {
+            try {
+                await connection.rollback();
+            } catch (rollbackError) {
+                console.error('事务回滚失败:', rollbackError);
+            }
+        }
+
+        console.error('激活会员失败:', {
+            openid: req.body.openid,
+            duration: req.body.duration,
             error: error.message,
             stack: error.stack
         });

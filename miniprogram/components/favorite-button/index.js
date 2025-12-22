@@ -184,9 +184,25 @@ Component({
                 cancelText: '我知道了',
                 success: (res) => {
                     if (res.confirm) {
-                        // 跳转到会员套餐页面
-                        wx.navigateTo({
-                            url: '/pages/member/packages/index',
+                        // 提示联系微信体验
+                        wx.showModal({
+                            title: '解锁收藏功能',
+                            content: '联系我的微信，开始体验无限收藏功能\n\n微信号：csuzhangleigang',
+                            confirmText: '复制微信号',
+                            cancelText: '知道了',
+                            success: (res) => {
+                                if (res.confirm) {
+                                    wx.setClipboardData({
+                                        data: 'csuzhangleigang',
+                                        success: () => {
+                                            wx.showToast({
+                                                title: '微信号已复制',
+                                                icon: 'success'
+                                            })
+                                        }
+                                    })
+                                }
+                            },
                             fail: () => {
                                 wx.showToast({
                                     title: '页面跳转失败',

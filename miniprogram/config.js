@@ -12,11 +12,22 @@ module.exports = {
   apiBaseUrl: 'https://api.feelnow.cn/api', // 生产环境
   // apiBaseUrl: 'http://localhost:3000/api', // 本地开发
 
-  // === 收款码支付配置 ===
+  // === 备用 API 配置（降级使用） ===
+  backupApiBaseUrl: null, // 备用API地址，如有需要可配置
+
+  // === 网络请求配置 ===
+  network: {
+    timeout: 10000,           // 默认超时时间（毫秒）
+    retryCount: 3,            // 默认重试次数
+    retryDelay: 1000,         // 默认重试延迟（毫秒）
+    enableFallback: true      // 是否启用降级处理
+  },
+
+  // === 收款码支付配置 - 审核期间暂时禁用 ===
   paymentQrcode: {
     url: 'https://api.feelnow.cn/static/images/payment-qrcode.png',
     accountName: '请填写收款人姓名', // ⚠️ 需要替换为实际收款人姓名
-    enabled: true
+    enabled: false // 审核期间禁用支付功能
   },
 
   // === 简历管理配置 ===
@@ -38,5 +49,13 @@ module.exports = {
 
     // 缓存配置
     cacheExpireTime: 5 * 60 * 1000 // 简历列表缓存5分钟
+  },
+
+  // === 微信转账支付配置 ===
+  wechatPayment: {
+    wechatId: 'csuzhangleigang',        // 管理员微信号
+    memberPrice: 99,                    // 会员价格(元)
+    memberDuration: 365,                // 会员时长(天)
+    enabled: true                       // 启用微信转账功能
   }
 }

@@ -1,9 +1,0 @@
-{
-    "navigationBarTitleText": "开通会员",
-    "navigationBarBackgroundColor": "#667eea",
-    "navigationBarTextStyle": "white",
-    "backgroundColor": "#f5f7fa",
-    "usingComponents": {
-        "van-icon": "@vant/weapp/icon/index"
-    }
-}

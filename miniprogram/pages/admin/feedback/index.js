@@ -43,7 +43,7 @@ Page({
     // 检查管理员权限
     checkAdminPermission() {
         const openid = wx.getStorageSync('openid')
-        const adminOpenIds = ['oAHR-1w1Qrz-cL2OiN_hjnqQlXNQ']
+        const adminOpenIds = ['onddF1_xp4H5FBBuT2NmNb4m_KbI']
         return adminOpenIds.includes(openid)
     },
 

@@ -68,18 +68,22 @@ Page({
     // 检查会员状态
     const memberInfo = await MemberAPI.checkMemberStatus()
     if (!memberInfo.isValid) {
-      const messages = {
-        'not_login': '请先登录后使用此功能',
-        'not_member': '此功能需要开通会员',
-        'expired': '您的会员已过期，请续费后继续使用'
-      }
+
       wx.showModal({
-        title: '需要会员',
-        content: messages[memberInfo.reason] || '需要开通会员才能使用此功能',
-        confirmText: '去开通',
+        title: '解锁AI岗位分析',
+        content: '联系我的微信，开始体验AI岗位分析功能\n\n微信号：csuzhangleigang',
+        confirmText: '复制',
         success: (res) => {
           if (res.confirm) {
-            wx.navigateTo({ url: '/pages/member/payment/index' })
+            wx.setClipboardData({
+              data: 'csuzhangleigang',
+              success: () => {
+                wx.showToast({
+                  title: '微信号已复制',
+                  icon: 'success'
+                })
+              }
+            })
           }
         }
       })

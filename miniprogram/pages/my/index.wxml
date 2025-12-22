@@ -74,16 +74,17 @@
         
         <!-- 未开通会员 -->
         <view wx:else class="member-empty">
-          <text class="empty-text">暂未开通会员</text>
-          <text class="empty-desc">开通会员后可使用所有 AI 功能</text>
-          <button class="btn btn-primary" bindtap="goMemberPayment">立即开通会员</button>
+          <text class="empty-text">体验完整功能</text>
+          <text class="empty-desc">联系我的微信，开始体验AI面试助手的完整功能</text>
+          <button class="btn btn-primary" bindtap="goMemberPayment">联系微信体验</button>
         </view>
       </view>
     </view>
 
     <!-- 功能菜单 -->
     <view class="menu-section">
-      <view class="menu-item-card" bindtap="goMemberBenefits">
+      <!-- 会员权益按钮暂时隐藏 -->
+      <view wx:if="{{false}}" class="menu-item-card" bindtap="goMemberBenefits">
         <view class="menu-item-left">
           <text class="menu-icon">💎</text>
           <text class="menu-title">会员权益</text>
@@ -92,6 +93,14 @@
       </view>
       
       <!-- 管理员功能 - 仅管理员可见 -->
+      <view wx:if="{{isAdmin}}" class="menu-item-card" bindtap="goUserManage">
+        <view class="menu-item-left">
+          <text class="menu-icon">👥</text>
+          <text class="menu-title">用户管理</text>
+        </view>
+        <text class="menu-arrow">→</text>
+      </view>
+      
       <view wx:if="{{isAdmin}}" class="menu-item-card" bindtap="goOrderManage">
         <view class="menu-item-left">
           <text class="menu-icon">📋</text>
