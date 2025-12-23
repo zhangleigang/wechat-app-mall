@@ -569,3 +569,45 @@
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.2);
 }
+/* 头部布局 */
+.header-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.header-left {
+  flex: 1;
+}
+
+.header-right {
+  margin-left: 20rpx;
+}
+
+/* 使用指南按钮 */
+.guide-btn {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 20rpx;
+  padding: 16rpx 24rpx;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  transition: all 0.3s ease;
+}
+
+.guide-btn:active {
+  transform: scale(0.95);
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.guide-icon {
+  font-size: 32rpx;
+  margin-bottom: 4rpx;
+}
+
+.guide-text {
+  font-size: 20rpx;
+  color: white;
+  font-weight: bold;
+}

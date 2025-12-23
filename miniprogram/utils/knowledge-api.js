@@ -54,7 +54,6 @@ async function requestWithRetry(url, options) {
 
     for (let attempt = 1; attempt <= config.maxRetries + 1; attempt++) {
         try {
-            console.log(`[KnowledgeAPI] 请求尝试 ${attempt}/${config.maxRetries + 1}: ${url}`);
 
             const result = await executeRequest(url, {
                 method,
@@ -64,7 +63,6 @@ async function requestWithRetry(url, options) {
 
             // 请求成功，记录成功日志
             if (attempt > 1) {
-                console.log(`[KnowledgeAPI] 重试成功，第 ${attempt} 次尝试`);
             }
 
             return result;
@@ -72,7 +70,8 @@ async function requestWithRetry(url, options) {
         } catch (error) {
             lastError = error;
 
-            console.warn(`[KnowledgeAPI] 请求失败 (第${attempt}次):`, {
+            // 记录错误日志
+            this.logError({
                 url,
                 error: error.message,
                 statusCode: error.statusCode,
@@ -82,8 +81,6 @@ async function requestWithRetry(url, options) {
             // 判断是否应该重试
             if (attempt <= config.maxRetries && isRetryableError(error)) {
                 const delay = ErrorConfig.calculateRetryDelay(attempt, config);
-
-                console.log(`[KnowledgeAPI] 将在 ${delay}ms 后进行第 ${attempt + 1} 次重试`);
 
                 // 显示重试提示（仅第一次失败时）
                 if (attempt === 1) {
@@ -106,7 +103,6 @@ async function requestWithRetry(url, options) {
         try {
             const fallbackResult = await handleRequestFallback(url, options, lastError);
             if (fallbackResult) {
-                console.log('[KnowledgeAPI] 降级处理成功');
                 return fallbackResult;
             }
         } catch (fallbackError) {
@@ -201,26 +197,22 @@ function isRetryableError(error) {
  * 处理请求降级
  */
 async function handleRequestFallback(url, options, originalError) {
-    console.log('[KnowledgeAPI] 开始降级处理:', url);
 
     // 1. 尝试从缓存获取数据
     const cachedData = await tryGetFromCache(url, options);
     if (cachedData) {
-        console.log('[KnowledgeAPI] 降级：使用缓存数据');
         return cachedData;
     }
 
     // 2. 尝试使用备用API地址（如果配置了）
     const backupResult = await tryBackupApi(url, options);
     if (backupResult) {
-        console.log('[KnowledgeAPI] 降级：使用备用API成功');
         return backupResult;
     }
 
     // 3. 返回默认数据（如果适用）
     const defaultData = getDefaultData(url);
     if (defaultData) {
-        console.log('[KnowledgeAPI] 降级：使用默认数据');
         return defaultData;
     }
 
@@ -255,7 +247,6 @@ async function tryBackupApi(url, options) {
     // 如果配置了备用API地址
     if (CONFIG.backupApiBaseUrl && CONFIG.backupApiBaseUrl !== API_BASE_URL) {
         try {
-            console.log('[KnowledgeAPI] 尝试备用API:', CONFIG.backupApiBaseUrl);
 
             const originalBaseUrl = API_BASE_URL;
             API_BASE_URL = CONFIG.backupApiBaseUrl;
@@ -513,13 +504,11 @@ async function getCategories(useCache = true) {
         // 尝试返回缓存数据（即使过期）
         const expiredCache = getCache('categories');
         if (expiredCache) {
-            console.log('[KnowledgeAPI] 使用过期缓存数据');
             return expiredCache;
         }
 
         // 最后降级到默认数据
         const defaultCategories = getDefaultCategories();
-        console.log('[KnowledgeAPI] 使用默认分类数据');
         return defaultCategories;
     }
 }
@@ -566,13 +555,11 @@ async function getQuestions(options = {}) {
         const cacheKey = `questions_${category || 'all'}_${page}_${pageSize}_${keyword || ''}`;
         const expiredCache = getCache(cacheKey);
         if (expiredCache) {
-            console.log('[KnowledgeAPI] 使用过期缓存数据');
             return expiredCache;
         }
 
         // 最后降级到默认数据
         const defaultQuestions = getDefaultQuestions();
-        console.log('[KnowledgeAPI] 使用默认题目数据');
         return defaultQuestions;
     }
 }
@@ -606,7 +593,6 @@ async function getQuestionDetail(id, useCache = true) {
         // 尝试返回缓存数据（即使过期）
         const expiredCache = getCache(`question_${id}`);
         if (expiredCache) {
-            console.log('[KnowledgeAPI] 使用过期缓存数据');
             return expiredCache;
         }
 
@@ -655,7 +641,6 @@ async function getFullKnowledge(forceUpdate = false) {
         // 尝试返回缓存数据（即使过期）
         const expiredCache = getCache('full');
         if (expiredCache) {
-            console.log('[KnowledgeAPI] 使用过期的完整知识库缓存');
             wx.showToast({
                 title: '使用离线数据',
                 icon: 'none',
@@ -686,18 +671,14 @@ async function initKnowledge() {
         const versionCheck = await checkVersion();
 
         if (versionCheck.needUpdate) {
-            console.log('知识库有更新，开始下载...');
             // 清除旧缓存
             clearCache();
             // 下载新数据
             await getFullKnowledge(true);
-            console.log('知识库更新完成');
         } else {
-            console.log('知识库已是最新版本');
             // 确保有缓存数据
             const cached = getCache('full');
             if (!cached) {
-                console.log('本地无缓存，开始下载...');
                 await getFullKnowledge(true);
             }
         }
@@ -756,11 +737,8 @@ function startNetworkMonitoring() {
             lastCheck: Date.now()
         };
 
-        console.log('[KnowledgeAPI] 网络状态变化:', networkStatus);
-
         // 网络恢复时，清理失败的请求缓存
         if (res.isConnected) {
-            console.log('[KnowledgeAPI] 网络已恢复，清理错误缓存');
             clearErrorCache();
         }
     });

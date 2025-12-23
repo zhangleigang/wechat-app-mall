@@ -10,17 +10,6 @@
     "wxa-plugin-canvas": "^1.1.12",
     "wxbarcode": "^1.0.2"
   },
-  "scripts": {
-    "test": "jest",
-    "test:watch": "jest --watch",
-    "test:coverage": "jest --coverage",
-    "test:auth": "jest auth-flow.test.js",
-    "test:payment": "jest member-payment-flow.test.js",
-    "test:verification": "jest member-verification.test.js"
-  },
-  "devDependencies": {
-    "jest": "^29.7.0"
-  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/EastWorld/wechat-app-mall.git"

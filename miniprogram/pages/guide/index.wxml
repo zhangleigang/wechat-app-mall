@@ -1,0 +1,90 @@
+<!--pages/guide/index.wxml-->
+<view class="guide-container">
+  <!-- 进度指示器 -->
+  <view class="progress-bar">
+    <view class="progress-steps">
+      <view 
+        wx:for="{{steps}}" 
+        wx:key="index"
+        class="step-dot {{index <= currentStep ? 'active' : ''}}"
+        data-step="{{index}}"
+        bindtap="goToStep"
+      >
+        {{index + 1}}
+      </view>
+    </view>
+    <view class="progress-line">
+      <view class="progress-fill" style="width: {{(currentStep / (steps.length - 1)) * 100}}%"></view>
+    </view>
+  </view>
+
+  <!-- 内容区域 -->
+  <view class="content-area">
+    <view class="step-content">
+      <!-- 标题 -->
+      <view class="step-title">{{steps[currentStep].title}}</view>
+      
+      <!-- 图片占位符 - 使用emoji代替 -->
+      <view class="step-emoji" wx:if="{{steps[currentStep].emoji}}">
+        <text class="emoji-large">{{steps[currentStep].emoji}}</text>
+      </view>
+      
+      <!-- 内容 -->
+      <view class="step-text">{{steps[currentStep].content}}</view>
+      
+      <!-- 特殊按钮 -->
+      <view class="step-actions">
+        <view 
+          wx:if="{{currentStep === 1}}" 
+          class="action-btn primary"
+          bindtap="startExperience"
+        >
+          立即体验免费功能
+        </view>
+        
+        <view 
+          wx:if="{{currentStep === 3 || currentStep === 4}}" 
+          class="action-btn highlight"
+          bindtap="contactForMembership"
+        >
+          添加微信开通会员
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 导航按钮 -->
+  <view class="navigation">
+    <view 
+      class="nav-btn {{currentStep === 0 ? 'disabled' : ''}}"
+      bindtap="prevStep"
+      data-disabled="{{currentStep === 0}}"
+    >
+      上一步
+    </view>
+    
+    <view class="step-indicator">
+      {{currentStep + 1}} / {{steps.length}}
+    </view>
+    
+    <view 
+      class="nav-btn {{currentStep === steps.length - 1 ? 'disabled' : ''}}"
+      bindtap="nextStep"
+      data-disabled="{{currentStep === steps.length - 1}}"
+    >
+      下一步
+    </view>
+  </view>
+
+  <!-- 快速入口 -->
+  <view class="quick-actions">
+    <view class="quick-item" bindtap="startExperience">
+      <view class="quick-icon">📚</view>
+      <view class="quick-text">开始体验</view>
+    </view>
+    <view class="quick-item" bindtap="contactForMembership">
+      <view class="quick-icon">💎</view>
+      <view class="quick-text">开通会员</view>
+    </view>
+  </view>
+</view>

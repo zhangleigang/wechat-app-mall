@@ -174,7 +174,6 @@ Page({
 
                 // 如果使用了缓存，在控制台提示
                 if (result.fromCache) {
-                    console.log('使用收藏列表缓存');
                 }
             } else {
                 throw new Error(result.message || '加载失败');
@@ -216,7 +215,6 @@ Page({
 
                 // 如果使用了缓存，在控制台提示
                 if (result.fromCache) {
-                    console.log('使用标签列表缓存');
                 }
             }
         } catch (error) {
@@ -251,7 +249,6 @@ Page({
                     }
                 });
 
-                console.log('配额信息已更新:', this.data.quotaInfo);
             }
         } catch (error) {
             console.error('加载配额信息失败:', error);
@@ -424,7 +421,6 @@ Page({
      * 配额超限处理
      */
     onQuotaExceeded(e) {
-        console.log('配额超限:', e.detail);
         this.showUpgradeModal();
     },
 
@@ -483,7 +479,6 @@ Page({
      * 添加问题成功回调
      */
     onQuestionSaved(e) {
-        console.log('问题已保存:', e.detail);
 
         // 刷新列表和配额信息
         this.setData({

@@ -56,8 +56,6 @@ Page({
     try {
       const DataTransferManager = require('../../utils/data-transfer.js');
 
-      console.log('[Detail] 开始加载题目数据:', options);
-
       // 1. 优先使用数据传递管理器获取数据
       let questionData = DataTransferManager.getQuestionData({
         dataId: options.dataId,
@@ -66,38 +64,32 @@ Page({
       });
 
       if (questionData && this.validateQuestionData(questionData)) {
-        console.log('[Detail] 从数据传递管理器获取数据成功');
         return questionData;
       }
 
       // 2. 尝试从应用全局数据恢复
       questionData = this.recoverFromGlobalData();
       if (questionData && this.validateQuestionData(questionData)) {
-        console.log('[Detail] 从全局数据恢复成功');
         return questionData;
       }
 
       // 3. 尝试从URL参数恢复基本信息
       questionData = this.recoverFromUrlParams(options);
       if (questionData && this.validateQuestionData(questionData)) {
-        console.log('[Detail] 从URL参数恢复成功');
         return questionData;
       }
 
       // 4. 尝试从本地存储恢复（紧急情况）
       questionData = this.recoverFromLocalStorage(options);
       if (questionData && this.validateQuestionData(questionData)) {
-        console.log('[Detail] 从本地存储恢复成功');
         return questionData;
       }
 
       // 5. 处理紧急模式
       if (options.emergency === 'true') {
-        console.log('[Detail] 紧急模式，创建最小数据结构');
         return this.createEmergencyQuestionData(options);
       }
 
-      console.warn('[Detail] 所有数据恢复方式都失败');
       return null;
 
     } catch (error) {
@@ -140,7 +132,6 @@ Page({
         if (app.globalData.navigationTimestamp) {
           const elapsed = Date.now() - app.globalData.navigationTimestamp;
           if (elapsed > 5 * 60 * 1000) {
-            console.warn('[Detail] 全局数据已过期');
             return null;
           }
         }
@@ -262,15 +253,11 @@ Page({
       // 强制刷新会员状态（清除缓存）
       const memberStatus = await MemberAPI.refreshMemberStatus();
 
-      console.log('会员状态检查结果:', memberStatus);
-
       if (memberStatus.isValid) {
         // 会员用户：显示完整答案
-        console.log('用户是有效会员，显示完整答案');
         this.displayFullAnswer();
       } else {
         // 非会员用户：显示会员提示
-        console.log('用户不是会员，显示会员提示，原因:', memberStatus.reason);
         this.displayMemberPrompt(memberStatus.reason);
       }
     } catch (error) {
@@ -320,7 +307,6 @@ Page({
       }, {
         configType: 'api',
         onRetry: (attempt, delay, error) => {
-          console.log(`[Detail] 会员状态检查重试 ${attempt}，${delay}ms后执行`);
         }
       });
 
@@ -359,8 +345,6 @@ Page({
    */
   handleDataLoadError() {
     const ErrorHandler = require('../../utils/error-handler.js');
-
-    console.error('[Detail] 处理数据加载错误');
 
     // 使用增强的错误处理
     ErrorHandler.showUserFriendlyError('DATA_ERROR', {
@@ -416,7 +400,6 @@ Page({
     const ErrorHandler = require('../../utils/error-handler.js');
 
     try {
-      console.log('[Detail] 开始重试数据加载');
 
       // 使用增强的加载提示
       const loadingController = ErrorHandler.showProgressLoading('重新加载数据...', {
@@ -469,7 +452,6 @@ Page({
    * 处理重试超时
    */
   handleRetryTimeout() {
-    console.warn('[Detail] 重试数据加载超时');
 
     const ErrorHandler = require('../../utils/error-handler.js');
     ErrorHandler.showUserFriendlyError('TIMEOUT', {
@@ -543,11 +525,9 @@ Page({
         try {
           wx.removeStorageSync(key);
         } catch (e) {
-          console.warn('[Detail] 清理存储键失败:', key, e);
         }
       });
 
-      console.log('[Detail] 缓存清理完成');
     } catch (error) {
       console.error('[Detail] 清理缓存失败:', error);
     }
@@ -671,7 +651,7 @@ Page({
    */
   showMemberModal(reason = 'not_member') {
     let title = '解锁完整答案';
-    let content = '联系我的微信，开始体验完整功能\n\n微信号：csuzhangleigang';
+    let content = '📋 开通会员步骤：\n\n1. 复制你的OpenID\n2. 添加微信：csuzhangleigang\n3. 发送"开通会员+OpenID+套餐"\n\n💰 套餐：月度¥29.9 | 季度¥49.9 | 年度¥99.9';
 
     // 根据不同原因显示不同内容
     if (reason === 'network_error') {
@@ -685,36 +665,45 @@ Page({
     wx.showModal({
       title: title,
       content: content,
-      confirmText: reason === 'network_error' ? '重试' : '复制',
-      cancelText: '返回',
+      confirmText: reason === 'network_error' ? '重试' : '获取OpenID',
+      cancelText: '复制微信',
       success: (res) => {
         if (res.confirm) {
           if (reason === 'network_error') {
             // 重试检查会员状态
             this.retryMemberCheck();
           } else {
-            // 复制微信号
-            wx.setClipboardData({
-              data: 'csuzhangleigang',
+            // 跳转到个人中心查看OpenID
+            wx.switchTab({
+              url: '/pages/my/index',
               success: () => {
-                wx.showToast({
-                  title: '微信号已复制',
-                  icon: 'success'
-                })
-              },
-              fail: () => {
-                wx.showToast({
-                  title: '复制失败，请重试',
-                  icon: 'none'
-                })
+                setTimeout(() => {
+                  wx.showToast({
+                    title: '请点击"查看OpenID"',
+                    icon: 'none',
+                    duration: 3000
+                  })
+                }, 1000)
               }
             })
           }
         } else {
-          // 返回上一页
-          wx.navigateBack({
-            delta: 1
-          });
+          // 复制微信号
+          wx.setClipboardData({
+            data: 'csuzhangleigang',
+            success: () => {
+              wx.showToast({
+                title: '微信号已复制',
+                icon: 'success'
+              })
+            },
+            fail: () => {
+              wx.showToast({
+                title: '复制失败，请重试',
+                icon: 'none'
+              })
+            }
+          })
         }
       },
       fail: (error) => {
@@ -748,7 +737,6 @@ Page({
     const ErrorHandler = require('../../utils/error-handler.js');
 
     try {
-      console.log('[Detail] 开始重试会员验证');
 
       // 使用增强的加载提示
       const loadingController = ErrorHandler.showProgressLoading('验证会员状态...', {
@@ -786,7 +774,6 @@ Page({
    * 处理会员检查超时
    */
   handleMemberCheckTimeout() {
-    console.warn('[Detail] 会员验证超时');
 
     const ErrorHandler = require('../../utils/error-handler.js');
     ErrorHandler.showUserFriendlyError('TIMEOUT', {
@@ -1106,8 +1093,6 @@ ${healthStatus.responseTime ? `响应时间：${healthStatus.responseTime}ms` : 
       favoriteId: favoriteId
     });
   },
-
-
 
   // 页面显示时重新检查收藏状态
   onShow() {

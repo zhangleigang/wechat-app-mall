@@ -20,7 +20,6 @@ Page({
     })
   },
   bindMobileOk(e) {
-    console.log(e.detail); // 这里是组件里data的数据
     this.setData({
       bindMobileShow: false
     })
@@ -52,7 +51,6 @@ Page({
     }
   },
   async formSubmit(e) {
-    console.log(e);
     const postData = {
       token: wx.getStorageSync('token'),
       nick: this.data.nick
@@ -67,7 +65,6 @@ Page({
       postData.gender = this.data.genderIndex * 1 + 1
     }
     postData.extJsonStr = JSON.stringify(e.detail.value)
-    console.log(postData);
     // https://www.yuque.com/apifm/nu0f75/ykr2zr
     const res = await WXAPI.modifyUserInfoV2(postData)
     if (res.code != 0) {
@@ -86,7 +83,6 @@ Page({
     }, 1000);
   },
   async onChooseAvatar(e) {
-    console.log(e);
     const avatarUrl = e.detail.avatarUrl
     this.setData({
       avatarUrl: avatarUrl,

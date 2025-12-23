@@ -114,8 +114,6 @@ export default function(hljs) {
     hljs.REGEXP_MODE
   ];
 
-
-
   return {
     name: 'TypeScript',
     aliases: ['ts'],

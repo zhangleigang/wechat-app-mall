@@ -31,10 +31,6 @@ Component({
 				_ts.setData({tips:{state:'h2w__audio--end',text:'End'}});
 			};
 
-
-
-
-
 			// // 更新播放状态
 			// _ts.audio.onTimeUpdate = function(duration,currentTime){
 			// 	_ts.setData({
@@ -88,14 +84,10 @@ Component({
 			const _ts = this,
 				audio = _ts.audio;
 
-			// console.log(audio);
-
 			audio.isTouch = true;
 			if(audio.status === 'update' || audio.status === 'play'){
-				// console.log('pause');
 				audio.pause();
 			}else{
-				// console.log('play');
 				audio.play();
 			};
 		}

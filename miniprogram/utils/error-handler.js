@@ -199,7 +199,6 @@ function showLoading(message = '加载中...', options = {}) {
                     customMessage: '操作时间过长，请检查网络连接或稍后重试',
                     onRetry: () => {
                         // 可以在这里重新执行操作
-                        console.log('用户选择重试超时操作');
                     },
                     showAdvancedOptions: true
                 });
@@ -277,7 +276,6 @@ function showProgressLoading(message = '加载中...', options = {}) {
                     customTitle: '加载超时',
                     customMessage: '加载时间过长，请检查网络连接',
                     onRetry: () => {
-                        console.log('用户选择重试超时的加载操作');
                     },
                     showAdvancedOptions: true
                 });
@@ -467,11 +465,8 @@ class LoadingManager {
             timestamp: Date.now()
         };
 
-        console.log('[Loading Stats]', stats);
-
         // 如果加载时间过长，记录警告
         if (duration > 10000) {
-            console.warn('[Loading] 加载时间过长:', stats);
         }
     }
 
@@ -930,7 +925,6 @@ function clearApplicationCache() {
                         try {
                             wx.removeStorageSync(key);
                         } catch (e) {
-                            console.warn('清理缓存键失败:', key);
                         }
                     });
 
@@ -1161,7 +1155,6 @@ function showNetworkSettings() {
                 // 尝试打开系统设置（可能不支持）
                 wx.openSetting({
                     success: () => {
-                        console.log('打开设置成功');
                     },
                     fail: () => {
                         wx.showToast({
@@ -1302,8 +1295,6 @@ async function retryOperation(operation, options = {}) {
             if (attempt <= config.maxRetries) {
                 const delay = ErrorConfig.calculateRetryDelay(attempt, config);
 
-                console.log(`[Retry] 第 ${attempt} 次重试，${delay}ms 后执行`);
-
                 if (onRetry) {
                     onRetry(attempt, delay, error);
                 }
@@ -1343,13 +1334,10 @@ function logError(errorType, error, context = {}) {
     // 根据配置的日志级别输出
     switch (config.logLevel) {
         case 'debug':
-            console.debug('[Error Log]', logEntry);
             break;
         case 'info':
-            console.info('[Error Log]', logEntry);
             break;
         case 'warn':
-            console.warn('[Error Log]', logEntry);
             break;
         case 'error':
         default:
@@ -1391,7 +1379,6 @@ function cleanupErrorLogs() {
 
         if (validLogs.length !== logs.length) {
             wx.setStorageSync('error_logs', validLogs);
-            console.log(`[Error Log] 清理了 ${logs.length - validLogs.length} 条过期日志`);
         }
     } catch (error) {
         console.error('[Error Log] 清理日志失败:', error);

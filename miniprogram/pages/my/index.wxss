@@ -488,7 +488,7 @@
   padding-bottom: var(--space-2xl);
 }
 
-/* 订单管理徽章 */
+/* 管理功能徽章 */
 .menu-badge {
   margin-left: 10rpx;
   padding: 4rpx 12rpx;
@@ -497,4 +497,38 @@
   font-size: 20rpx;
   border-radius: 20rpx;
   font-weight: 600;
+}
+/* 使用指南高亮样式 */
+.menu-item-card.highlight {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: 2px solid #4CAF50;
+  box-shadow: 0 4rpx 16rpx rgba(102, 126, 234, 0.3);
+}
+
+.menu-item-card.highlight .menu-icon {
+  font-size: 32rpx;
+}
+
+.menu-item-card.highlight .menu-title {
+  color: white;
+  font-weight: bold;
+}
+
+.menu-item-card.highlight .menu-subtitle {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 22rpx;
+  margin-top: 4rpx;
+}
+
+.menu-item-card.highlight .menu-arrow {
+  color: white;
+  font-weight: bold;
+}
+
+.menu-subtitle {
+  display: block;
+  font-size: 24rpx;
+  color: #999;
+  margin-top: 4rpx;
 }

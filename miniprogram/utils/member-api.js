@@ -86,7 +86,6 @@ async function getMemberStatus(openid) {
             }
         }
     } catch (err) {
-        console.error('查询会员状态失败:', err)
         return {
             success: false,
             isValid: false,
@@ -139,7 +138,6 @@ async function activateMember(openid, packageId, amount) {
             }
         }
     } catch (err) {
-        console.error('激活会员失败:', err)
         return {
             success: false,
             error: err.message
@@ -191,7 +189,6 @@ async function renewMember(openid, packageId, amount) {
             }
         }
     } catch (err) {
-        console.error('续费会员失败:', err)
         return {
             success: false,
             error: err.message
@@ -199,34 +196,6 @@ async function renewMember(openid, packageId, amount) {
     }
 }
 
-/**
- * 查询订单记录
- * @param {string} openid - 用户OpenID
- * @returns {Promise<Object>}
- */
-async function getOrders(openid) {
-    try {
-        const res = await request(`/orders?openid=${openid}`)
-
-        if (res.code === 0) {
-            return {
-                success: true,
-                orders: res.data
-            }
-        } else {
-            return {
-                success: false,
-                message: res.message
-            }
-        }
-    } catch (err) {
-        console.error('查询订单失败:', err)
-        return {
-            success: false,
-            error: err.message
-        }
-    }
-}
 
 /**
  * 检查会员状态（带缓存）
@@ -326,7 +295,6 @@ async function updateUserProfile(openid, profile) {
             }
         }
     } catch (err) {
-        console.error('更新用户信息失败:', err)
         return {
             success: false,
             error: err.message
@@ -355,7 +323,6 @@ module.exports = {
     getMemberStatus,
     activateMember,
     renewMember,
-    getOrders,
     checkMemberStatus,
     refreshMemberStatus,
     updateUserProfile,

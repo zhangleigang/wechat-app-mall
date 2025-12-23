@@ -12,7 +12,6 @@ function light() {
             type: 'light'
         });
     } catch (error) {
-        console.warn('触觉反馈失败:', error);
     }
 }
 
@@ -25,7 +24,6 @@ function medium() {
             type: 'medium'
         });
     } catch (error) {
-        console.warn('触觉反馈失败:', error);
     }
 }
 
@@ -38,7 +36,6 @@ function heavy() {
             type: 'heavy'
         });
     } catch (error) {
-        console.warn('触觉反馈失败:', error);
     }
 }
 
@@ -56,7 +53,6 @@ function success() {
             });
         }, 100);
     } catch (error) {
-        console.warn('触觉反馈失败:', error);
     }
 }
 
@@ -79,7 +75,6 @@ function error() {
             });
         }, 200);
     } catch (error) {
-        console.warn('触觉反馈失败:', error);
     }
 }
 
@@ -92,7 +87,6 @@ function selection() {
             type: 'light'
         });
     } catch (error) {
-        console.warn('触觉反馈失败:', error);
     }
 }
 

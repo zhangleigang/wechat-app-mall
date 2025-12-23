@@ -168,17 +168,7 @@
     >
       批量开通非会员
     </van-button>
-    
-    <view class="action-row">
-      <van-button 
-        type="default" 
-        size="large"
-        icon="orders-o"
-        bind:click="navigateToOrders"
-      >
-        订单管理
-      </van-button>
-    </view>
+
     
     <view class="refresh-hint">
       <text>下拉刷新数据，上拉加载更多</text>

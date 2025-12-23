@@ -10,7 +10,6 @@ Page({
     memberDaysRemaining: 0,
     userInfo: null,
     shortId: '',
-    pendingOrderCount: 0,
     isAdmin: false,
   },
 
@@ -24,30 +23,17 @@ Page({
         this.loadUserInfo();
         this.loadMemberInfo();
         this.checkAdminPermission();
-        this.loadPendingOrderCount();
       } else {
         getApp().loginOK = () => {
           this.loadUserInfo();
           this.loadMemberInfo();
           this.checkAdminPermission();
-          this.loadPendingOrderCount();
         }
       }
     })
   },
 
-  // 加载待核实订单数量（仅管理员）
-  loadPendingOrderCount() {
-    if (!this.data.isAdmin) return
 
-    try {
-      const orders = wx.getStorageSync('pending_orders') || []
-      const pendingCount = orders.filter(o => o.status === 'pending_verify').length
-      this.setData({ pendingOrderCount: pendingCount })
-    } catch (error) {
-      console.error('加载订单数量失败:', error)
-    }
-  },
 
   // 加载用户信息
   async loadUserInfo() {
@@ -325,8 +311,8 @@ Page({
   goMemberPayment() {
     wx.showModal({
       title: '解锁全部功能',
-      content: '联系我的微信，开始体验完整功能\n\n微信号：csuzhangleigang',
-      confirmText: '复制',
+      content: '📋 开通会员步骤：\n\n1. 复制你的OpenID（点击下方"查看OpenID"）\n2. 添加微信：csuzhangleigang\n3. 发送"开通会员+OpenID+套餐"\n4. 完成支付后立即激活\n\n💰 套餐选择：\n月度¥29.9 | 季度¥49.9 | 年度¥99.9',
+      confirmText: '复制微信',
       cancelText: '知道了',
       success: (res) => {
         if (res.confirm) {
@@ -346,10 +332,7 @@ Page({
     })
   },
 
-  // 管理员功能导航
-  goOrderManage() {
-    wx.navigateTo({ url: '/pages/admin/orders/index' })
-  },
+
 
   goFeedbackManage() {
     wx.navigateTo({ url: '/pages/admin/feedback/index' })
@@ -360,6 +343,10 @@ Page({
   },
 
   // 普通功能导航
+  goGuide() {
+    wx.navigateTo({ url: '/pages/guide/index' })
+  },
+
   goSettings() {
     wx.navigateTo({ url: '/pages/my/setting' })
   },
@@ -384,9 +371,5 @@ Page({
     const isAdmin = adminOpenIds.includes(openid)
 
     this.setData({ isAdmin: isAdmin })
-
-    if (isAdmin) {
-      this.loadPendingOrderCount()
-    }
   }
 })

@@ -169,14 +169,12 @@ async function uploadResume(filePath, openid, originalName = null) {
                     }
                 },
                 fail: (err) => {
-                    console.error('上传请求失败:', err)
                     const errorMsg = getFriendlyErrorMessage(err.errMsg, null)
                     reject(new Error(errorMsg))
                 }
             })
         })
     } catch (err) {
-        console.error('上传简历异常:', err)
         return {
             success: false,
             message: getFriendlyErrorMessage(err.message, null)
@@ -236,7 +234,6 @@ async function getResumeList(openid, useCache = true) {
             }
         }
     } catch (err) {
-        console.error('获取简历列表失败:', err)
         const errorMsg = getFriendlyErrorMessage(err.message, null)
         return {
             success: false,
@@ -276,7 +273,6 @@ async function getResumeDetail(resumeId, openid) {
             }
         }
     } catch (err) {
-        console.error('获取简历详情失败:', err)
         const errorMsg = getFriendlyErrorMessage(err.message, null)
         return {
             success: false,
@@ -312,7 +308,6 @@ async function deleteResume(resumeId, openid) {
             }
         }
     } catch (err) {
-        console.error('删除简历失败:', err)
         const errorMsg = getFriendlyErrorMessage(err.message, null)
         return {
             success: false,
@@ -356,7 +351,6 @@ async function chatWithResume(resumeId, question, openid, conversationHistory = 
             }
         }
     } catch (err) {
-        console.error('AI问答失败:', err)
         const errorMsg = getFriendlyErrorMessage(err.message, null)
         return {
             success: false,

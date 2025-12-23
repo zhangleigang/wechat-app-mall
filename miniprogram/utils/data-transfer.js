@@ -57,13 +57,11 @@ class DataTransferManager {
             if (app) {
                 app.globalData = app.globalData || {};
                 app.globalData.currentQuestion = dataWithMeta;
-                console.log('[DataTransfer] 数据已存储到全局变量');
             }
 
             // 2. 存储到本地存储（持久化）
             const storageKey = STORAGE_PREFIX + id;
             wx.setStorageSync(storageKey, dataWithMeta);
-            console.log('[DataTransfer] 数据已存储到本地存储:', storageKey);
 
             // 3. 记录数据ID到索引（用于清理过期数据）
             this.addToIndex(id);
@@ -99,7 +97,6 @@ class DataTransferManager {
             // 1. 优先从全局变量获取
             questionData = this.getFromGlobalData();
             if (questionData && this.isDataValid(questionData, allowExpired)) {
-                console.log('[DataTransfer] 从全局变量获取数据');
                 return this.cleanMetadata(questionData);
             }
 
@@ -107,7 +104,6 @@ class DataTransferManager {
             if (dataId) {
                 questionData = this.getFromStorage(dataId);
                 if (questionData && this.isDataValid(questionData, allowExpired)) {
-                    console.log('[DataTransfer] 从本地存储获取数据');
                     // 恢复到全局变量
                     this.restoreToGlobalData(questionData);
                     return this.cleanMetadata(questionData);
@@ -117,14 +113,12 @@ class DataTransferManager {
             // 3. 从URL参数获取（兼容性降级）
             questionData = this.getFromUrlParams(urlParams);
             if (questionData) {
-                console.log('[DataTransfer] 从URL参数获取数据');
                 // 重新存储到全局变量和本地存储
                 const newId = this.setQuestionData(questionData);
                 return questionData;
             }
 
             // 4. 所有方式都失败
-            console.warn('[DataTransfer] 无法获取数据，所有数据源都失败');
             return null;
 
         } catch (error) {
@@ -146,7 +140,6 @@ class DataTransferManager {
             const app = getApp();
             if (app && app.globalData && app.globalData.currentQuestion) {
                 delete app.globalData.currentQuestion;
-                console.log('[DataTransfer] 已清理全局变量数据');
             }
 
             // 清理本地存储
@@ -154,7 +147,6 @@ class DataTransferManager {
                 const storageKey = STORAGE_PREFIX + dataId;
                 wx.removeStorageSync(storageKey);
                 this.removeFromIndex(dataId);
-                console.log('[DataTransfer] 已清理本地存储数据:', storageKey);
             }
         } catch (error) {
             console.error('[DataTransfer] 清理数据失败:', error);
@@ -182,7 +174,6 @@ class DataTransferManager {
             });
 
             if (cleanedCount > 0) {
-                console.log(`[DataTransfer] 已清理 ${cleanedCount} 个过期数据`);
             }
         } catch (error) {
             console.error('[DataTransfer] 清理过期数据失败:', error);

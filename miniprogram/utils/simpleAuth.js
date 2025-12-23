@@ -43,7 +43,6 @@ async function silentLogin() {
         let token = wx.getStorageSync('token')
 
         if (openid && token) {
-            console.log('使用已有登录信息:', { openid, token })
             return {
                 success: true,
                 data: { openid, token }
@@ -52,16 +51,13 @@ async function silentLogin() {
 
         // 2. 获取微信 code
         const code = await getWxCode()
-        console.log('获取到微信 code:', code)
 
         // 3. 判断是否使用后端API
         if (CONFIG.apiBaseUrl && CONFIG.apiBaseUrl !== 'http://localhost:3000/api') {
             // 使用后端API登录
-            console.log('使用后端API登录')
             return await loginWithBackend(code)
         } else {
             // 使用本地模拟登录
-            console.log('使用本地模拟登录')
             return await loginLocally(code)
         }
     } catch (error) {
@@ -97,8 +93,6 @@ async function loginWithBackend(code) {
                     wx.setStorageSync('nickName', res.data.data.nickName || '')
                     wx.setStorageSync('avatarUrl', res.data.data.avatarUrl || '')
 
-                    console.log('后端登录成功:', res.data.data)
-
                     resolve({
                         success: true,
                         data: res.data.data
@@ -108,12 +102,10 @@ async function loginWithBackend(code) {
                 }
             },
             fail: (err) => {
-                console.error('后端登录请求失败:', err)
                 // 生产环境不使用本地模拟登录
                 reject(new Error('登录服务暂时不可用，请稍后重试'))
 
                 // 开发环境可以取消下面的注释启用降级
-                // console.log('降级到本地登录')
                 // loginLocally(code).then(resolve).catch(reject)
             }
         })
@@ -133,8 +125,6 @@ async function loginLocally(code) {
     wx.setStorageSync('token', token)
     wx.setStorageSync('wxCode', code)
     wx.setStorageSync('loginTime', Date.now())
-
-    console.log('本地登录成功:', { openid, token })
 
     return {
         success: true,
@@ -167,8 +157,6 @@ async function phoneLogin(phoneCode) {
         wx.setStorageSync('wxCode', code)
         wx.setStorageSync('loginTime', Date.now())
 
-        console.log('手机号登录成功:', { openid, phone: mockPhone })
-
         return {
             success: true,
             data: { openid, token, phone: mockPhone }
@@ -199,7 +187,6 @@ function checkLoginStatus() {
     const expireTime = 30 * 24 * 60 * 60 * 1000 // 30天
 
     if (loginTime && (now - loginTime > expireTime)) {
-        console.log('登录已过期')
         logout()
         return false
     }
@@ -218,7 +205,6 @@ async function checkHasLogined() {
     }
 
     // 自动静默登录
-    console.log('未登录，执行自动登录...')
     const result = await silentLogin()
     return result.success
 }
@@ -250,7 +236,6 @@ function updateUserInfo(info) {
     if (info.gender !== undefined) {
         wx.setStorageSync('gender', info.gender)
     }
-    console.log('用户信息已更新:', info)
 }
 
 /**
@@ -264,7 +249,6 @@ function logout() {
     wx.removeStorageSync('avatarUrl')
     wx.removeStorageSync('wxCode')
     wx.removeStorageSync('loginTime')
-    console.log('已退出登录')
 }
 
 /**

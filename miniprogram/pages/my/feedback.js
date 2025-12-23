@@ -54,10 +54,6 @@ Page({
   // 微信联系
   contactWechat() {
     const wechat = this.data.contactInfo.wechat
-    console.log('=== 微信联系功能调试 ===')
-    console.log('微信号:', wechat)
-    console.log('微信号类型:', typeof wechat)
-    console.log('微信号长度:', wechat ? wechat.length : 'undefined')
 
     if (!wechat || wechat === 'your_wechat_id') {
       wx.showToast({
@@ -73,34 +69,25 @@ Page({
       confirmText: '复制',
       cancelText: '取消',
       success: (res) => {
-        console.log('Modal 成功回调:', res)
         if (res.confirm) {
-          console.log('用户点击了复制，准备复制微信号:', wechat)
-
-          // 尝试复制
           wx.setClipboardData({
-            data: String(wechat), // 确保是字符串
+            data: String(wechat),
             success: () => {
-              console.log('微信号复制成功!')
               wx.showToast({
                 title: '微信号已复制',
                 icon: 'success'
               })
             },
             fail: (err) => {
-              console.error('微信号复制失败:', err)
               wx.showToast({
                 title: '复制失败: ' + (err.errMsg || '未知错误'),
                 icon: 'none'
               })
             }
           })
-        } else {
-          console.log('用户取消了复制')
         }
       },
-      fail: (err) => {
-        console.error('Modal 显示失败:', err)
+      fail: () => {
         wx.showToast({
           title: 'Modal显示失败',
           icon: 'none'
@@ -112,27 +99,22 @@ Page({
   // 邮件反馈
   contactEmail() {
     const email = this.data.contactInfo.email
-    console.log('准备复制邮箱:', email)
 
     wx.showModal({
       title: '邮件反馈',
       content: `邮箱：${email}\n\n请复制邮箱地址，在邮件应用中发送反馈`,
       confirmText: '复制',
       success: (res) => {
-        console.log('邮箱 Modal 回调:', res)
         if (res.confirm) {
-          console.log('开始复制邮箱:', email)
           wx.setClipboardData({
             data: email,
             success: () => {
-              console.log('邮箱复制成功')
               wx.showToast({
                 title: '邮箱已复制',
                 icon: 'success'
               })
             },
-            fail: (err) => {
-              console.error('邮箱复制失败:', err)
+            fail: () => {
               wx.showToast({
                 title: '复制失败',
                 icon: 'none'
@@ -140,9 +122,6 @@ Page({
             }
           })
         }
-      },
-      fail: (err) => {
-        console.error('邮箱 Modal 显示失败:', err)
       }
     })
   },

@@ -17,7 +17,6 @@ class Audio{
         _ts.create();
         _ts.index = 0;
 
-        
     }
     create(){
         const _ts = this,
@@ -53,15 +52,11 @@ class Audio{
             };
             _ts.eventTimeUpdate(formatTime(_ts.duration),formatTime(_ts.currentTime));
         });
-
-        // 
         audio.onSeeked(function(){
             if(_ts.loop){
                 _ts.play();
             };
         });
-
-
 
     }
     // 播放

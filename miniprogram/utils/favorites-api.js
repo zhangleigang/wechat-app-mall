@@ -6,9 +6,7 @@
 const CONFIG = require('../config.js');
 const errorHandler = require('./error-handler.js');
 
-// ============================================
 // 缓存管理
-// ============================================
 
 // 缓存配置
 const CACHE_CONFIG = {
@@ -129,7 +127,6 @@ function request(url, method = 'GET', data = null, retryCount = 0) {
                     reject(new Error('权限不足'));
                 } else if (res.statusCode >= 500 && retryCount < 2) {
                     // 服务器错误，重试
-                    console.log(`服务器错误，重试第 ${retryCount + 1} 次`);
                     setTimeout(() => {
                         request(url, method, data, retryCount + 1)
                             .then(resolve)
@@ -142,7 +139,6 @@ function request(url, method = 'GET', data = null, retryCount = 0) {
             fail: (err) => {
                 // 网络错误，重试
                 if (retryCount < 2) {
-                    console.log(`网络错误，重试第 ${retryCount + 1} 次`);
                     setTimeout(() => {
                         request(url, method, data, retryCount + 1)
                             .then(resolve)
@@ -223,7 +219,6 @@ async function createFavorite(favoriteData) {
             return result;
         }
     } catch (err) {
-        console.error('创建收藏失败:', err);
         return {
             success: false,
             error: err.message
@@ -260,7 +255,6 @@ async function getFavorites(params) {
             const cached = getCache(cacheKey, CACHE_CONFIG.LIST_CACHE_TIME);
 
             if (cached) {
-                console.log('使用收藏列表缓存');
                 return {
                     ...cached,
                     fromCache: true
@@ -295,7 +289,6 @@ async function getFavorites(params) {
             return result;
         }
     } catch (err) {
-        console.error('获取收藏列表失败:', err);
         return {
             success: false,
             error: err.message,
@@ -325,7 +318,6 @@ async function getFavoriteDetail(id, openid) {
             return result;
         }
     } catch (err) {
-        console.error('获取收藏详情失败:', err);
         return {
             success: false,
             error: err.message
@@ -360,7 +352,6 @@ async function updateFavorite(id, updateData) {
             return result;
         }
     } catch (err) {
-        console.error('更新收藏失败:', err);
         return {
             success: false,
             error: err.message
@@ -392,7 +383,6 @@ async function deleteFavorite(id, openid) {
             return result;
         }
     } catch (err) {
-        console.error('删除收藏失败:', err);
         return {
             success: false,
             error: err.message
@@ -417,7 +407,6 @@ async function getTags(openid, forceRefresh = false) {
             );
 
             if (cached) {
-                console.log('使用标签缓存');
                 return {
                     success: true,
                     tags: cached,
@@ -453,7 +442,6 @@ async function getTags(openid, forceRefresh = false) {
             return result;
         }
     } catch (err) {
-        console.error('获取标签列表失败:', err);
         return {
             success: false,
             error: err.message,
@@ -491,7 +479,6 @@ async function addTag(favoriteId, tagName, openid) {
             return result;
         }
     } catch (err) {
-        console.error('添加标签失败:', err);
         return {
             success: false,
             error: err.message
@@ -526,7 +513,6 @@ async function removeTag(favoriteId, tagId, openid) {
             return result;
         }
     } catch (err) {
-        console.error('移除标签失败:', err);
         return {
             success: false,
             error: err.message
@@ -553,7 +539,6 @@ async function getStats(openid) {
             return result;
         }
     } catch (err) {
-        console.error('获取统计信息失败:', err);
         return {
             success: false,
             error: err.message,
@@ -576,7 +561,6 @@ function generateAnswer(question, openid, onChunk, onComplete, onError) {
     let isAborted = false;
 
     try {
-        console.log('🚀 开始生成答案（非流式）');
 
         // 创建请求任务
         requestTask = request('/favorites/generate-answer', 'POST', {
@@ -588,13 +572,10 @@ function generateAnswer(question, openid, onChunk, onComplete, onError) {
             .then(response => {
                 if (isAborted) return;
 
-                console.log('✅ 答案生成成功');
-
                 const result = handleResponse(response);
 
                 if (result.success) {
                     const answer = result.data.answer || '';
-                    console.log('📄 答案长度:', answer.length);
 
                     // 调用完成回调
                     onComplete && onComplete(answer);
@@ -610,7 +591,6 @@ function generateAnswer(question, openid, onChunk, onComplete, onError) {
             });
 
     } catch (err) {
-        console.error('❌ 请求创建失败:', err);
         onError && onError(err, false);
     }
 

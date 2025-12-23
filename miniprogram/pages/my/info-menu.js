@@ -36,7 +36,6 @@ Page({
     })
   },
   bindMobileOk(e) {
-    console.log(e.detail); // 这里是组件里data的数据
     this.setData({
       bindMobileShow: false
     })

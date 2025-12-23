@@ -73,7 +73,6 @@ Page({
           await this.selectResume(result.resumes[0].id)
         }
       } else {
-        console.error('加载简历列表失败:', result.message)
         // 网络错误时显示提示
         if (result.message && result.message.includes('网络')) {
           wx.showToast({
@@ -85,7 +84,6 @@ Page({
       }
     } catch (err) {
       wx.hideLoading()
-      console.error('加载简历列表异常:', err)
     }
   },
 
@@ -234,7 +232,6 @@ Page({
           }
         } catch (e) {
           wx.hideLoading()
-          console.error('上传失败:', e)
 
           const errorMsg = e.message || '上传失败，请检查文件格式或网络连接'
 
@@ -252,7 +249,6 @@ Page({
         }
       },
       fail: (err) => {
-        console.error('选择文件失败:', err)
       }
     })
   },
@@ -305,7 +301,6 @@ Page({
       }
     } catch (err) {
       wx.hideLoading()
-      console.error('选择简历失败:', err)
       const errorMsg = err.message || '加载简历失败，请稍后重试'
       wx.showToast({
         title: errorMsg,
@@ -425,7 +420,6 @@ Page({
       }
     } catch (err) {
       wx.hideLoading()
-      console.error('删除简历失败:', err)
       const errorMsg = err.message || '删除失败，请稍后重试'
       wx.showModal({
         title: '删除失败',
@@ -559,7 +553,6 @@ Page({
       }
 
     } catch (err) {
-      console.error('发送消息失败:', err)
       const errorMsg = err.message || 'AI服务异常，请稍后重试'
 
       // 显示错误提示

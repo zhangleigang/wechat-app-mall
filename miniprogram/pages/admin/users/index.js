@@ -36,11 +36,9 @@ Page({
     },
 
     async onShow() {
-        console.log('=== 用户管理页面显示，检查是否需要刷新数据 ===')
 
         // 如果有用户正在激活中，不重新加载数据
         if (this.hasUsersActivating()) {
-            console.log('有用户正在激活中，跳过数据重新加载')
             return
         }
 
@@ -50,11 +48,9 @@ Page({
         const shouldRefresh = (currentTime - lastRefreshTime) > 30000 // 30秒内不重复刷新
 
         if (shouldRefresh) {
-            console.log('距离上次刷新超过30秒，重新加载数据')
             await this.loadUsers()
             this.setData({ lastRefreshTime: currentTime })
         } else {
-            console.log('距离上次刷新不足30秒，仅重新计算统计数据')
             this.calculateStats()
         }
     },
@@ -69,20 +65,22 @@ Page({
             const page = refresh ? 1 : this.data.page
             const { filterStatus, searchKeyword } = this.data
 
-            console.log('=== 开始加载用户列表 ===')
-            console.log('请求参数:', { page, limit: 50, memberStatus: filterStatus })
+            // 同时获取用户列表和统计数据
+            const [userResult, statsResult] = await Promise.all([
+                AdminAPI.getUsers({
+                    page,
+                    limit: 50,
+                    memberStatus: filterStatus === 'all' ? 'all' :
+                        filterStatus === 'member' ? 'member' : 'non-member'
+                }),
+                refresh ? AdminAPI.getStats() : Promise.resolve(null)
+            ])
 
-            const result = await AdminAPI.getUsers({
-                page,
-                limit: 50,
-                memberStatus: filterStatus === 'all' ? 'all' :
-                    filterStatus === 'member' ? 'member' : 'non-member'
-            })
+            if (statsResult) {
+            }
 
-            console.log('API响应结果:', result)
-
-            if (result.code === 0) {
-                let users = result.data.users.map(user => ({
+            if (userResult.code === 0) {
+                let users = userResult.data.users.map(user => ({
                     ...user,
                     displayName: user.nick_name || '未设置昵称',
                     memberStatus: user.isMember ? '会员' : '非会员',
@@ -105,14 +103,31 @@ Page({
                     page: page,
                     hasMore: users.length === 50,
                     loading: false
-                }, () => {
-                    this.calculateStats()
                 })
 
-                console.log('用户数据已更新:', this.data.users)
+                // 更新统计数据（使用后端真实数据）
+                if (refresh && statsResult && statsResult.code === 0) {
+                    const stats = statsResult.data
+
+                    const newStats = {
+                        total: stats.totalUsers || 0,
+                        members: stats.validMembers || 0,
+                        nonMembers: (stats.totalUsers || 0) - (stats.validMembers || 0)
+                    }
+
+                    this.setData({
+                        stats: newStats
+                    })
+                } else {
+                    if (statsResult) {
+                    }
+
+                    // 如果统计API失败，回退到基于当前用户列表计算
+                    this.calculateStats()
+                }
+
             } else {
-                console.error('API返回错误:', result)
-                throw new Error(result.msg || '加载失败')
+                throw new Error(userResult.msg || '加载失败')
             }
         } catch (error) {
             console.error('加载用户失败:', error)
@@ -127,8 +142,6 @@ Page({
     // 计算统计数据
     calculateStats() {
         const allUsers = this.data.users || []
-        console.log('=== 开始重新计算统计数据 ===')
-        console.log('当前用户总数:', allUsers.length)
 
         const members = allUsers.filter(u => u.isMember).length
         const nonMembers = allUsers.filter(u => !u.isMember).length
@@ -146,7 +159,6 @@ Page({
         })
 
         this.setData({ stats: newStats })
-        console.log('=== 统计数据计算完成 ===')
     },
 
     // 筛选用户
@@ -337,7 +349,6 @@ Page({
         this.setData({ users })
 
         try {
-            console.log(`开始激活用户: ${user.displayName} (OpenID: ${user.openid})`)
 
             const result = await AdminAPI.activateMember({
                 openid: user.openid,
@@ -345,7 +356,6 @@ Page({
             })
 
             if (result.code === 0) {
-                console.log(`用户 ${user.displayName} 激活成功`)
 
                 // 更新用户状态
                 users[index].isMember = true
@@ -362,8 +372,6 @@ Page({
                     title: '会员开通成功',
                     icon: 'success'
                 })
-
-                console.log(`用户 ${user.displayName} 激活流程完成`)
 
             } else {
                 throw new Error(result.msg || '激活失败')
@@ -429,14 +437,12 @@ Page({
 
                 if (result.code === 0) {
                     successCount++
-                    console.log(`用户 ${users[i].displayName} 激活成功`)
                 } else {
                     failCount++
                     failedUsers.push({
                         name: users[i].displayName,
                         reason: result.msg || '未知错误'
                     })
-                    console.error(`用户 ${users[i].displayName} 激活失败:`, result.msg)
                 }
             } catch (error) {
                 failCount++
@@ -482,7 +488,6 @@ Page({
 
     // 下拉刷新
     async onPullDownRefresh() {
-        console.log('=== 用户触发下拉刷新 ===')
 
         if (this.hasUsersActivating()) {
             wx.showToast({
@@ -495,7 +500,6 @@ Page({
 
         try {
             await this.loadUsers(true)
-            console.log('下拉刷新完成')
         } catch (error) {
             console.error('下拉刷新失败:', error)
         } finally {
@@ -530,17 +534,11 @@ Page({
         })
     },
 
-    // 导航到订单管理页面
-    navigateToOrders() {
-        wx.navigateTo({
-            url: '/pages/admin/orders/index'
-        })
-    },
+
 
     // 检查管理员权限
     checkAdminPermission() {
         const openid = wx.getStorageSync('openid')
-        console.log('当前用户 openid:', openid)
 
         // 管理员 OpenID 列表
         const adminOpenIds = [
@@ -548,7 +546,6 @@ Page({
         ]
 
         const isAdmin = adminOpenIds.includes(openid)
-        console.log('是否为管理员:', isAdmin)
         return isAdmin
     }
 })

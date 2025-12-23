@@ -83,6 +83,16 @@
 
     <!-- 功能菜单 -->
     <view class="menu-section">
+      <!-- 使用指南 - 置顶显示 -->
+      <view class="menu-item-card highlight" bindtap="goGuide">
+        <view class="menu-item-left">
+          <text class="menu-icon">📖</text>
+          <text class="menu-title">使用指南</text>
+          <text class="menu-subtitle">如何开通会员？功能怎么用？</text>
+        </view>
+        <text class="menu-arrow">→</text>
+      </view>
+      
       <!-- 会员权益按钮暂时隐藏 -->
       <view wx:if="{{false}}" class="menu-item-card" bindtap="goMemberBenefits">
         <view class="menu-item-left">
@@ -100,15 +110,7 @@
         </view>
         <text class="menu-arrow">→</text>
       </view>
-      
-      <view wx:if="{{isAdmin}}" class="menu-item-card" bindtap="goOrderManage">
-        <view class="menu-item-left">
-          <text class="menu-icon">📋</text>
-          <text class="menu-title">订单管理</text>
-          <text class="menu-badge" wx:if="{{pendingOrderCount > 0}}">{{pendingOrderCount}}</text>
-        </view>
-        <text class="menu-arrow">→</text>
-      </view>
+
       
       <view wx:if="{{isAdmin}}" class="menu-item-card" bindtap="goFeedbackManage">
         <view class="menu-item-left">

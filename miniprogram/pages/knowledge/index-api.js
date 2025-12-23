@@ -49,7 +49,6 @@ Page({
 
             // 尝试降级到本地数据
             if (this.data.useApi && localKnowledge) {
-                console.log('降级到本地数据');
                 this.setData({ useApi: false });
                 this.loadFromLocal();
                 this.loadQuestions();
@@ -106,7 +105,6 @@ Page({
             loading: false
         });
 
-        console.log('从本地加载成功');
     },
 
     /**

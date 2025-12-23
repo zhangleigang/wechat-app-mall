@@ -20,7 +20,6 @@ Page({
     async checkAutoLogin() {
         const isLogined = SimpleAuth.checkLoginStatus()
         if (isLogined) {
-            console.log('已登录，跳转到首页')
             wx.showToast({
                 title: '欢迎回来',
                 icon: 'success'
@@ -37,7 +36,6 @@ Page({
     onChooseAvatar(e) {
         const { avatarUrl } = e.detail
         this.setData({ avatarUrl })
-        console.log('选择头像:', avatarUrl)
 
         wx.showToast({
             title: '头像已选择',
@@ -51,7 +49,6 @@ Page({
      */
     onNicknameInput(e) {
         this.setData({ nickname: e.detail.value })
-        console.log('输入昵称:', e.detail.value)
     },
 
     /**
@@ -92,11 +89,8 @@ Page({
                     icon: 'success'
                 })
 
-                console.log('登录成功，用户信息已保存')
-
                 // 延迟跳转
                 setTimeout(() => {
-                    console.log('准备执行跳转...');
                     this.navigateToHome();
                 }, 1500);
             } else {
@@ -137,11 +131,8 @@ Page({
                     icon: 'success'
                 })
 
-                console.log('登录成功:', result.data)
-
                 // 延迟跳转，让用户看到成功提示
                 setTimeout(() => {
-                    console.log('快速登录成功，准备跳转...');
                     this.navigateToHome();
                 }, 1500);
             } else {
@@ -171,8 +162,6 @@ Page({
             return
         }
 
-        console.log('手机号授权结果:', e.detail)
-
         if (e.detail.errMsg === 'getPhoneNumber:ok') {
             this.setData({ loading: true })
 
@@ -184,8 +173,6 @@ Page({
                         title: '登录成功',
                         icon: 'success'
                     })
-
-                    console.log('手机号登录成功:', result.data)
 
                     setTimeout(() => {
                         this.navigateToHome()
@@ -204,7 +191,6 @@ Page({
                 this.setData({ loading: false })
             }
         } else if (e.detail.errMsg === 'getPhoneNumber:fail user deny') {
-            console.log('用户拒绝授权手机号')
         }
     },
 
@@ -231,13 +217,11 @@ Page({
      * 跳转到首页
      */
     navigateToHome() {
-        console.log('准备跳转到首页...');
 
         // 跳转到 tabBar 的第一个页面（面试知识）
         wx.switchTab({
             url: '/pages/knowledge/index',
             success: () => {
-                console.log('跳转到面试知识页面成功');
             },
             fail: (error) => {
                 console.error('switchTab 失败:', error);
@@ -245,10 +229,8 @@ Page({
                 wx.reLaunch({
                     url: '/pages/knowledge/index',
                     success: () => {
-                        console.log('reLaunch 跳转成功');
                     },
                     fail: (err) => {
-                        console.error('reLaunch 也失败:', err);
                     }
                 });
             }

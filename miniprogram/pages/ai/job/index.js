@@ -138,7 +138,6 @@ Page({
       this.saveConversation()
 
     } catch (err) {
-      console.error('发送消息失败:', err)
       wx.showToast({
         title: err.message || 'AI服务异常',
         icon: 'none'

@@ -50,7 +50,6 @@ function isValidOrderStatus(status) {
  */
 function getStatusDisplayText(status) {
     if (!isValidOrderStatus(status)) {
-        console.warn(`Invalid order status: ${status}`);
         return `无效状态(${status})`;
     }
     return STATUS_DISPLAY[status];
@@ -63,7 +62,6 @@ function getStatusDisplayText(status) {
  */
 function getStatusMapping(status) {
     if (!isValidOrderStatus(status)) {
-        console.warn(`Invalid order status: ${status}`);
         return 'unknown';
     }
     return STATUS_MAPPING[status];
@@ -85,7 +83,6 @@ function getStatusFromMapping(statusString) {
  */
 function mapOrderStatus(order) {
     if (!order || typeof order.status === 'undefined') {
-        console.warn('Order object missing or has no status field');
         return order;
     }
 
@@ -161,18 +158,15 @@ function getValidStatusValues() {
  */
 function validateOrderList(orders) {
     if (!Array.isArray(orders)) {
-        console.warn('Orders is not an array:', orders);
         return [];
     }
 
     return orders.map((order, index) => {
         if (!order) {
-            console.warn(`Order at index ${index} is null or undefined`);
             return order;
         }
 
         if (typeof order.status === 'undefined') {
-            console.warn(`Order at index ${index} missing status field:`, order);
             return order;
         }
 
@@ -180,7 +174,6 @@ function validateOrderList(orders) {
         if (typeof order.status === 'string') {
             const statusCode = getStatusFromMapping(order.status);
             if (statusCode === null) {
-                console.warn(`Order at index ${index} has invalid status string: ${order.status}`);
             }
             return order;
         }
@@ -188,12 +181,10 @@ function validateOrderList(orders) {
         // If status is a number, validate it
         if (typeof order.status === 'number') {
             if (!isValidOrderStatus(order.status)) {
-                console.warn(`Order at index ${index} has invalid status code: ${order.status}`);
             }
             return mapOrderStatus(order);
         }
 
-        console.warn(`Order at index ${index} has unexpected status type:`, typeof order.status, order.status);
         return order;
     });
 }

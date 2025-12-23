@@ -138,7 +138,6 @@ Page({
      * 处理加载超时
      */
     handleLoadTimeout() {
-        console.warn('[Knowledge] 加载超时');
 
         this.setData({
             error: '加载超时，请检查网络连接',
@@ -264,7 +263,6 @@ Page({
         const ErrorHandler = require('../../utils/error-handler.js');
 
         try {
-            console.log('[Knowledge] 开始重试加载');
 
             this.setData({
                 loading: true,
@@ -277,7 +275,6 @@ Page({
             }, {
                 configType: 'api',
                 onRetry: (attempt, delay, error) => {
-                    console.log(`[Knowledge] 第 ${attempt} 次重试，${delay}ms 后执行`);
                     wx.showToast({
                         title: `重试中... (${attempt}/3)`,
                         icon: 'loading',
@@ -550,6 +547,13 @@ ${healthStatus.responseTime ? `响应时间：${healthStatus.responseTime}ms` : 
         throw new Error('本地数据已禁用，请使用 API 模式');
     },
 
+    // 跳转到使用指南
+    goGuide() {
+        wx.navigateTo({
+            url: '/pages/guide/index'
+        })
+    },
+
     /**
      * 切换分类
      */
@@ -631,7 +635,7 @@ ${healthStatus.responseTime ? `响应时间：${healthStatus.responseTime}ms` : 
             };
 
             // 记录跳转尝试
-            console.log(`[Navigation] 尝试跳转到题目详情页 (第${retryCount + 1}次)`, {
+            this.logNavigationAttempt({
                 questionId: question.id,
                 category: this.data.activeCategoryKey,
                 retryCount
@@ -651,7 +655,6 @@ ${healthStatus.responseTime ? `响应时间：${healthStatus.responseTime}ms` : 
 
             // 判断是否需要重试
             if (retryCount < MAX_RETRIES && this.isRetryableError(error)) {
-                console.log(`[Navigation] 将在 ${RETRY_DELAY}ms 后进行第${retryCount + 2}次重试`);
 
                 // 显示重试提示
                 if (retryCount === 0) {
@@ -725,17 +728,14 @@ ${healthStatus.responseTime ? `响应时间：${healthStatus.responseTime}ms` : 
             wx.navigateTo({
                 url: primaryUrl,
                 success: (res) => {
-                    console.log('[Navigation] 主要跳转成功');
                     resolve(res);
                 },
                 fail: (error) => {
-                    console.warn('[Navigation] 主要跳转失败，尝试降级方案:', error);
 
                     // 尝试降级跳转
                     wx.navigateTo({
                         url: fallbackUrl,
                         success: (res) => {
-                            console.log('[Navigation] 降级跳转成功');
                             resolve(res);
                         },
                         fail: (fallbackError) => {
@@ -757,7 +757,6 @@ ${healthStatus.responseTime ? `响应时间：${healthStatus.responseTime}ms` : 
      */
     async tryEmergencyNavigation(questionData) {
         return new Promise((resolve, reject) => {
-            console.log('[Navigation] 尝试紧急跳转方案');
 
             // 使用最简单的URL，只传递必要参数
             const emergencyUrl = `/pages/knowledge/detail?id=${encodeURIComponent(questionData.id)}&emergency=true`;
@@ -765,7 +764,6 @@ ${healthStatus.responseTime ? `响应时间：${healthStatus.responseTime}ms` : 
             wx.navigateTo({
                 url: emergencyUrl,
                 success: (res) => {
-                    console.log('[Navigation] 紧急跳转成功');
                     resolve(res);
                 },
                 fail: (error) => {
@@ -818,6 +816,18 @@ ${healthStatus.responseTime ? `响应时间：${healthStatus.responseTime}ms` : 
     },
 
     /**
+     * 记录跳转尝试日志
+     */
+    logNavigationAttempt(attemptData) {
+        try {
+            // 简单的尝试记录，不做复杂处理
+            // 在生产环境中可以发送到分析服务
+        } catch (error) {
+            // 静默失败，不影响主要功能
+        }
+    },
+
+    /**
      * 记录跳转错误日志
      */
     logNavigationError(error, question, retryCount) {
@@ -855,7 +865,6 @@ ${healthStatus.responseTime ? `响应时间：${healthStatus.responseTime}ms` : 
      * 处理跳转失败
      */
     handleNavigationFailure(error, question, retryCount) {
-        console.error('[Navigation] 所有跳转方式都失败，显示错误提示');
 
         // 根据错误类型确定错误信息
         let customMessage = '页面跳转失败，请重试';
@@ -911,7 +920,6 @@ ${healthStatus.responseTime ? `响应时间：${healthStatus.responseTime}ms` : 
 
             wx.setStorageSync('navigation_failures', failures);
 
-            console.log('[Navigation] 跳转失败记录已保存:', failureRecord);
         } catch (storageError) {
             console.error('[Navigation] 保存失败记录出错:', storageError);
         }
@@ -957,7 +965,6 @@ ${healthStatus.responseTime ? `响应时间：${healthStatus.responseTime}ms` : 
      * 注意：此方法已被新的 navigateToDetail 方法替代
      */
     fallbackNavigation(question) {
-        console.warn('[Navigation] 使用旧的降级跳转方案，建议使用新的 navigateToDetail 方法');
 
         // 直接调用新的跳转方法
         this.navigateToDetail(question, null, 0);
@@ -1063,7 +1070,6 @@ ${healthStatus.responseTime ? `响应时间：${healthStatus.responseTime}ms` : 
 
                 // 检查是否在合理时间内
                 if (Date.now() - timestamp < 30000) { // 30秒内
-                    console.log('[Navigation] 发现待处理的跳转，继续执行');
                     this.navigateToDetail(question, null, 0);
                 }
 
@@ -1140,10 +1146,7 @@ ${healthStatus.responseTime ? `响应时间：${healthStatus.responseTime}ms` : 
     testNavigation() {
         if (this.data.allQuestions && this.data.allQuestions.length > 0) {
             const testQuestion = this.data.allQuestions[0];
-            console.log('[Test] 测试跳转功能:', testQuestion);
             this.navigateToDetail(testQuestion, null, 0);
-        } else {
-            console.warn('[Test] 没有可用的题目进行测试');
         }
     }
 });
