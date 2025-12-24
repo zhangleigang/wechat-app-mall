@@ -665,7 +665,7 @@ Page({
     wx.showModal({
       title: title,
       content: content,
-      confirmText: reason === 'network_error' ? '重试' : '获取OpenID',
+      confirmText: reason === 'network_error' ? '重试' : '获取',
       cancelText: '复制微信',
       success: (res) => {
         if (res.confirm) {
@@ -999,7 +999,7 @@ ${healthStatus.responseTime ? `响应时间：${healthStatus.responseTime}ms` : 
     wx.showModal({
       title: '联系客服',
       content: supportInfo,
-      confirmText: '复制微信号',
+      confirmText: '复制',
       cancelText: '关闭',
       success: (res) => {
         if (res.confirm) {

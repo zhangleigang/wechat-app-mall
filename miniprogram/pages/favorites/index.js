@@ -451,7 +451,7 @@ Page({
         wx.showModal({
             title: '解锁无限收藏',
             content: '联系我的微信，开始体验无限收藏功能\n\n微信号：csuzhangleigang',
-            confirmText: '复制微信号',
+            confirmText: '复制',
             cancelText: '知道了',
             success: (res) => {
                 if (res.confirm) {

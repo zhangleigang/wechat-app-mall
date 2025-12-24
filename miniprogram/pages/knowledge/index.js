@@ -522,7 +522,7 @@ ${healthStatus.responseTime ? `响应时间：${healthStatus.responseTime}ms` : 
         wx.showModal({
             title: '技术支持',
             content: supportInfo,
-            confirmText: '复制微信号',
+            confirmText: '复制',
             cancelText: '关闭',
             success: (res) => {
                 if (res.confirm) {
