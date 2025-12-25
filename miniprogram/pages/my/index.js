@@ -371,5 +371,46 @@ Page({
     const isAdmin = adminOpenIds.includes(openid)
 
     this.setData({ isAdmin: isAdmin })
+  },
+
+  /**
+   * 分享配置 - 个人中心
+   */
+  onShareAppMessage(options) {
+    const { from, target } = options || {};
+    const { memberInfo, nick } = this.data;
+
+    // 检测分享目标类型
+    const isGroupShare = target && target.includes('group');
+
+    // 构建分享路径
+    const sharePath = `/pages/knowledge/index?from=share&source=my_center&target=${isGroupShare ? 'group' : 'private'}`;
+
+    if (isGroupShare) {
+      // 群聊分享 - 推广工具
+      return {
+        title: 'AI面试助手 - 大数据面试神器，群友一起刷题提升！',
+        path: sharePath,
+        imageUrl: '' // 使用默认分享图片
+      };
+    } else {
+      // 私聊分享 - 个人推荐
+      if (memberInfo && memberInfo.isValid) {
+        // 会员用户分享
+        const userName = nick && nick !== '未登录' ? nick : '我';
+        return {
+          title: `${userName}正在用AI面试助手准备大数据面试，推荐给你！`,
+          path: sharePath,
+          imageUrl: '' // 使用默认分享图片
+        };
+      } else {
+        // 普通用户分享
+        return {
+          title: 'AI面试助手 - 大数据面试必备神器，AI智能解读简历！',
+          path: sharePath,
+          imageUrl: '' // 使用默认分享图片
+        };
+      }
+    }
   }
 })

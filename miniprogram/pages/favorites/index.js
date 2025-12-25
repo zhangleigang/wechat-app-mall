@@ -578,5 +578,56 @@ Page({
         }
 
         return `${year}-${month}-${day}`;
+    },
+
+    /**
+     * 分享配置 - 我的收藏页
+     */
+    onShareAppMessage(options) {
+        const { from, target } = options || {};
+        const { favorites, activeTag, quotaInfo, total } = this.data;
+
+        // 检测分享目标类型
+        const isGroupShare = target && target.includes('group');
+
+        // 获取收藏统计信息
+        const favoriteCount = total || favorites.length;
+        const tagText = activeTag ? `#${activeTag}` : '';
+
+        // 构建分享路径
+        const sharePath = `/pages/favorites/index?from=share&target=${isGroupShare ? 'group' : 'private'}`;
+
+        if (isGroupShare) {
+            // 群聊分享 - 强调学习价值
+            if (favoriteCount > 0) {
+                return {
+                    title: `我的面试收藏 - ${favoriteCount}道精选题目${tagText}，群友一起学习！`,
+                    path: sharePath,
+                    imageUrl: '' // 使用默认分享图片
+                };
+            } else {
+                return {
+                    title: 'AI面试助手收藏功能 - 群友一起收藏好题，提升面试成功率！',
+                    path: sharePath,
+                    imageUrl: '' // 使用默认分享图片
+                };
+            }
+        } else {
+            // 私聊分享 - 个人推荐
+            if (favoriteCount > 0) {
+                const memberText = quotaInfo.unlimited ? '会员' : '';
+                return {
+                    title: `我的面试收藏${memberText} - ${favoriteCount}道精选题目${tagText}，推荐给你！`,
+                    path: sharePath,
+                    imageUrl: '' // 使用默认分享图片
+                };
+            } else {
+                return {
+                    title: 'AI面试助手收藏功能 - 收藏好题，随时复习，提升面试竞争力！',
+                    path: sharePath,
+                    imageUrl: '' // 使用默认分享图片
+                };
+            }
+        }
     }
 });

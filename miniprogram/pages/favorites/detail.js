@@ -708,39 +708,58 @@ Page({
     },
 
     /**
-     * 分享到好友
+     * 分享到好友 - 优化版
      */
-    onShareAppMessage() {
+    onShareAppMessage(options) {
+        const { from, target } = options || {};
         const { favorite } = this.data;
+
+        // 检测分享目标类型
+        const isGroupShare = target && target.includes('group');
 
         if (!favorite) {
             return {
                 title: 'AI面试助手 - 我的收藏',
-                path: '/pages/favorites/index'
+                path: '/pages/favorites/index?from=share'
             };
         }
 
-        // 获取问题预览（前30个字符）
+        // 获取问题预览和标签信息
         const questionPreview = favorite.question.length > 30
             ? favorite.question.substring(0, 30) + '...'
             : favorite.question;
 
-        // 获取来源标签
-        const sourceLabel = favorite.sourceType === 'knowledge'
-            ? '知识库'
-            : favorite.sourceType === 'resume'
-                ? '简历解读'
-                : '自定义';
+        const sourceLabel = this.getSourceLabel(favorite.sourceType);
+        const tagsText = favorite.tags && favorite.tags.length > 0
+            ? `#${favorite.tags.slice(0, 2).join(' #')}`
+            : '';
 
-        return {
-            title: `【${sourceLabel}】${questionPreview}`,
-            path: `/pages/favorites/detail?id=${favorite.id}`,
-            imageUrl: '' // 可以设置分享图片
-        };
+        // 构建分享路径
+        const sharePath = `/pages/favorites/detail?id=${favorite.id}&from=share&target=${isGroupShare ? 'group' : 'private'}`;
+
+        if (isGroupShare) {
+            // 群聊分享 - 强调学习价值
+            return {
+                title: `【${sourceLabel}】${questionPreview} - 群友一起学习面试题！`,
+                path: sharePath,
+                imageUrl: '' // 使用默认分享图片
+            };
+        } else {
+            // 私聊分享 - 个性化推荐
+            const shareTitle = tagsText
+                ? `【${sourceLabel}】${questionPreview} ${tagsText} - 我觉得这道题很有价值！`
+                : `【${sourceLabel}】${questionPreview} - 推荐一道面试好题！`;
+
+            return {
+                title: shareTitle,
+                path: sharePath,
+                imageUrl: '' // 使用默认分享图片
+            };
+        }
     },
 
     /**
-     * 分享到朋友圈（需要开通）
+     * 分享到朋友圈（需要开通）- 优化版
      */
     onShareTimeline() {
         const { favorite } = this.data;
@@ -751,15 +770,30 @@ Page({
             };
         }
 
-        // 获取问题预览
-        const questionPreview = favorite.question.length > 30
-            ? favorite.question.substring(0, 30) + '...'
+        // 获取问题预览和来源
+        const questionPreview = favorite.question.length > 25
+            ? favorite.question.substring(0, 25) + '...'
             : favorite.question;
 
+        const sourceLabel = this.getSourceLabel(favorite.sourceType);
+
         return {
-            title: `${questionPreview} - AI面试助手`,
-            query: `id=${favorite.id}`,
-            imageUrl: '' // 可以设置分享图片
+            title: `【${sourceLabel}面试题】${questionPreview} - AI面试助手`,
+            query: `id=${favorite.id}&from=timeline`,
+            imageUrl: '' // 使用默认分享图片
         };
+    },
+
+    /**
+     * 获取来源标签
+     */
+    getSourceLabel(sourceType) {
+        const sourceLabels = {
+            'knowledge': '知识库',
+            'resume': '简历解读',
+            'custom': '自定义',
+            'ai_generated': 'AI生成'
+        };
+        return sourceLabels[sourceType] || '收藏';
     }
 });

@@ -1148,5 +1148,48 @@ ${healthStatus.responseTime ? `响应时间：${healthStatus.responseTime}ms` : 
             const testQuestion = this.data.allQuestions[0];
             this.navigateToDetail(testQuestion, null, 0);
         }
+    },
+
+    /**
+     * 分享配置 - 知识库列表页
+     */
+    onShareAppMessage(options) {
+        const { from, target } = options || {};
+        const { activeCategoryKey, categories, allQuestions } = this.data;
+
+        // 检测分享目标类型
+        const isGroupShare = target && target.includes('group');
+
+        // 获取当前分类信息
+        const currentCategory = categories.find(c => c.key === activeCategoryKey);
+        const categoryName = currentCategory ? currentCategory.name : '大数据面试';
+        const questionCount = allQuestions ? allQuestions.length : 0;
+
+        // 构建分享路径
+        const sharePath = `/pages/knowledge/index?from=share&category=${activeCategoryKey}&target=${isGroupShare ? 'group' : 'private'}`;
+
+        if (isGroupShare) {
+            // 群聊分享 - 强调学习价值和题目数量
+            return {
+                title: `${categoryName}面试题库 - ${questionCount}道精选题目，群友一起刷题提升！`,
+                path: sharePath,
+                imageUrl: '' // 使用默认分享图片
+            };
+        } else {
+            // 私聊分享 - 个人推荐
+            if (questionCount > 0) {
+                return {
+                    title: `推荐${categoryName}面试题库 - ${questionCount}道精选题目，助你面试成功！`,
+                    path: sharePath,
+                    imageUrl: '' // 使用默认分享图片
+                };
+            } else {
+                return {
+                    title: `大数据面试题库 - 精选面试题目，提升面试竞争力！`,
+                    path: sharePath,
+                    imageUrl: '' // 使用默认分享图片
+                };
+            }
+        }
     }
 });

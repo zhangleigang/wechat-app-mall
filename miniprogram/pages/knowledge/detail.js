@@ -1102,11 +1102,36 @@ ${healthStatus.responseTime ? `响应时间：${healthStatus.responseTime}ms` : 
     }
   },
 
-  onShareAppMessage() {
-    return {
-      title: this.data.question,
-      path: `/pages/knowledge/detail?question=${encodeURIComponent(this.data.question)}&answer=${encodeURIComponent(this.data.answer)}`,
-      imageUrl: ''
+  /**
+   * 分享配置 - 优化版
+   */
+  onShareAppMessage(options) {
+    const { from, target } = options || {};
+    const { currentItem, question, category, categoryName } = this.data;
+
+    // 检测分享目标类型
+    const isGroupShare = target && target.includes('group');
+
+    // 构建分享路径，包含更多上下文信息
+    const sharePath = currentItem?.id
+      ? `/pages/knowledge/detail?id=${currentItem.id}&from=share&category=${category || ''}`
+      : `/pages/knowledge/detail?question=${encodeURIComponent(question)}&category=${category || ''}&from=share`;
+
+    // 根据分享场景定制内容
+    if (isGroupShare) {
+      return {
+        title: `${question} - 大数据面试题，群友一起学习！`,
+        path: sharePath + '&target=group',
+        imageUrl: '' // 使用默认分享图片
+      };
+    } else {
+      // 私聊分享
+      const categoryText = categoryName ? `【${categoryName}】` : '';
+      return {
+        title: `${categoryText}${question} - 大数据面试必考题`,
+        path: sharePath + '&target=private',
+        imageUrl: '' // 使用默认分享图片
+      };
     }
   }
 })

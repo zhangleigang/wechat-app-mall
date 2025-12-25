@@ -24,7 +24,7 @@ Page({
       '用STAR原则解读这份简历'
     ]
   },
-  async onLoad() {
+  async onLoad(options) {
     this.setData({ sessionId: Date.now() + '' })
     wx.setNavigationBarTitle({ title: '简历解读' })
 
@@ -849,13 +849,87 @@ Page({
   },
 
   /**
-   * 分享
+   * 分享配置 - 优化版
    */
-  onShareAppMessage() {
-    return {
-      title: '简历解读 - AI智能分析简历',
-      path: '/pages/ai/resume/index',
-      imageUrl: ''
+  onShareAppMessage(options) {
+    const { from, target } = options || {};
+    const { activeResumeId, resumeList, messages } = this.data;
+
+    // 检测分享目标类型
+    const isGroupShare = target && target.includes('group');
+
+    // 获取当前简历信息
+    const activeResume = activeResumeId ?
+      resumeList.find(r => r.id === activeResumeId) : null;
+
+    // 分析对话中的亮点（简单提取）
+    const analysisHighlight = this.extractAnalysisHighlight();
+
+    // 构建分享路径
+    const sharePath = `/pages/ai/resume/index?from=share&target=${isGroupShare ? 'group' : 'private'}`;
+
+    if (isGroupShare) {
+      // 群聊分享 - 强调工具价值
+      return {
+        title: 'AI简历解读神器 - 群友一起优化简历，提升面试成功率！',
+        path: sharePath,
+        imageUrl: '' // 使用默认分享图片
+      };
+    } else {
+      // 私聊分享 - 个性化内容
+      if (analysisHighlight) {
+        return {
+          title: `我的简历分析结果：${analysisHighlight} - 快来试试AI简历解读！`,
+          path: sharePath,
+          imageUrl: '' // 使用默认分享图片
+        };
+      } else if (activeResume) {
+        return {
+          title: `AI帮我分析了简历，发现了很多亮点 - 推荐你也试试！`,
+          path: sharePath,
+          imageUrl: '' // 使用默认分享图片
+        };
+      } else {
+        return {
+          title: 'AI简历解读 - 发现简历亮点，提升面试成功率',
+          path: sharePath,
+          imageUrl: '' // 使用默认分享图片
+        };
+      }
+    }
+  },
+
+  /**
+   * 提取分析亮点用于分享
+   */
+  extractAnalysisHighlight() {
+    try {
+      const { messages } = this.data;
+
+      // 查找包含"亮点"、"优势"、"特长"等关键词的AI回复
+      const highlightKeywords = ['亮点', '优势', '特长', '突出', '擅长', '经验丰富'];
+
+      for (let i = messages.length - 1; i >= 0; i--) {
+        const message = messages[i];
+        if (message.role === 'assistant' && message.content) {
+          for (const keyword of highlightKeywords) {
+            if (message.content.includes(keyword)) {
+              // 提取包含关键词的句子（简化版）
+              const sentences = message.content.split(/[。！？\n]/);
+              for (const sentence of sentences) {
+                if (sentence.includes(keyword) && sentence.length > 10 && sentence.length < 50) {
+                  return sentence.trim();
+                }
+              }
+            }
+          }
+        }
+      }
+
+      return null;
+    } catch (error) {
+      console.error('提取分析亮点失败:', error);
+      return null;
     }
   }
 })
