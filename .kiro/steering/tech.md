@@ -24,7 +24,7 @@
 
 ## 后端服务
 
-**AI服务** - 自定义AI后端，提供岗位分析、简历解析、情绪支持
+**AI服务** - 自定义AI后端，提供简历解析
 - 协议：HTTPS + RESTful API
 - 认证：Bearer Token
 - 格式：JSON
@@ -113,7 +113,7 @@ pm2 restart ai-interview-helper
 **请求格式**
 ```json
 {
-  "scene": "job|resume|mood",
+  "scene": "resume",
   "messages": [...],
   "userId": "xxx",
   "sessionId": "xxx"

@@ -36,9 +36,7 @@ ai-interview-helper/
 按功能区域组织，每个页面包含4个文件：
 
 **AI功能** (`pages/ai/`)
-- `job/` - 岗位描述分析
 - `resume/` - 简历解析和优化
-- `mood/` - 情绪支持和压力管理
 
 **知识库** (`pages/knowledge/`)
 - `index.js` - 分类浏览和搜索
