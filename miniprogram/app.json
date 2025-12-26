@@ -7,13 +7,9 @@
     "pages/favorites/detail",
     "pages/my/index",
     "pages/my/setting",
-    "pages/my/feedback",
     "pages/guide/index",
     "pages/login/simple",
-    "pages/ai/job/index",
-    "pages/ai/mood/index",
-    "pages/admin/users/index",
-    "pages/admin/feedback/index"
+    "pages/admin/users/index"
   ],
   "requiredPrivateInfos": [],
   "subpackages": [],

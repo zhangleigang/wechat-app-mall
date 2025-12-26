@@ -37,7 +37,7 @@ function chat({ scene, messages, sessionId }) {
       method: 'POST',
       header: _headers(),
       data: {
-        scene, // 'job' | 'resume' | 'mood'
+        scene, // 'resume'
         sessionId,
         userId,
         token,

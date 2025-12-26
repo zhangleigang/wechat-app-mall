@@ -334,10 +334,6 @@ Page({
 
 
 
-  goFeedbackManage() {
-    wx.navigateTo({ url: '/pages/admin/feedback/index' })
-  },
-
   goUserManage() {
     wx.navigateTo({ url: '/pages/admin/users/index' })
   },
@@ -349,10 +345,6 @@ Page({
 
   goSettings() {
     wx.navigateTo({ url: '/pages/my/setting' })
-  },
-
-  goFeedback() {
-    wx.navigateTo({ url: '/pages/my/feedback' })
   },
 
   // 头像加载错误处理

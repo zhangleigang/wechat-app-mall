@@ -111,27 +111,10 @@
         <text class="menu-arrow">→</text>
       </view>
 
-      
-      <view wx:if="{{isAdmin}}" class="menu-item-card" bindtap="goFeedbackManage">
-        <view class="menu-item-left">
-          <text class="menu-icon">💬</text>
-          <text class="menu-title">反馈管理</text>
-        </view>
-        <text class="menu-arrow">→</text>
-      </view>
-      
       <view class="menu-item-card" bindtap="goSettings">
         <view class="menu-item-left">
           <text class="menu-icon">⚙️</text>
           <text class="menu-title">设置</text>
-        </view>
-        <text class="menu-arrow">→</text>
-      </view>
-      
-      <view class="menu-item-card" bindtap="goFeedback">
-        <view class="menu-item-left">
-          <text class="menu-icon">💬</text>
-          <text class="menu-title">意见反馈</text>
         </view>
         <text class="menu-arrow">→</text>
       </view>

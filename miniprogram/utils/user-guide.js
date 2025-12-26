@@ -120,7 +120,7 @@ class UserGuide {
             },
             ai: {
                 title: '🤖 AI功能',
-                content: '智能面试助手\n\n• 岗位分析和预测\n• 简历智能解读\n• 情绪支持小屋\n• 需要会员权限'
+                content: '智能面试助手\n\n• 简历智能解读\n• 需要会员权限'
             }
         }
 
