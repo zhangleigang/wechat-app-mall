@@ -161,10 +161,10 @@
     </van-button>
   </view>
 
-  <!-- 添加自定义问题按钮（悬浮） -->
-  <view class="add-question-fab" wx:if="{{isLogined}}" bindtap="showAddQuestionModal">
+  <!-- 添加自定义问题按钮（悬浮） - 已隐藏 -->
+  <!-- <view class="add-question-fab" wx:if="{{isLogined}}" bindtap="showAddQuestionModal">
     <van-icon name="plus" size="24px" color="#fff" />
-  </view>
+  </view> -->
 
   <!-- 添加问题弹窗 -->
   <add-question-modal

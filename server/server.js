@@ -36,6 +36,7 @@ const resumeRoutes = require('./src/routes/resume');
 const favoritesRoutes = require('./src/routes/favorites');
 const feedbackRoutes = require('./src/routes/feedback');
 const wechatPaymentRoutes = require('./src/routes/wechat-payment');
+const groupBuyRoutes = require('./src/routes/group-buy');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/member', memberRoutes);
@@ -47,6 +48,7 @@ app.use('/api/resume', resumeRoutes);
 app.use('/api/favorites', favoritesRoutes);
 app.use('/api/feedback', feedbackRoutes);
 app.use('/api/wechat-payment', wechatPaymentRoutes);
+app.use('/api/group-buy', groupBuyRoutes);
 
 // ============ 健康检查 ============
 app.get('/health', (req, res) => {

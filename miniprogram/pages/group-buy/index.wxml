@@ -1,0 +1,100 @@
+<view class="container">
+  <!-- 分类 Tabs -->
+  <view class="category-tabs">
+    <van-tabs active="{{ activeCategory }}" bind:change="onCategoryChange" ellipsis="{{ false }}" line-width="24">
+      <van-tab wx:for="{{ categories }}" wx:key="*this" title="{{ item }}" name="{{ item }}"></van-tab>
+    </van-tabs>
+  </view>
+
+  <view class="wishlist-entry">
+    <van-button size="small" plain type="info" bind:click="goWishlist">我的心愿单</van-button>
+  </view>
+
+  <!-- 商品列表 -->
+  <view class="product-list">
+    <block wx:if="{{ products.length > 0 }}">
+      <view class="product-item" wx:for="{{ products }}" wx:key="id">
+        <van-card
+          custom-class="product-card"
+          num="意向: {{ item.intention_count }}"
+          price="{{ item.jd_price }}"
+          title="{{ item.title }}"
+          thumb="{{ item.image }}"
+          lazy-load
+        >
+          <view slot="desc">
+            <view class="category-line">
+              <van-tag type="primary" plain="{{ true }}" size="small">{{ item.category || '其他' }}</van-tag>
+            </view>
+            <view class="room-desc">发布者: {{ item.room_no }}</view>
+            <view class="time-desc">{{ item.created_at_format }}</view>
+          </view>
+        </van-card>
+        
+        <!-- 操作与意向区域（默认展开） -->
+        <view class="detail-area">
+          <view class="detail-actions">
+            <van-button custom-class="detail-action-btn" type="danger" round bind:click="goToJD" data-sku="{{ item.jd_sku_id }}">京东详情</van-button>
+            <van-button custom-class="detail-action-btn" type="primary" round bind:click="showIntentionModal" data-id="{{ item.id }}">我也想要</van-button>
+          </view>
+          
+          <!-- 意向列表 -->
+          <view class="intentions-box">
+            <view class="intentions-header">
+              <text>意向邻居 ({{ item.intentions ? item.intentions.length : 0 }})</text>
+              <van-button custom-class="intentions-copy-btn" size="mini" plain type="info" bind:click="copyIntentions" data-id="{{ item.id }}" disabled="{{ !item.intentions || item.intentions.length === 0 }}">一键复制</van-button>
+            </view>
+            <view class="intentions-list" wx:if="{{ item.intentions && item.intentions.length > 0 }}">
+              <van-tag class="intention-tag" type="primary" plain="{{ true }}" size="small" wx:for="{{ item.intentions }}" wx:key="id" wx:for-item="intention">
+                {{ intention.room_no }}
+              </van-tag>
+            </view>
+            <view class="intentions-empty" wx:else>暂无意向邻居</view>
+          </view>
+        </view>
+      </view>
+    </block>
+    <van-empty wx:else description="暂无团购商品" />
+  </view>
+
+  <!-- 登记意向弹窗 -->
+  <van-popup show="{{ showIntention }}" position="bottom" custom-style="height: 50%;" bind:close="closeIntentionModal" round closeable>
+    <view class="popup-container">
+      <view class="popup-title">登记意向</view>
+      <view class="step-box">
+        <view class="room-input-group">
+          <view class="room-input-label">您的房号：</view>
+          <view class="room-inputs">
+            <view class="picker-box" bindtap="showUnitPicker">
+              <text>{{ selectedUnit ? selectedUnit + '栋/单元' : '选择栋' }}</text>
+              <van-icon name="arrow-down" />
+            </view>
+            <text class="separator">-</text>
+            <input class="room-number-input" type="number" placeholder="房号(如2002)" value="{{ roomNumber }}" bindinput="onRoomNumberChange" />
+            <text class="separator">-</text>
+            <view class="picker-box" bindtap="showLayoutPicker">
+              <text>{{ selectedLayout ? selectedLayout + '户型' : '选择户型' }}</text>
+              <van-icon name="arrow-down" />
+            </view>
+          </view>
+        </view>
+        <view class="step-action" style="margin-top: 30px;">
+          <van-button type="primary" block bind:click="submitIntention" loading="{{ submitting }}">确认登记</van-button>
+        </view>
+      </view>
+    </view>
+  </van-popup>
+
+  <!-- 单元和户型选择器 (复用) -->
+  <van-popup show="{{ showPicker }}" position="bottom" bind:close="closePicker">
+    <van-picker
+      show-toolbar
+      title="{{ pickerTitle }}"
+      columns="{{ pickerColumns }}"
+      bind:cancel="closePicker"
+      bind:confirm="onPickerConfirm"
+    />
+  </van-popup>
+
+  <van-toast id="van-toast" />
+</view>

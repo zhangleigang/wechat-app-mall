@@ -9,7 +9,9 @@
     "pages/my/setting",
     "pages/guide/index",
     "pages/login/simple",
-    "pages/admin/users/index"
+    "pages/admin/users/index",
+    "pages/group-buy/index",
+    "pages/wishlist/index"
   ],
   "requiredPrivateInfos": [],
   "subpackages": [],
@@ -31,12 +33,6 @@
         "iconPath": "images/nav/fl-off.png",
         "selectedIconPath": "images/nav/fl-on.png",
         "text": "面试知识"
-      },
-      {
-        "pagePath": "pages/ai/resume/index",
-        "iconPath": "images/nav/order-off.png",
-        "selectedIconPath": "images/nav/order-on.png",
-        "text": "简历解读"
       },
       {
         "pagePath": "pages/favorites/index",

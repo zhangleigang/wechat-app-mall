@@ -1,0 +1,39 @@
+<view class="container">
+  <view class="summary">
+    <view class="summary-left">
+      <view class="summary-title">我的心愿单</view>
+      <view class="summary-sub">共 {{ count }} 件</view>
+    </view>
+    <view class="summary-right">
+      <view class="summary-label">合计</view>
+      <view class="summary-price">¥{{ totalPrice }}</view>
+    </view>
+  </view>
+
+  <view class="product-list">
+    <block wx:if="{{ items.length > 0 }}">
+      <view class="product-item" wx:for="{{ items }}" wx:key="id">
+        <van-card
+          custom-class="product-card"
+          num="意向: {{ item.intention_count }}"
+          price="{{ item.jd_price }}"
+          title="{{ item.title }}"
+          thumb="{{ item.image }}"
+          lazy-load
+        >
+          <view slot="desc">
+            <view class="category-line">
+              <van-tag type="primary" plain="{{ true }}" size="small">{{ item.category || '其他' }}</van-tag>
+            </view>
+            <view class="room-desc">发布者: {{ item.room_no }}</view>
+          </view>
+        </van-card>
+
+        <view class="actions">
+          <van-button custom-class="action-btn" type="danger" round bind:click="goToJD" data-sku="{{ item.jd_sku_id }}">京东详情</van-button>
+        </view>
+      </view>
+    </block>
+    <van-empty wx:else description="暂无心愿商品" />
+  </view>
+</view>
